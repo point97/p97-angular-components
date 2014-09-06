@@ -12,3 +12,7 @@ Each components is contained in a directory strucuted as follows
 -- templates/
 ```
    
+
+# Candidates
+- RadioGrid question type (currently in viewpoint from OFR)
+- Coordinate conversion functions (currently in viewpoint in zoomto from OFR)
