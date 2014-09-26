@@ -71,7 +71,7 @@ angular.module('vpApi.services', [])
     res = _.find(surveys, function(survey){
       return (survey[field] === value);
     });
-    return res;
+    return res || [];
   }
 
 
@@ -81,6 +81,5 @@ angular.module('vpApi.services', [])
 
   }
 }]);
-
 
 
