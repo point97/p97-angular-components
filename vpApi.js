@@ -1,9 +1,7 @@
 angular.module('starter.services', [])
 
-.factory( 'vpApi', ['$http', function($http) {
+.factory( 'vpApi', ['$http', 'Survey', function($http, Survey) {
   
-
-
   var user = {username:null,
               token:null,
               profile:null,
@@ -44,6 +42,7 @@ angular.module('starter.services', [])
     var url = apiBase + resource + '/';
     var config = {headers: {'Authorization':'Token ' + user.token}};
     $http.get(url, config).success(function(data, status){
+      Survey.load(data);
       success(data, status);
     })
     .error(function(data, status){
@@ -59,4 +58,29 @@ angular.module('starter.services', [])
 
       fetch:fetch,
   };
+}])
+
+.factory( 'Survey', ['$resource', function($resource) {
+
+  var surveys = [];
+  function load(data){
+    surveys = data;
+  }
+
+  function getBySlug(field, value){
+    res = _.find(surveys, function(survey){
+      return (survey[field] === value);
+    });
+    return res;
+  }
+
+
+  return {
+    load:load,
+    get:getBySlug,
+
+  }
 }]);
+
+
+
