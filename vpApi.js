@@ -1,4 +1,4 @@
-angular.module('starter.services', [])
+angular.module('vpApi.services', [])
 
 .factory( 'vpApi', ['$http', 'Survey', function($http, Survey) {
   
