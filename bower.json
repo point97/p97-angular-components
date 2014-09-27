@@ -1,0 +1,26 @@
+{
+  "name": "p97-angular-components",
+  "version": "0.1.0",
+  "homepage": "https://github.com/point97/p97-angular-components",
+  "authors": [
+    "Wil Black <wil@pointnineseven.com>"
+  ],
+  "description": "A collection of Angular components to be used with the Viewpoint 2 API",
+  "main": "dist/p97components.js",
+  "keywords": [
+    "angular",
+    "p97",
+    "viewpoint"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "src",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "LICENSE",
+    "README.md",
+  ]
+}
