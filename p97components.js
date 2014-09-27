@@ -1,6 +1,6 @@
 angular.module('vpApi.services', [])
 
-.factory( 'vpApi', ['$http', 'Survey', function($http, Survey) {
+.factory( 'vpApi', ['$http', function($http) {
   
   var user = {username:null,
               token:null,
@@ -42,7 +42,21 @@ angular.module('vpApi.services', [])
     var url = apiBase + resource + '/';
     var config = {headers: {'Authorization':'Token ' + user.token}};
     $http.get(url, config).success(function(data, status){
-      Survey.load(data);
+      success(data, status);
+    })
+    .error(function(data, status){
+      fail(data, status);
+    });
+  }
+
+  function post(resource, data, success, fail){
+    var url = apiBase + resource + '/';
+    var config = {headers: {'Authorization':'Token ' + user.token}};
+    $http({url:url,
+          method:'POST',
+          data: data,
+          headers: {'Authorization':'Token ' + user.token}
+    }).success(function(data, status){
       success(data, status);
     })
     .error(function(data, status){
@@ -57,19 +71,31 @@ angular.module('vpApi.services', [])
       user:user,
 
       fetch:fetch,
+      post:post
   };
 }])
 
-.factory( 'Survey', ['$resource', function($resource) {
+.factory( 'FormStack', ['vpApi', function(vpApi) {
 
-  var surveys = [];
-  function load(data){
-    surveys = data;
+  var resource_name = 'pforms/formstack';
+  var objects = [];
+  
+  function load(successCallback){
+    vpApi.fetch(resource_name, {}, function(data, status){
+      objects = data;
+      successCallback(data, status)
+    },
+    function(data, status){
+      console.log("Failed to fetch " + resource_name + ". Returned Status: " + status);
+      console.log(data);
+    });
   }
 
+
+
   function getBySlug(field, value){
-    res = _.find(surveys, function(survey){
-      return (survey[field] === value);
+    res = _.find(objects, function(obj){
+      return (obj[field] === value);
     });
     return res || [];
   }
@@ -78,8 +104,58 @@ angular.module('vpApi.services', [])
   return {
     load:load,
     get:getBySlug,
+    objects:objects,
 
+  };
+}])
+
+.factory('Question', ['vpApi', function(vpApi){
+  var resource_name = 'pforms/question';
+  var objects = [];
+
+  function load(successCallback){
+    vpApi.fetch(resource_name, {}, function(data, status){
+      objects = data;
+      successCallback(data, status)
+    },
+    function(data, status){
+      console.log("Failed to fetch " + resource_name + ". Returned Status: " + status);
+      console.log(data);
+    });
   }
+
+  function create(data, callback) {
+    vpApi.post(resource_name, data, function(data, status){
+      callback(data, status);
+    }, function(data, status){
+      console.log("Failed to create " + resource_name + ". Returned Status: " + status);
+      console.log(data);
+      callback(data, status);
+
+    });
+  };
+
+  function getBySlug(field, value){
+    res = _.find(objects, function(obj){
+      return (obj[field] === value);
+    });
+    return res || [];
+  }
+
+  function cleanData(data){
+    data.options = {'placeholder':''};
+    data.type = parseInt(data.type);
+    return data;
+  }
+
+  return {
+    load:load,
+    create:create,
+    get:getBySlug,
+    objects:objects,
+    cleanData:cleanData
+  };
+
 }]);
 
 
