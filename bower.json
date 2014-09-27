@@ -6,7 +6,7 @@
     "Wil Black <wil@pointnineseven.com>"
   ],
   "description": "A collection of Angular components to be used with the Viewpoint 2 API",
-  "main": "dist/p97components.js",
+  "main": "p97components.js",
   "keywords": [
     "angular",
     "p97",
