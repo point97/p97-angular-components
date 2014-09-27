@@ -20,6 +20,11 @@ This will install a directory named `p97-angular-components` containing p97compo
 <script src="PATH_TO_JS_LIB/p97-angular-components/p97components.js"></script>
 ```
 
+To update an existing installation use
+```
+bower install p97-angular-components --save
+```
+
 
 ##Developer
 
