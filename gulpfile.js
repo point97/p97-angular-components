@@ -19,9 +19,11 @@ var QUESTION_TYPES = [
 gulp.task('question-types', function() {
     
     var js_srcs = _.map(QUESTION_TYPES, function(type){
-        return "src/question-types/"+type+'/*.js';
+        return "example/app/scripts/p97-components/src/question-types/"+type+'/*.js';
     });
 
+    // Prepend the module.js file.
+    js_srcs.unshift("example/app/scripts/p97-components/src/question-types/module.js");
     gulp.src(js_srcs)
    
     // This will output the non-minified version
