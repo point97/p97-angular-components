@@ -34,10 +34,24 @@ bower install p97-angular-components --save
 
 ##Developer
 
-CLone repo and run 
+### Getting started
+THIS SECTION IS INCOMPLETE
+Clone repo and run 
 ```
 npm install
 ```
+
+### Creating Question Types
+
+All directives must accept question and answer objects. Options for the question will be defined
+in question.options.
+
+All directives must record their answers in an answer object. Answer objects have the following
+keywords
+
+* value - A the actaull answer that is recorded. This could be a JSON object. 
+* verbose (optional) - A human readable name to display as the answer.
+
 
 ##Example
 There is an example application used for testing and a tutorial located in `examples/`

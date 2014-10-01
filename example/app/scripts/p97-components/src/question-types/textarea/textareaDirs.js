@@ -15,7 +15,6 @@ angular.module('p97.questionTypes', [])  // All p97 components should be under p
         },
         link: function(scope, element, attrs) {
             console.log("I made it to textarea link function");
-            console.log(scope.question)
         }
     }
 });
