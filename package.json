@@ -1,0 +1,29 @@
+{
+  "name": "p97-components",
+  "version": "1.2.0",
+  "description": "P97 common components for Viewpoint",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "~3.8.8"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.8",
+    "gulp-rename": "^1.2.0",
+    "gulp-uglify": "^1.0.1",
+    "gulp-concat": "^2.4.1",
+    "underscore": "^1.7.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/point97/p97-angular-components.git"
+  },
+  "author": "Wil Black <wil@pointninesevne.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/point97/p97-angular-components/issues"
+  },
+  "homepage": "https://github.com/point97/p97-angular-components"
+}

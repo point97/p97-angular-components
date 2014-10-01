@@ -1,12 +1,12 @@
 {
-  "name": "p97-angular-components",
-  "version": "0.1.4",
+  "name": "p97-components",
+  "version": "0.2.4",
   "homepage": "https://github.com/point97/p97-angular-components",
   "authors": [
     "Wil Black <wil@pointnineseven.com>"
   ],
-  "description": "A collection of Angular components to be used with the Viewpoint 2 API",
-  "main": "p97components.js",
+  "description": "A collection of Javscript (mostly angular) components to be used with the Viewpoint 2 API",
+  "main": "dist/",
   "keywords": [
     "angular",
     "p97",
@@ -21,6 +21,9 @@
     "test",
     "tests",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "gulpfile.js",
+    "package.json",
+    "example"
   ]
 }
