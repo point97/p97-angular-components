@@ -33,7 +33,12 @@ angular.module('exampleApp')
             "label": "enter a number",
             "type": "number",
             "options": {"required": true}
-        }],
+        },{
+            "body": "This textarea 2",
+            "label": "enter a something",
+            "type": "textarea",
+            "options": {"required": true}
+        }]
     };
 
     //Create empty answers array (one for each question)

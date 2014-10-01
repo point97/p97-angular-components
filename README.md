@@ -70,7 +70,7 @@ If you get a compass error try
 
 ```
 sudo gem update --system
-gem install sass
-gem install compass
+sudo gem install sass
+sudo gem install compass
 ```
 
