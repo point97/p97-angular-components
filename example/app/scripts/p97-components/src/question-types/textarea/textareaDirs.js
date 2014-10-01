@@ -1,6 +1,6 @@
 // textarea directives.js
 
-angular.module('p97.questionTypes', [])  // All p97 components should be under p97.
+angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('textarea', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
