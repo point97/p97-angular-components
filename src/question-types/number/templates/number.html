@@ -1,0 +1,11 @@
+<input
+      name="integerAnswer"
+      ng-model="data.answer"
+      ng-change="isNumberValid(data.answer)"
+      placeholder="{{ question.label }}"
+      type="number"
+      min="{{options.integer_min}}"
+      max="{{options.integer_max}}"
+      step=""
+      required
+/>
