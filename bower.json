@@ -1,6 +1,6 @@
 {
   "name": "p97-components",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "homepage": "https://github.com/point97/p97-angular-components",
   "authors": [
     "Wil Black <wil@pointnineseven.com>"
@@ -21,6 +21,8 @@
     "test",
     "tests",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "gulpfile.js",
+    "package.json"
   ]
 }
