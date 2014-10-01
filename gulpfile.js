@@ -3,10 +3,13 @@
 var gulp = require('gulp');
 var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
+var concat = require('gulp-concat');
 
-var DEST = 'question-types.js';
+var DEST = 'dist/';
 
-gulp.task('default', function() {
+
+
+gulp.task('question-types', function() {
     return gulp.src(['src/question-types/number/*.js',
                      'src/question-types/yes-no/*.js',
                      'src/question-types/textarea/*.js',
@@ -14,9 +17,25 @@ gulp.task('default', function() {
    
     // This will output the non-minified version
     .pipe(concat('question-types.js'))
-    .pip(gulp.dest(DEST))
+    .pipe(gulp.dest(DEST))
     // This will minify and rename to foo.min.js
     .pipe(uglify())
     .pipe(rename({ extname: '.min.js' }))
     .pipe(gulp.dest(DEST));
+});
+
+gulp.task('viewpoint2', function() {
+    return gulp.src(['src/viewpoint2/*.js'])
+   
+    // This will output the non-minified version
+    .pipe(concat('p97-components.js'))
+    .pipe(gulp.dest(DEST))
+    // This will minify and rename to foo.min.js
+    .pipe(uglify())
+    .pipe(rename({ extname: '.min.js' }))
+    .pipe(gulp.dest(DEST));
+});
+
+gulp.task('default', ['question-types', 'viewpoint2'], function() {
+
 });
