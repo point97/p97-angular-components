@@ -41,3 +41,4 @@ Each question type directive will have the following methods available.
 
 * **validate_answer(answer)**
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
+
