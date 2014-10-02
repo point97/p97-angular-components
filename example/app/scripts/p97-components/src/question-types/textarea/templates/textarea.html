@@ -1,13 +1,12 @@
 <div class="p97-textarea">
     <div>{{question.body}}</div>
-    <form name="myForm">
         <textarea 
-                  name='field'
                   placeholder="{{ question.label }}" 
-                  ng-model="answer" 
-                  ng-required='question.options.required' >
-        </textarea>
-    <span class="error" ng-show="myForm.field.$error.required">This field is required</span>
-    </form>
-    
+                  ng-model="value" 
+                  ng-required='question.options.required'
+                  ng-class="{'error':errors.length>0}"
+        ></textarea>
+        <div ng-show='question.options.show_word_count' class="small">{{value.split(' ').length || 0 }} words</div>
+        <div ng-show='question.options.show_char_count' class="small">{{value.length || 0 }} characters</div>
+        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
 </div>

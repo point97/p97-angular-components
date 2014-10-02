@@ -6,8 +6,13 @@
     <h2>Question Types</h2>
 
     <div>
+      <div>
       <h3>textarea</h3>
-      <div textarea question="current.block.questions[0]" answer="current.block.answers[0].value"></div>
+      <div textarea 
+           question="current.block.questions[0]" 
+           value="current.block.answers[0].value"
+           control="current.block.answers[0].form">
+      </div>
     </div>
 
     <div>
@@ -25,19 +30,17 @@
       <div number 
            question="current.block.questions[3]" 
            value="current.block.answers[3].value"
-           control="numberControl">
+           control="current.block.answers[3].form">
       </div>
     </div>
 
-    <div>
-      <h3>textarea 2</h3>
-      <div textarea question="current.block.questions[4]" answer="current.block.answers[4].value"></div>
-    </div>
+
 </div>
 
 <div>
   <div>
     <button ng-click='saveBlockCallback()' class="button button-positive">Save</button>
+    <span>{{current.block.message}}</span>
   </div>
 </div>
 

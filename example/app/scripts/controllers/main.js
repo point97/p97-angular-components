@@ -22,7 +22,13 @@ angular.module('exampleApp')
             "label": "how are you?",
             "slug": "how-are-you",
             "type": "textarea",
-            "options": {"required": true}
+            "options": {
+                "required": true,
+                "min_word": 3,
+                "max_word": 10,
+                "show_word_count":true,
+                "show_char_count":true
+            }
         },{
             "body": "When did that happen?",
             "label": "select a date and time",
@@ -43,11 +49,6 @@ angular.module('exampleApp')
                 "min": 1,
                 "max": 10
             }
-        },{
-            "body": "This textarea 2",
-            "label": "enter a something",
-            "type": "textarea",
-            "options": {"required": true}
         }]
     };
 
@@ -55,19 +56,38 @@ angular.module('exampleApp')
     $scope.loadAnswersForBlock = function(block) {
         // This function belings on the block controller.
         $scope.current.block.answers = _.map(block.questions, function(q){
-            return {'verbose':'', value:null};
+            return {'verbose':'', value:null, form:{}};
         });
+
     };
+    $scope.loadAnswersForBlock($scope.current.block);
 
     // Save button callback
     $scope.saveBlockCallback = function(){
+        
         // clean_data
-        var is_valid = $scope.numberControl.validate_answer();
-        console.log("is valid:" + is_valid);
-        // Validate data
+        var isBlockValid = true;
+        _.each($scope.current.block.answers, function(answer){
+            try {
+                answer.form.clean_answer();
+                var isValid = answer.form.validate_answer();
+                if (!isValid){
+                    isBlockValid = false;
+                }
+            } catch(err) {
+                console.log(err)
+                console.log(answer)
+            }
+            
+        });
 
+        if (isBlockValid){
+            $scope.current.block.message = 'Block Saved.';
+        } else {
+            $scope.current.block.message = 'There are some errors.';
+        }
     };
 
-    $scope.loadAnswersForBlock($scope.current.block);
+    
 
   });

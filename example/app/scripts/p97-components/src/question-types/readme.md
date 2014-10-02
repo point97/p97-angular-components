@@ -28,4 +28,6 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 
 * **yes-no**
  options
- * defa
+ * default
+
+
