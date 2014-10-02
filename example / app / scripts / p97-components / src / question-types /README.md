@@ -33,9 +33,26 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
  * default
 
 
-## Question Methods
-Each question type directive will have the following methods available. 
 
+## Question Type Directives
+The scope takes three objects. 
+
+ * question - This is a Viewpoint question object. Validation options are kept in `question.objects`
+ 
+ * value - The actual raw value to record. This could be a string, a number, of a JSON object
+ 
+ * control - The handle to attach function to you want exposed in the parent Controller.
+ 
+```
+scope: {
+            question: '=', 
+            value: '=',
+            control: '='
+        },
+```
+
+### Question Methods
+Each question type directive will have the following methods available. These are attached to the `control` object passed into the directive and are then available to the Controller.
 
 
 * **clean_answer(answer)**
@@ -44,4 +61,3 @@ Each question type directive will have the following methods available.
 * **validate_answer(answer)**
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
-
