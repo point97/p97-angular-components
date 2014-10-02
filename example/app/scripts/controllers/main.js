@@ -10,12 +10,17 @@
 angular.module('exampleApp')
   .controller('MainCtrl', function ($scope) {
     
+
+    $scope.numberControl = {};
+
+
     $scope.current = {};
     $scope.current.form = {};
     $scope.current.block = {
         questions: [{
             "body": "how are you doing?",
             "label": "how are you?",
+            "slug": "how-are-you",
             "type": "textarea",
             "options": {"required": true}
         },{
@@ -32,7 +37,12 @@ angular.module('exampleApp')
             "body": "This is a number question. I can be a decimal. Enter a number between 1 and 10",
             "label": "enter a number",
             "type": "number",
-            "options": {"required": true}
+            "slug": "num",
+            "options": {
+                "required": true,
+                "min": 1,
+                "max": 10
+            }
         },{
             "body": "This textarea 2",
             "label": "enter a something",
@@ -47,6 +57,15 @@ angular.module('exampleApp')
         $scope.current.block.answers = _.map(block.questions, function(q){
             return {'verbose':'', value:null};
         });
+    };
+
+    // Save button callback
+    $scope.saveBlockCallback = function(){
+        // clean_data
+        var is_valid = $scope.numberControl.validate_answer();
+        console.log("is valid:" + is_valid);
+        // Validate data
+
     };
 
     $scope.loadAnswersForBlock($scope.current.block);

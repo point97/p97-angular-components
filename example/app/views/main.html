@@ -3,35 +3,45 @@
 </div>
 
 <div class="row">
-  <h2>Question Types</h2>
-  
-  <div>
-    <h3>textarea</h3>
-    <div textarea question="current.block.questions[0]" answer="current.block.answers[0].value"></div>
-  </div>
-
-  <div>
-    <h3>datetime</h3>
-    <div datetime question="current.block.questions[1]" answer="current.block.answers[1].value"></div>
-  </div>
+    <h2>Question Types</h2>
 
     <div>
-    <h3>yes-no</h3>
-    <div yes-no question="current.block.questions[2]" answer="current.block.answers[2].value"></div>
-  </div>
+      <h3>textarea</h3>
+      <div textarea question="current.block.questions[0]" answer="current.block.answers[0].value"></div>
+    </div>
 
-  <div>
-    <h3>number</h3>
-    <div number question="current.block.questions[3]" answer="current.block.answers[3].value"></div>
-  </div>
+    <div>
+      <h3>datetime</h3>
+      <div datetime question="current.block.questions[1]" answer="current.block.answers[1].value"></div>
+    </div>
 
-  <div>
-    <h3>textarea 2</h3>
-    <div textarea question="current.block.questions[4]" answer="current.block.answers[4].value"></div>
-  </div>
+    <div>
+      <h3>yes-no</h3>
+      <div yes-no question="current.block.questions[2]" answer="current.block.answers[2].value"></div>
+    </div>
 
+    <div>
+      <h3>number</h3>
+      <div number 
+           question="current.block.questions[3]" 
+           value="current.block.answers[3].value"
+           control="numberControl">
+      </div>
+    </div>
+
+    <div>
+      <h3>textarea 2</h3>
+      <div textarea question="current.block.questions[4]" answer="current.block.answers[4].value"></div>
+    </div>
 </div>
+
 <div>
+  <div>
+    <button ng-click='saveBlockCallback()' class="button button-positive">Save</button>
+  </div>
+</div>
+
+<div class="row">
   <h3>Block Answers JSON</h3>
   <div>
     {{current.block.answers}}
