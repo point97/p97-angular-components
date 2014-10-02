@@ -1,0 +1,14 @@
+<div class="p97-components">
+    <div>{{question.body}}</div>
+    <label class="toggle">
+       {{question.label}}
+       <input type="checkbox" 
+              ng-model='value'
+              ng-class="{'error':errors.length>0}">
+       
+       <div class="track">
+         <div class="handle"></div>
+       </div>
+    </label>
+    <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+</div>

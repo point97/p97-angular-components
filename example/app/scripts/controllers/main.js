@@ -31,11 +31,11 @@ angular.module('exampleApp')
             }
         },{
             "body": "When did that happen?",
-            "label": "mm/dd/yyyy",
+            "label": "mm/dd/yyyy hh:mm:ss",
             "type": "datetime",
             "options": {
                 "required": true,
-                "datejs_format": "MM/dd/yyyy"
+                "datejs_format": "MM/dd/yyyy hh:mm:ss"
             }
         },{
             "body": "This is a yes-no question. Do you like cheese?",

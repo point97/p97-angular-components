@@ -37,7 +37,9 @@ gulp.task('question-types', function() {
 
     // Copy HMTL templates to dist/templates
     var templates_srcs = _.map(QUESTION_TYPES, function(type){
-        return "src/question-types/"+type+'/templates/*.html';
+        // return "src/question-types/"+type+'/templates/*.html';
+        return 'example/app/scripts/p97-components/src/**/'+ type+'/templates/*.html';
+
     });
 
     gulp.src(templates_srcs)
