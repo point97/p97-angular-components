@@ -25,6 +25,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * max_word
   * min_char
   * max_char
+  * show_word_count
+  * show_char_count
 
 * **yes-no**
  options
@@ -40,4 +42,6 @@ Each question type directive will have the following methods available.
   Use this method to do any sort of pre-processing of data before passing it on to validate_answer(). For example hidden fields or computed fields that depend on related field's data. 
 
 * **validate_answer(answer)**
+  Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
+
