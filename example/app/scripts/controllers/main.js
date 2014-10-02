@@ -31,9 +31,12 @@ angular.module('exampleApp')
             }
         },{
             "body": "When did that happen?",
-            "label": "select a date and time",
+            "label": "mm/dd/yyyy",
             "type": "datetime",
-            "options": {"required": true}
+            "options": {
+                "required": true,
+                "datejs_format": "MM/dd/yyyy"
+            }
         },{
             "body": "This is a yes-no question. Do you like cheese?",
             "label": "do you like cheese",

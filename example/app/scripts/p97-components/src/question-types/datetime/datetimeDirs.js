@@ -22,15 +22,18 @@ angular.module('p97.questionTypes')
             
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
-            
             scope.internalControl.validate_answer = function(){
                 // 
                 scope.errors = [];
-                // if (options.min && typeof(options.min === 'number')) {
-                //     if (scope.value < options.min){
-                //         scope.errors.push('value must not be less than ' + options.min);
-                //     }
-                // }
+                var dateObj = Date.parseExact(scope.value, options.datejs_format)
+
+                // if required check for a valid date.
+
+                if (options.required && options.required === true) {
+                    if(!dateObj){
+                        scope.errors.push('A date and time is required.');
+                    }
+                }
 
                 // if (options.max && typeof(options.max === 'number')) {
                 //     if (scope.value > options.max){
