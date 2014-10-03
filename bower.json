@@ -1,6 +1,6 @@
 {
   "name": "p97-components",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "homepage": "https://github.com/point97/p97-angular-components",
   "authors": [
     "Wil Black <wil@pointnineseven.com>"
@@ -25,5 +25,9 @@
     "gulpfile.js",
     "package.json",
     "example"
-  ]
+  ],
+  "dependencies": {
+    "underscore": "~1.7.0",
+    "datejs": "~1.0.0-rc1"
+  },
 }
