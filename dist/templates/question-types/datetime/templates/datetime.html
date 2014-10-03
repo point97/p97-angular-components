@@ -1,0 +1,10 @@
+<div class="p97-datetime">
+    <div>{{question.body}}</div>
+    <input type="datetime" 
+           placeholder="{{ question.label }}" 
+           ng-model="value"
+           ng-required='question.options.required'
+           ng-class="{'error':errors.length>0}"
+           />
+    <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+</div>
