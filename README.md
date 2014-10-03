@@ -1,5 +1,5 @@
 
-# p97-angular-components
+# p97-components
 
 A collection of angular component used by Point 97.
 
@@ -8,9 +8,6 @@ Each components is contained in a directory strucuted as follows
 ##Installation
 
 ```
-
-bower install p97-components
-
 # Save to dependencies
 bower install p97-components --save
 
@@ -29,7 +26,7 @@ This will install a directory named `p97-components` containing
 
 To update an existing installation use
 ```
-bower install p97-angular-components --save
+bower install p97-components --save
 ```
 
 
