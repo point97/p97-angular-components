@@ -115,6 +115,16 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 
 ### Making Question Type Components
 
+There are several steps required to make a new question type directive but here is a breif outline.
+
+1. Make a new directory named `src/question-types/my-awesome-directive/`
+
+1. Write the directive and controller. Add any necessary templates to  `src/question-types/my-awesome-directive/templates`. Be sure the only values required by your directive are found in scope.quesiton. scope.value, and scope.control
+
+1. Write a karma test for the directive.
+
+1. Update the Viewpoint 2 to added the new question type and its default options.  
+
 ####Directory structure
 ```
 src/question-types/
