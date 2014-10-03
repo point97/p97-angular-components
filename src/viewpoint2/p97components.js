@@ -109,6 +109,24 @@ angular.module('vpApi.services', [])
   };
 }])
 
+.factory( 'Form', ['vpApi', function(vpApi) {
+
+  var objects = [];
+
+  function getById(forms, field, value){
+    console.log("getById")
+    res = _.find(forms, function(obj){
+      return (obj[field] == value);
+    });
+    return res || [];
+  }
+
+  return {
+    get:getById,
+    objects:objects
+  };
+}])
+
 .factory('Question', ['vpApi', function(vpApi){
   var resource_name = 'pforms/question';
   var objects = [];
