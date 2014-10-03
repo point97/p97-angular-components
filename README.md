@@ -137,7 +137,7 @@ src/question-types/
 #### Directive Scope
 The scope takes three objects. 
 
-```
+```javascript
         // Scope should always look like this in all question types.
         scope: {
             question: '=', 
@@ -157,7 +157,7 @@ The scope takes three objects.
 ### Question Methods
 Each question type directive will have the following methods available. These are attached to the `control` object passed into the directive and are then available to the Controller.
 
-```
+```javascript
 // This is availible in the main controller.
 scope.internalControl = scope.control || {};
 scope.internalControl.validate_answer = function(){
