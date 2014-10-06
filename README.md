@@ -179,3 +179,11 @@ scope.internalControl.clean_answer = function(){
 * **validate_answer(answer)**
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
+
+
+## Testing
+
+I am following https://github.com/karma-runner/karma-ng-html2js-preprocessor
+
+And here
+http://angular-tips.com/blog/2014/06/introduction-to-unit-test-directives/
