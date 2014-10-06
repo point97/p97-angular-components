@@ -116,7 +116,7 @@ angular.module('vpApi.services', [])
   function getById(forms, field, value){
     console.log("getById")
     res = _.find(forms, function(obj){
-      return (obj[field] == value);
+      return (obj[field] === value);
     });
     return res || [];
   }
