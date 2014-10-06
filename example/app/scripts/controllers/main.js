@@ -9,11 +9,8 @@
  */
 angular.module('exampleApp')
   .controller('MainCtrl', function ($scope) {
-    
 
     $scope.numberControl = {};
-
-
     $scope.current = {};
     $scope.current.form = {};
     $scope.current.block = {
@@ -55,6 +52,16 @@ angular.module('exampleApp')
         }]
     };
 
+    $scope.getQuestionIndexBySlug = function(slug){
+        var question = _.find($scope.current.block.questions, function(question){
+            return (question.slug === slug);
+        });
+        return _.indexOf($scope.current.block.questions, question);
+
+    };
+
+    $scope.current.block.answers = [];
+
     //Create empty answers array (one for each question)
     $scope.loadAnswersForBlock = function(block) {
         // This function belings on the block controller.
@@ -78,8 +85,8 @@ angular.module('exampleApp')
                     isBlockValid = false;
                 }
             } catch(err) {
-                console.log(err)
-                console.log(answer)
+                console.log(err);
+                console.log(answer);
             }
             
         });
@@ -90,7 +97,5 @@ angular.module('exampleApp')
             $scope.current.block.message = 'There are some errors.';
         }
     };
-
-    
 
   });
