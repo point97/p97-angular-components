@@ -11,6 +11,8 @@ angular.module('vpApi.services', [])
   }
   var apiBase = 'http://localhost:8000/api/v2/';
 
+
+
   function login(data, success_callback, error_callback) { 
     /*
     Inputs:
@@ -70,43 +72,62 @@ angular.module('vpApi.services', [])
       authenticate:login,
       user:user,
 
+
       fetch:fetch,
       post:post
   };
 }])
 
-.factory( 'FormStack', ['vpApi', function(vpApi) {
+.service('$formstack', ['vpApi', '$localStorage', function(vpApi, $localStorage) {
+  var obj = this;
+  this.resource_name = 'pforms/formstack';
+  this.objects = [];
 
-  var resource_name = 'pforms/formstack';
-  var objects = [];
-  
-  function load(successCallback){
-    vpApi.fetch(resource_name, {}, function(data, status){
-      objects = data;
-      successCallback(data, status)
+
+  this.loadBySlug = function(slug, successCallback){
+    /*
+    Get the formstack from the VP2 server. 
+    */
+    vpApi.fetch(this.resource_name, {'slug':slug}, function(data, status){
+      obj.objects = data;
+      console.log("[loadBySlug] got data");
+      console.log(data);
+
+      $localStorage.setObject('formstack', data[0]);
+      successCallback(data[0], status);
+
     },
     function(data, status){
-      console.log("Failed to fetch " + resource_name + ". Returned Status: " + status);
+      console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
       console.log(data);
     });
-  }
+  };
 
-
-
-  function getBySlug(field, value){
-    res = _.find(objects, function(obj){
+  this.getBySlug = function(field, value){
+    res = _.find(this.objects, function(obj){
       return (obj[field] === value);
     });
     return res || [];
   }
 
+  this.fetchUpdates = function(slug, callback){
+    /*
+    Fetches update since last times stamp.
 
-  return {
-    load:load,
-    get:getBySlug,
-    objects:objects,
+    TODO make this work, right now it just gets the formstack.
+    */
+    console.log("[fetchUpdates] getting data");
 
-  };
+    this.loadBySlug(slug, callback);
+  }
+
+  this.getFormBySlug = function(slug){
+    var form = _.find(this.objects[0].forms, function(obj){
+      return (obj.slug === slug);
+    });
+    return form;
+  }
+
 }])
 
 .factory( 'Form', ['vpApi', function(vpApi) {
@@ -174,6 +195,23 @@ angular.module('vpApi.services', [])
     cleanData:cleanData
   };
 
+}])
+
+.factory('$localStorage', ['$window', function($window) {
+  return {
+    set: function(key, value) {
+      $window.localStorage[key] = value;
+    },
+    get: function(key, defaultValue) {
+      return $window.localStorage[key] || defaultValue;
+    },
+    setObject: function(key, value) {
+      $window.localStorage[key] = JSON.stringify(value);
+    },
+    getObject: function(key) {
+      return JSON.parse($window.localStorage[key] || '{}');
+    }
+  }
 }]);
 
 
