@@ -213,5 +213,3 @@ angular.module('vpApi.services', [])
     }
   }
 }]);
-
-
