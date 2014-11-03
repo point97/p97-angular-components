@@ -29,37 +29,16 @@ To update an existing installation use
 bower install p97-components --save
 ```
 
-
-## For Developers
-
-### Getting started
-THIS SECTION IS INCOMPLETE
-Clone repo and run 
-```
-npm install
-```
-
-### Creating Question Types
-
-All directives must accept question and answer objects. Options for the question will be defined
-in question.options.
-
-All directives must record their answers in an answer object. Answer objects have the following
-keywords
-
-* value - A the actaull answer that is recorded. This could be a JSON object. 
-* verbose (optional) - A human readable name to display as the answer.
-
-
-## Example App
+---
+## The Example App
 There is an example application used for testing and a tutorial located in `examples/`
 
 This example is build on Yeoman and it's Angular generator. See http://yeoman.io/codelab/setup.html for more info. You will need Ruby installed and up-to-date, and node and npm installed and up-to-date.
 
 To run the example app
+```
 cd example/
 npm install
-```
 grunt serve
 ```
 
@@ -78,6 +57,19 @@ sudo gem install compass
 
 
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive.
+
+
+
+----
+## For Developers
+
+### Getting started
+THIS SECTION IS INCOMPLETE
+Clone repo and run 
+```
+npm install
+```
+
 
 ## Reference
 ### Question Types
@@ -114,22 +106,46 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 
 There are several steps required to make a new question type directive but here is a breif outline.
 
-1. Make a new directory named `src/question-types/my-awesome-directive/`
+1. Make a new directory named `src/viewpoint/question-types/<QUESTION-TYPE>/`. See the [directory structure below](#source-directory-structure).
 
-1. Write the directive and controller. Add any necessary templates to  `src/question-types/my-awesome-directive/templates`. Be sure the only values required by your directive are found in scope.quesiton. scope.value, and scope.control
+2. Create your directive(s)  in `src/.../<QUESTION-TYPE>/directives.js` (Do the same for the controllers is needed).  You directive should be named with the question type slug. See the [Question Type Directive](#question-type-directives) section below for a description of the scope and methods the directive must have. 
 
-1. Write a karma test for the directive.
+3. Add templates to  `src/viewpoint/question-types/<QUESTION-TYPE>/templates/<THEME-NAME>/`. The THEME-NAME for vpMarket is **ionic**. There should always be a template named `<QUESTION-TYPE>.html` if additional templates are needed, you are free to name them how you want.  
 
-1. Update the Viewpoint 2 to added the new question type and its default options.  
+4. Document the question type and all it's options in p97-angular-components README.md file (this document).
 
-####Directory structure
+4. Add your question type to the example app to test it.
+
+5. Write a Jasmine test for the directive. See the [Testing](#testing) section for this. 
+
+6. Update the Viewpoint API to add the new question type and its default options.  
+
+7. Build a new version, tag it and push the tag.  See [The Build Process](#the-build-process) for more info. 
+
+#### Source Directory structure
 ```
-src/question-types/
- -- <directive-name>/
-	 -- templates/
-	 -- controllers.js
-	 -- directives.js
+src/
+  - viewpoint/
+    - services.js
+    - question-types/
+      - <QUESTION-TYPE>/
+      - templates/
+      - theme/
+        - <QUESTION-TYPE>.html
+        - other-template.html   
+      - controllers.js
+      - directives.js
 ```
+Where `<QUESTION-TYPE>` is the slug of the question type.
+
+
+### Question Type Directives
+
+All question type directives must accept `question` ,  `value`, and `form`  (this was previously named control) on their scopes. These varaibles will then be shared  between the parent controller's scope and the directive's scope.  Options for the questions will be defined. 
+in `question.options`.
+
+All directives must record their answers to the `scope.value`.  The answer maybe a number, string, or JSON object, depending on the question type.
+
 
 #### Directive Scope
 The scope takes three objects. 
@@ -137,9 +153,9 @@ The scope takes three objects.
 ```javascript
         // Scope should always look like this in all question types.
         scope: {
-            question: '=', 
-            value: '=',
-            control: '='
+            question: '=', // question object coming from VP2 API
+            value: '=', // The place where an anser is stored.
+            form: '=' // An empty object where validation methods will be attached.
         },
 ```
 
@@ -147,43 +163,76 @@ The scope takes three objects.
  
  * **value** - The actual raw value to record. This could be a string, a number, of a JSON object
  
- * **control** - The handle to attach function to you want exposed in the parent Controller.
+ * **form** - A handle to attach methods to you want exposed in the parent controller.
  
 
-
-### Question Methods
-Each question type directive will have the following methods available. These are attached to the `control` object passed into the directive and are then available to the Controller.
+#### Question Methods
+Each question type directive will have the following methods available. These are attached to the `form` object passed into the directive and are then available to the parent controller.
 
 ```javascript
-// This is availible in the main controller.
-scope.internalControl = scope.control || {};
-scope.internalControl.validate_answer = function(){
-	scope.errors = [];
-	// Define your directive's validation here.
-	
-	// Add any error messages to errors array.
-	
-	return is_valid;  // A boolean	
+// This is available in the main controller.
+scope.internalForm = scope.form || {};
+scope.internalForm.validate_answer = function(){
+  scope.errors = []; // A list of errors to display to the user
+  // Define your directive's validation here.
+  ...
+  
+  // Add any error messages to errors array.
+  ...
+  
+  return is_valid;  // A boolean  
 }
 
+
 scope.internalControl.clean_answer = function(){
-	// Defined any data cleaning here e.g. time formats.
-	// You should do this before validating. 
-	// Acts on scope.value
+  // Defined any data cleaning here e.g. time formats.
+  // You should do this before validating. 
+  // Acts on scope.value
 };
 ```
 
 * **clean_answer(answer)**
-  Use this method to do any sort of pre-processing of data before passing it on to validate_answer(). For example hidden fields or computed fields that depend on related field's data. 
+Use this method to do any sort of pre-processing of data before passing it on to validate_answer(). For example hidden fields or computed fields that depend on related field's data. 
 
 * **validate_answer(answer)**
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
 
+### Question Type Templates
+Templates are grouped by themes. Themes usually depend on the front-end framework being used (e.g. Boostrap, Ionic, or Foundation) or platform being used, desktop vs. phonegap. 
 
+Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
+
+## The Build Process
+The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
+
+The build process is defined in `/gulpfile.js` and can be configured there. 
+
+### Distribution Directory Structure
+
+```
+dist/
+  - viewpoint/
+    - services.min.js
+    - question-types.min.js 
+    - templates/
+      - ionic/
+        - question-types/
+          - <QUESTION-TYPE>/
+            - <QUESTION-TYPE>.html
+        - other-template.html   
+
+```
+
+
+----
 ## Testing
 
 I am following https://github.com/karma-runner/karma-ng-html2js-preprocessor
 
 And here
 http://angular-tips.com/blog/2014/06/introduction-to-unit-test-directives/
+
+
+
+
