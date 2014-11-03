@@ -1,7 +1,31 @@
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', []);
-// datetime controllers.js
-// datetime directives.js
+
+angular.module('p97.questionTypes')
+  .directive( 'qtLoader', function ( $compile ) {
+    return {
+        restrict: 'E',
+        scope: { questions: '=' },
+        template: "<div class='row blocks'></div>",
+        controller: function ( $scope, $element ) {
+
+            $scope.addDirectives = function() {
+                /*
+                Dynamically inject the question type directives into the
+                DOM and then compile with Angular.
+                */
+                _.each($scope.questions, function(q, i){
+                    q.form = {};
+                    if (typeof(q.value) === 'undefined') q.value = '';
+                    var html = '<div '+q.type+' question="questions['+i+']" value="questions['+i+'].value" control="questions['+i+'].form" cid="questions['+i+'].answerCid"></div>';
+                    var el = $compile(html)($scope);
+                    $element.parent().append(el);
+                });
+            }
+            $scope.addDirectives();
+        }
+    }
+});
 
 angular.module('p97.questionTypes')
   .directive('datetime', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
@@ -17,7 +41,6 @@ angular.module('p97.questionTypes')
             control: '='
         },
         link: function(scope, element, attrs) {
-            console.log("I made it to datetime link function");
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -27,42 +50,36 @@ angular.module('p97.questionTypes')
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
                 // 
+                
                 scope.errors = [];
-                var dateObj = Date.parseExact(scope.value, options.datejs_format)
+                var format =  options.datejs_format || 'MM/dd/yyyy';
+                var dateObj = Date.parseExact(scope.value, format)
 
-                // if required check for a valid date.
+                if (options.required === true){
+                    // if required check for a valid date.
+                    if(dateObj === null){
+                        scope.errors.push('Invalid format.');
+                    }
 
-                if (options.required && options.required === true) {
-                    if(!dateObj){
-                        scope.errors.push('A date and time is required.');
+                    if(scope.value.length === 0){
+                        scope.errors.push('This field is required');
+                    }
+                } else {
+                    if(scope.value.length > 0 && dateObj === null){
+                        scope.errors.push('Invalid format.');
                     }
                 }
-
-                // if (options.max && typeof(options.max === 'number')) {
-                //     if (scope.value > options.max){
-                //         scope.errors.push('value must not be more than ' + options.max);
-                //     }
-                // }
-
-                // if (options.required && options.required === true) {
-                //     if (typeof(scope.value) !== 'number'){
-                //         scope.errors.push('A number is required.');
-                //     }
-                // }
 
                 return (scope.errors.length === 0);
             };
 
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
-                console.log('in clean_answer')
             };
             
         }
     };
 });
-// number controllers.js
-// number directives.js
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('number', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
@@ -111,8 +128,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-                // Nothing to see here.
-                console.log('in clean_answer')
+                scope.value = parseFloat(scope.value, 10);
             };
 
 
@@ -120,12 +136,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         }
     }
 });
-// textare controllers.js
-// textarea directives.js
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('textarea', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
-
 
     return {
         templateUrl: BASE_URL+'textarea/templates/textarea.html',
@@ -139,7 +152,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
             
-            console.log("I made it to textarea link function");
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -186,11 +198,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
-                console.log('in clean_answer');
             };
 
             scope.$watch('value', function(newValue){
-                if (newValue === null) return;
+                if (!newValue) return;
                 var char_count = newValue.length;
                 if (char_count === 0){
                     word_count = 0;
@@ -208,9 +219,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
     }
 });
 
-// yes-no controllers.js
-// yes-no controllers.js
-
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('yesNo', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
@@ -226,7 +234,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
-            console.log("I made it to yes-no link function");
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -236,7 +243,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = [];
                 if (options.required && options.required === true){
-                    console.log(scope.value)
                     if (scope.value === null) {
                         scope.errors.push('This field is required');
                     }
@@ -245,7 +251,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
-                console.log('in yesNo clean_answer');
                 if (scope.value === null){
                     scope.value = false;
                 }
@@ -253,3 +258,64 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         }
     }
 });
+
+
+angular.module('p97.questionTypes')
+  .directive('singleSelect', function(){
+    return {
+        templateUrl: BASE_URL+'single-select/templates/single-select.html',
+        restrict: 'EA',
+
+        // Scope should always look like this in all question types.
+        scope: {
+            question: '=', 
+            value: '=',
+            control: '='
+        },
+        link: function(scope, element, attrs) {
+            if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+            // This is availible in the main controller.
+            scope.internalControl = scope.control || {};
+            scope.internalControl.validate_answer = function(){
+                
+                return true;
+            },
+
+            scope.internalControl.clean_answer = function(){
+            }
+
+        }
+    } // end return 
+})
+
+angular.module('p97.questionTypes')
+  .directive('text', function(){
+    return {
+        templateUrl: BASE_URL+'text/templates/text.html',
+        restrict: 'EA',
+
+        // Scope should always look like this in all question types.
+        scope: {
+            question: '=', 
+            value: '=',
+            control: '='
+        },
+        link: function(scope, element, attrs) {
+            if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+            // This is availible in the main controller.
+            scope.internalControl = scope.control || {};
+            scope.internalControl.validate_answer = function(){
+                return true;
+            },
+
+            scope.internalControl.clean_answer = function(){
+                // Nothing to see here.
+            }
+
+            // scope.$watch('value', function(newVal){
+            //     scope.internalControl.isDirty = true;
+            // })
+
+        }
+    } // end return 
+})
