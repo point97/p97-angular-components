@@ -203,6 +203,7 @@ Templates are grouped by themes. Themes usually depend on the front-end framewor
 
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
 
+----
 ## The Build Process
 The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
 
@@ -223,6 +224,21 @@ dist/
         - other-template.html   
 
 ```
+
+Once you have a new version build you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 
+```
+git commit -m "Blah blah"
+git tag v0.3.12
+git push origin v0.3 --tag
+```
+
+To check your vresion, create a temporary folder and boew install it.
+```
+mkdir tmp
+cd tmp
+bower install p97-components
+```
+
 
 
 ----
