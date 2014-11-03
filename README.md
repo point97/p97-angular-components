@@ -129,12 +129,12 @@ src/
     - services.js
     - question-types/
       - <QUESTION-TYPE>/
-      - templates/
-      - theme/
-        - <QUESTION-TYPE>.html
-        - other-template.html   
-      - controllers.js
-      - directives.js
+        - templates/
+        - theme/
+          - <QUESTION-TYPE>.html
+          - other-template.html   
+        - controllers.js
+        - directives.js
 ```
 Where `<QUESTION-TYPE>` is the slug of the question type.
 
