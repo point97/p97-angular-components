@@ -54,8 +54,10 @@ sudo gem install compass
 You will need to symbolically link the `src/` directory to the example apps `scripts/p97-components/` directory. This allows you to edit the src files in one place.
 
 ```
-cd example/app/scripts/p97-components
-ln -s ln -s ../../../../src/ src
+cd example/app/scripts/
+mkdir p97-components
+cd p97-components
+ln -s ../../../../src/ src
 ```
 
 
