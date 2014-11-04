@@ -253,6 +253,14 @@ bower install p97-components
 ----
 ## Testing
 
+Test are ran through the example app. 
+
+To run tests
+```
+cd example
+grunt test
+```
+
 I am following https://github.com/karma-runner/karma-ng-html2js-preprocessor
 
 And here

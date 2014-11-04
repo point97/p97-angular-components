@@ -20,10 +20,36 @@ module.exports = function(config) {
     files: [
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
+      'bower_components/underscore/underscore-min.js',
+
+      // Our app
+      'app/scripts/p97-components/src/viewpoint/question-types/*.js',  // Get the main module
+      'app/scripts/p97-components/src/viewpoint/question-types/**/*.js', // Get all the directives and controllers
+
+      // Our templates
+      'app/scripts/p97-components/src/viewpoint/**/ionic/*.html',
+
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js'
+      'test/spec/**/*.js',
+
+      'bower_components/jquery/dist/jquery.js',
     ],
+
+    // generate js files from html templates
+    preprocessors: {
+      'app/scripts/p97-components/**/*.html': ['ng-html2js']
+    },
+
+    ngHtml2JsPreprocessor: {
+        // If your build process changes the path to your templates,
+        // use stripPrefix and prependPrefix to adjust it.
+        stripPrefix: "app/",
+
+        // the name of the Angular module to create
+        moduleName: "templates"
+    },
+
 
     // list of files / patterns to exclude
     exclude: [],
@@ -46,7 +72,8 @@ module.exports = function(config) {
     // Which plugins to enable
     plugins: [
       'karma-phantomjs-launcher',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-ng-html2js-preprocessor'
     ],
 
     // Continuous Integration mode
