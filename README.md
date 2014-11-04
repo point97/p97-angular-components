@@ -14,8 +14,8 @@ bower install p97-components --save
 ```
 
 This will install a directory named `p97-components` containing 
-* p97-componnets.js
-* p97-components.min.js
+* services.js
+* services.min.js
 * question-types.js
 * question-types.min.js
 * templates/
