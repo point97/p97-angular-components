@@ -31,7 +31,7 @@ angular.module('p97.questionTypes')
   .directive('datetime', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
-        templateUrl: BASE_URL+'datetime/templates/datetime.html',
+        templateUrl: BASE_URL+'datetime/templates/'+TEMPLATE_THEME+'/datetime.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -86,7 +86,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
     return {
-        templateUrl: BASE_URL+'number/templates/number.html',
+        templateUrl: BASE_URL+'number/templates/'+TEMPLATE_THEME+'/number.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -141,7 +141,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('textarea', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
-        templateUrl: BASE_URL+'textarea/templates/textarea.html',
+        templateUrl: BASE_URL+'textarea/templates/'+TEMPLATE_THEME+'/textarea.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -224,7 +224,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
     return {
-        templateUrl: BASE_URL+'yes-no/templates/yes-no.html',
+        templateUrl: BASE_URL+'yes-no/templates/'+TEMPLATE_THEME+'/yes-no.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -291,7 +291,7 @@ angular.module('p97.questionTypes')
 angular.module('p97.questionTypes')
   .directive('text', function(){
     return {
-        templateUrl: BASE_URL+'text/templates/text.html',
+        templateUrl: BASE_URL+'text/templates/'+THEME+'/text.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -311,11 +311,6 @@ angular.module('p97.questionTypes')
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
             }
-
-            // scope.$watch('value', function(newVal){
-            //     scope.internalControl.isDirty = true;
-            // })
-
         }
     } // end return 
 })
