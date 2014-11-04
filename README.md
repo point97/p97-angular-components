@@ -10,7 +10,6 @@ A collection of angular component used by Point 97.
 ```
 # Save to dependencies
 bower install p97-components --save
-
 ```
 
 This will install a directory named `p97-components` containing 
@@ -27,10 +26,7 @@ Then add the files to your html.
 <script src="PATH_TO_JS_LIB/p97-components/question-types.min.js"></script>
 ```
 
-To update an existing installation use
-```
-bower install p97-components --save
-```
+See the [Reference](#reference) section for a detailed list of the question types. 
 
 ---
 ## The Example App
