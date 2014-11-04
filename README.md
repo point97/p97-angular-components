@@ -20,8 +20,11 @@ This will install a directory named `p97-components` containing
 * question-types.min.js
 * templates/
 
+
+Then add the files to your html. 
 ```
-<script src="PATH_TO_JS_LIB/p97-components/p97components.js"></script>
+<script src="PATH_TO_JS_LIB/p97-components/services.min.js"></script>
+<script src="PATH_TO_JS_LIB/p97-components/question-types.min.js"></script>
 ```
 
 To update an existing installation use
