@@ -3,8 +3,9 @@
 
 A collection of angular component used by Point 97.
 
-##Installation
-Note: for developer install see [For Developers](#for-developers)
+# Usage
+
+**Note:** This section describes how to use the components in your application. For instruction to develope components see [For Developers](#for-developers)
 
 ```
 # Save to dependencies
