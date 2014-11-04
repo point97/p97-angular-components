@@ -5,7 +5,7 @@ A collection of angular component used by Point 97.
 
 # Usage
 
-**Note:** This section describes how to use the components in your application. For instruction to develope components see [For Developers](#for-developers)
+**Note:** This section describes how to use the components in your application. For instruction on how to develop components see [For Developers](#for-developers)
 
 ```
 # Save to dependencies
