@@ -6,6 +6,7 @@ A collection of angular component used by Point 97.
 Each components is contained in a directory strucuted as follows
 
 ##Installation
+Note: for developer install see [For Developers](#for-developers)
 
 ```
 # Save to dependencies
@@ -33,7 +34,7 @@ bower install p97-components --save
 ## The Example App
 There is an example application used for testing and a tutorial located in `examples/`
 
-This example is build on Yeoman and it's Angular generator. See http://yeoman.io/codelab/setup.html for more info. You will need Ruby installed and up-to-date, and node and npm installed and up-to-date.
+This example is build on Yeoman and it's Angular generator. See http://yeoman.io/codelab/setup.html for more info. You will need Ruby and Compass installed and up-to-date, and node and npm installed and up-to-date.
 
 To run the example app
 ```
@@ -53,17 +54,12 @@ sudo gem install compass
 ```
 
 
-
-
-
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive.
 
 
 
 ----
 ## For Developers
-
-
 
 ### Getting started
 This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
@@ -77,10 +73,7 @@ This assumes you have Node and NPM installed. See their pages on how to install.
 npm install
 ```
 
-### Run the example app
-This assumes you Have Ruby and Compass installed. 
-
-1. cd into exmaple/ and run npm install 
+4. See [The Example App](#the-example-app) to get the example app up and running.
 
 
 ## Reference
