@@ -63,12 +63,24 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 ----
 ## For Developers
 
+
+
 ### Getting started
-THIS SECTION IS INCOMPLETE
-Clone repo and run 
+This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
+
+1. cd into an appropriate diectory and clone the repo `git@github.com:point97/p97-angular-components.git`
+
+2. Change to the appropriate branch 
+
+3. Install NPM packages.
 ```
 npm install
 ```
+
+### Run the example app
+This assumes you Have Ruby and Compass installed. 
+
+1. cd into exmaple/ and run npm install 
 
 
 ## Reference
