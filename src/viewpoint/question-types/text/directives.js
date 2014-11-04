@@ -1,7 +1,7 @@
 angular.module('p97.questionTypes')
   .directive('text', function(){
     return {
-        templateUrl: BASE_URL+'text/templates/text.html',
+        templateUrl: BASE_URL+'text/templates/'+THEME+'/text.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -21,11 +21,6 @@ angular.module('p97.questionTypes')
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
             }
-
-            // scope.$watch('value', function(newVal){
-            //     scope.internalControl.isDirty = true;
-            // })
-
         }
     } // end return 
 })

@@ -2,7 +2,7 @@ angular.module('p97.questionTypes')
   .directive('datetime', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
-        templateUrl: BASE_URL+'datetime/templates/datetime.html',
+        templateUrl: BASE_URL+'datetime/templates/'+TEMPLATE_THEME+'/datetime.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.

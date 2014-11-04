@@ -3,7 +3,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
     return {
-        templateUrl: BASE_URL+'number/templates/number.html',
+        templateUrl: BASE_URL+'number/templates/'+TEMPLATE_THEME+'/number.html',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.

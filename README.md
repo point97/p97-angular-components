@@ -51,8 +51,12 @@ sudo gem install sass
 sudo gem install compass
 ```
 
+You will need to symbolically link the `src/` directory to the example apps `scripts/p97-components/` directory. This allows you to edit the src files in one place.
 
-Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive.
+```
+cd example/app/scripts/p97-components
+ln -s ln -s ../../../../src/ src
+```
 
 
 
