@@ -69,9 +69,9 @@ This assumes you have Node and NPM installed. See their pages on how to install.
 2. Change to the appropriate branch 
 
 3. Install NPM packages.
-```
-npm install
-```
+    ```
+    npm install
+    ```
 
 4. See [The Example App](#the-example-app) to get the example app up and running.
 
