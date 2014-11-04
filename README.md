@@ -3,8 +3,6 @@
 
 A collection of angular component used by Point 97.
 
-Each components is contained in a directory strucuted as follows
-
 ##Installation
 Note: for developer install see [For Developers](#for-developers)
 
