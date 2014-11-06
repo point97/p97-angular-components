@@ -23,7 +23,13 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
-                if (options.min && typeof(options.min === 'number')) {
+
+                if (typeof scope.value !== 'number' ) {
+                    scope.errors.push('input must be a number');
+                    return false;
+                }
+
+                if (options.min && (typeof options.min === 'number')) {
                     if (scope.value < options.min){
                         scope.errors.push('value must not be less than ' + options.min);
                     }

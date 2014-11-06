@@ -79,33 +79,36 @@ describe('Controller: MainCtrl', function () {
 
     }));
 
-    it('should not allow a letter in the number field', function(){
-      debugger;
-    // scope.loadAnswersForBlock(scope.current.block);
-
-    // var question_index = scope.getQuestionIndexBySlug('num');
-    // console.log("Question index: "+question_index);
-        $rootScope.current.value = 'cat';
+    it('should not allow a letter in the number field', function(){    
         var isolated = elm.isolateScope();
+        isolated.value = 'cat';
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
     });
 
     it('should not exceed max', function() {
-        $rootScope.current.value = 15;
         var isolated = elm.isolateScope();
+        isolated.value = 15;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should be greater than min', function() {
+        var isolated = elm.isolateScope();
+        isolated.value = -2;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
     });
 
     it('should be within range', function() {
-        $rootScope.current.value = 3;
         var isolated = elm.isolateScope();
+        isolated.value = 4;
 
         var is_valid = isolated.internalControl.validate_answer();
-        console.log(isolated.errors);
         expect(is_valid).toBe(true);
+
     });
 });
