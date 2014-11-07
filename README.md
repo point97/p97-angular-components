@@ -236,9 +236,10 @@ dist/
 
 Once you have a new version build you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 
 ```
+gulp
 git commit -m "Blah blah"
-git tag v0.3.12
-git push origin v0.3 --tag
+git tag 0.3.12
+git push origin [BRANCH] --tag
 ```
 
 To check your vresion, create a temporary folder and boew install it.
