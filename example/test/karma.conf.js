@@ -21,6 +21,7 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/underscore/underscore-min.js',
+      'bower_components/datejs/build/production/date.min.js',
 
       // Our app
       'app/scripts/p97-components/src/viewpoint/question-types/*.js',  // Get the main module

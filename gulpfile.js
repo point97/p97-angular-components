@@ -8,6 +8,8 @@ var clean = require('gulp-clean');
 
 var _ =require('underscore');
 
+var datejs =require('datejs');
+
 var DEST = 'dist/';
 
 var QUESTION_TYPES = [

@@ -28,7 +28,7 @@ angular.module('p97.questionTypes')
 
                 if (options.required === true){
                     // if required check for a valid date.
-                    if(dateObj === null){
+                    if(dateObj === null || isNaN(dateObj)){
                         scope.errors.push('Invalid format.');
                     }
 
@@ -36,7 +36,7 @@ angular.module('p97.questionTypes')
                         scope.errors.push('This field is required');
                     }
                 } else {
-                    if(scope.value.length > 0 && dateObj === null){
+                    if(scope.value.length > 0 && (dateObj === null  || dateObj === NaN)) {
                         scope.errors.push('Invalid format.');
                     }
                 }
