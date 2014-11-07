@@ -24,7 +24,12 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                if (typeof scope.value !== 'number' ) {
+                if (typeof scope.value !== 'number' && options.required && options.required === true) {
+                    scope.errors.push('input must be a number');
+                    return false;
+                }
+
+                if (typeof scope.value !== 'number' && (!options.required || options.required === false)) {
                     scope.errors.push('input must be a number');
                     return false;
                 }
@@ -38,12 +43,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 if (options.max && typeof(options.max === 'number')) {
                     if (scope.value > options.max){
                         scope.errors.push('value must not be more than ' + options.max);
-                    }
-                }
-
-                if (options.required && options.required === true) {
-                    if (typeof(scope.value) !== 'number'){
-                        scope.errors.push('A number is required.');
                     }
                 }
 
