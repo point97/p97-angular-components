@@ -74,8 +74,15 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 
 * **datetime** 
  options
+  * templateUrl: 
+		  * "ionic/inline.html"
+		  * "ionic/popup.html"
+		  * "yeoman/inline.hmtl"
+		  * "yeoman/popup.html"
+  * initial
   * min 
   * max
+  * datejs_format: [String] e.g. 'MM/dd/yyyy'
   * required
 
 * **number**
@@ -97,6 +104,59 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 * **yes-no**
  options
  * default
+
+* **single-select**
+options
+  * templateUrl: "ionic/drop-down.html", "ionic/radio.html"
+  * required: [Boolean] defaults to `true`
+
+
+### Available in v 0.4
+* **multi-select**
+options
+  * templateUrl: "ionic/drop-down.html", "ionic/expanded.html"
+  * grouping
+  * random_order
+  * randmon_order_groups 
+
+* **date** 
+ options
+  * templateUrl: 
+		  * "ionic/time.html"
+		  * "ionic/popup.html"
+		  * "yeoman/time.html"
+		  * "yeoman/popup.html"
+  * initial
+  * min 
+  * max
+  * datejs_format: [String] e.g. 'MM/dd/yyyy HH:mm:ss'
+  * required
+
+* **date** 
+ options
+  * templateUrl: 
+		  * "ionic/time.html"
+		  * "ionic/popup.html"
+		  * "yeoman/time.html"
+		  * "yeoman/popup.html"
+  * initial
+  * min 
+  * max
+  * datejs_format: [String] e.g. 'MM/dd/yyyy HH:mm:ss'
+  * required
+
+* **checkbox**
+options
+  * ???
+
+* **phone-number**
+options
+  * format: "(xxx) xxx-xxxx"
+  * required
+
+* **email**
+options
+  * required
 
 ----
 ## 4. For Developers
