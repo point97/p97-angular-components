@@ -27,7 +27,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 
                 if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
 
-               
                 if (options.min_word && typeof(options.min_word === 'number')) {                 
                     if (scope.word_count < options.min_word){
                         scope.errors.push('You must have at least '+options.min_word+' words. You have ' + scope.word_count);
@@ -35,8 +34,11 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 }
 
                 if (options.max_word && typeof(options.max_word === 'number')) {
-                    
-                    if (scope.word_count > options.max_word){
+                    var max_count = options.max_count || 500;
+                    if (scope.word_count > max_count) {
+                        scope.errors.push('You can have up to '+max_count+' words. You currently have ' + scope.word_count);
+                    }
+                    else if (scope.word_count > options.max_word){
                         scope.errors.push('You can only have ' + options.max_word + ' words. You have ' + scope.word_count);
                     }
                 }
@@ -64,6 +66,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.$watch('value', function(newValue){
                 if (!newValue) return;
                 var char_count = newValue.length;
+                var word_count;
                 if (char_count === 0){
                     word_count = 0;
                 } else {

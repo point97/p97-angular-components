@@ -171,7 +171,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 
                 if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
 
-               
                 if (options.min_word && typeof(options.min_word === 'number')) {                 
                     if (scope.word_count < options.min_word){
                         scope.errors.push('You must have at least '+options.min_word+' words. You have ' + scope.word_count);
@@ -179,8 +178,11 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 }
 
                 if (options.max_word && typeof(options.max_word === 'number')) {
-                    
-                    if (scope.word_count > options.max_word){
+                    var max_count = options.max_count || 500;
+                    if (scope.word_count > max_count) {
+                        scope.errors.push('You can have up to '+max_count+' words. You currently have ' + scope.word_count);
+                    }
+                    else if (scope.word_count > options.max_word){
                         scope.errors.push('You can only have ' + options.max_word + ' words. You have ' + scope.word_count);
                     }
                 }
@@ -208,6 +210,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.$watch('value', function(newValue){
                 if (!newValue) return;
                 var char_count = newValue.length;
+                var word_count;
                 if (char_count === 0){
                     word_count = 0;
                 } else {
@@ -278,20 +281,37 @@ angular.module('p97.questionTypes')
             control: '='
         },
         link: function(scope, element, attrs) {
+            if (!scope.question) return;
+            var options = scope.question.options;
+            scope.errors = [];
+
             if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
-                
-                return true;
+                scope.errors = [];
+
+                if (options.required && options.required === true) {
+                    if (scope.value === null) {
+                        scope.errors.push('This field is required')
+                    }
+                }
             },
 
             scope.internalControl.clean_answer = function(){
+
+                if (scope.value === null){
+                    scope.value = false;
+                }
             }
 
         }
     } // end return 
 })
+
+
+
 
 angular.module('p97.questionTypes')
   .directive('text', function(){
