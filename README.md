@@ -82,14 +82,16 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * initial
   * min 
   * max
-  * datejs_format: [String] e.g. 'MM/dd/yyyy'
+  * datejs_format: [String] e.g. 'MM/dd/yyyy HH:mm:ss'
   * required
+  * default
 
-* **number**
+* **number** - This can either be a decimal or an integer
  options
   * min
   * max
   * required
+  * default
  
 * **textarea**
   `min_word` and `max_word` take precedence over `min_char` and `max_char`
@@ -100,24 +102,33 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * max_char
   * show_word_count
   * show_char_count
+  * required
+  * default
 
 * **yes-no**
  options
- * default
+ * default: 'yes'
 
 * **single-select**
 options
-  * templateUrl: "ionic/drop-down.html", "ionic/radio.html"
+  * templateUrl
+     * "ionic/drop-down.html"
+     * "ionic/radio.html"
   * required: [Boolean] defaults to `true`
+  * default
 
 
 ### Available in v 0.4
 * **multi-select**
 options
-  * templateUrl: "ionic/drop-down.html", "ionic/expanded.html"
+  * templateUrl 
+     * "ionic/drop-down.html"
+     * "ionic/expanded.html"
   * grouping
   * random_order
-  * randmon_order_groups 
+  * random_order_groups 
+  * required
+  * default
 
 * **date** 
  options
@@ -129,10 +140,11 @@ options
   * initial
   * min 
   * max
-  * datejs_format: [String] e.g. 'MM/dd/yyyy HH:mm:ss'
+  * datejs_format: [String] e.g. 'MM/dd/yyyy'
   * required
+  * default
 
-* **date** 
+* **time** 
  options
   * templateUrl: 
 		  * "ionic/time.html"
@@ -142,21 +154,41 @@ options
   * initial
   * min 
   * max
-  * datejs_format: [String] e.g. 'MM/dd/yyyy HH:mm:ss'
+  * datejs_format: [String] e.g. 'HH:mm:ss'
   * required
+  * default
 
 * **checkbox**
 options
   * ???
+  * required
+  * default
 
 * **phone-number**
 options
   * format: "(xxx) xxx-xxxx"
   * required
+  * default
 
 * **email**
 options
   * required
+  * default
+
+* **integer**
+options
+  * min
+  * max
+  * required
+  * default
+
+* **currency**
+options
+* min
+* max
+* code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
+* required
+* default
 
 ----
 ## 4. For Developers
