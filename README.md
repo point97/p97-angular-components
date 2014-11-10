@@ -126,7 +126,9 @@ options
      * "ionic/expanded.html"
   * grouping
   * random_order
-  * random_order_groups 
+  * random_order_groups
+  * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
+  * choices_from_previous_answer: [String] the question slug who's answers to use as choices for this question.  
   * required
   * default
 
@@ -158,14 +160,18 @@ options
   * required
   * default
 
+* **checkbox**
+options
+  * default: [String] 'checked', 'unchecked'
+  * required
+
 * **toggle**
 options
-  * positive_value:
+  * positive_value
   * positive_label
   * negative_value
   * negative_label
   * required
-  * default
 
 * **phone-number**
 options
