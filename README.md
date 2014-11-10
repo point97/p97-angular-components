@@ -105,7 +105,7 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * required
   * default
 
-* **yes-no**
+* **yes-no** (deprecated in v 0.4 in favor of toggle)
  options
  * default: 'yes'
 
@@ -158,9 +158,12 @@ options
   * required
   * default
 
-* **checkbox**
+* **toggle**
 options
-  * ???
+  * positive_value:
+  * positive_label
+  * negative_value
+  * negative_label
   * required
   * default
 
