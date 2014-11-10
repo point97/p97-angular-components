@@ -114,6 +114,8 @@ options
   * templateUrl
      * "ionic/drop-down.html"
      * "ionic/radio.html"
+  * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
+  * choices_from_previous_answer: [String] the question slug who's answers to use as choices for this question.  
   * required: [Boolean] defaults to `true`
   * default
 
