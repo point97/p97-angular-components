@@ -309,7 +309,7 @@ Templates are grouped by themes. Themes usually depend on the front-end framewor
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
 
 
-#### Dynamic Templates
+#### Dynamic Templates (v0.4 and up)
 Dynamic templates allow allow survey author's and developer to change the html template used by a question type. This is useful for per directive level templates specification.
 
 Templates should be organized in the following structure. The theme can be either `ionic` or `yeoman`. The default template location will be at `<QUESTION-TYPE>/templates/ionic/<QUESTION-TYPE>.html` Alternative templates should go in either and ionic or yeoman, with the name <ALTERNATIVE>. This should be specified on `question. options.templateUrl`
@@ -325,9 +325,9 @@ Templates should be organized in the following structure. The theme can be eithe
         - directives.js
 ```
 
-Add the following keyword
+Add the following keyword to the directive's `return` object. 
 ```
-template: '<div ng-include="getContentUrl()"></div>'
+template: ''
 ```
 
 Inside the directives link function you will need to define a function to get the template URL
