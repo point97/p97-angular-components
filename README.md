@@ -35,7 +35,7 @@ Then add the files to your html.
 <script src="PATH_TO_JS_LIB/p97-components/question-types.min.js"></script>
 ```
 
-See the [Reference](#reference) section for a detailed list of the question types. 
+See the [Question Types](#3-question-types) section for a detailed list of the question types. 
 
 ---
 ##2. The Example App
