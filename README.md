@@ -196,7 +196,7 @@ options
 ### Getting started
 This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
 
-1. cd into an appropriate diectory and clone the repo `git@github.com:point97/p97-angular-components.git`
+1. cd into an appropriate directory and clone the repo `git@github.com:point97/p97-angular-components.git`
 
 2. Change to the appropriate branch 
 
@@ -310,7 +310,7 @@ Each directive must have a template name using the question type's slug. Templat
 
 
 #### Dynamic Templates
-Dynamic templates allow allow survey author's and developer to change the html template used by a question type. This is useful for per directive level templates specifiction.
+Dynamic templates allow allow survey author's and developer to change the html template used by a question type. This is useful for per directive level templates specification.
 
 Templates should be organized in the following structure. The theme can be either `ionic` or `yeoman`. The default template location will be at `<QUESTION-TYPE>/templates/ionic/<QUESTION-TYPE>.html` Alternative templates should go in either and ionic or yeoman, with the name <ALTERNATIVE>. This should be specified on `question. options.templateUrl`
 
@@ -334,12 +334,17 @@ Inside the directives link function you will need to define a function to get th
 
 ```
 scope.getContentUrl = function() {
-   if(scope.question.options.templateUrl) 
-    return    BASE_URL+'text/templates/text'+scope.question.options.templateUrl+'.html';
-    else
-     return BASE_URL+'text/templates/text.html';
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'<QUESTION_TYPE>/templates/<QUESTION_TYPE>/'+scope.question.options.templateUrl;
+                else
+                    return BASE_URL+'<QUESTION_TYPE>/templates/ionic/<QUESTION_TYPE>.html';
             }
-    if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+            
+// Compile the template into the directive's scope.
+$http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
 ```
 
 ----
