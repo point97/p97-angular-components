@@ -1,9 +1,18 @@
 
 # p97-components
 
-A collection of angular component used by Point 97.
+A collection of angular component to be used with Viewpoint 2.
 
-# Usage
+## Table of Contents 
+
+* [1. Usage](#1-usage)
+* [2. The Example App](#2-the-example-app) 
+* [3. Question Types](#3-question-types)
+* [4. For Developers](#4-for-developers)
+* [5. The Build Process](#5-the-build-process)
+* [6. Testing](#6-testing)
+
+##1. Usage
 
 **Note:** This section describes how to use the components in your application. For instruction on how to develop components see [For Developers](#for-developers)
 
@@ -29,7 +38,7 @@ Then add the files to your html.
 See the [Reference](#reference) section for a detailed list of the question types. 
 
 ---
-## The Example App
+##2. The Example App
 There is an example application used for testing and a tutorial located in `examples/`
 
 This example is build on Yeoman and it's Angular generator. See http://yeoman.io/codelab/setup.html for more info. You will need Ruby and Compass installed and up-to-date, and node and npm installed and up-to-date.
@@ -60,28 +69,7 @@ cd p97-components
 ln -s ../../../../src/ src
 ```
 
-
-
-----
-## For Developers
-
-### Getting started
-This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
-
-1. cd into an appropriate diectory and clone the repo `git@github.com:point97/p97-angular-components.git`
-
-2. Change to the appropriate branch 
-
-3. Install NPM packages.
-    ```
-    npm install
-    ```
-
-4. See [The Example App](#the-example-app) to get the example app up and running.
-
-
-## Reference
-### Question Types
+## 3. Question Types
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
 
 * **datetime** 
@@ -110,6 +98,22 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
  options
  * default
 
+----
+## 4. For Developers
+
+### Getting started
+This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
+
+1. cd into an appropriate diectory and clone the repo `git@github.com:point97/p97-angular-components.git`
+
+2. Change to the appropriate branch 
+
+3. Install NPM packages.
+    ```
+    npm install
+    ```
+
+4. See [The Example App](#the-example-app) to get the example app up and running.
 
 ### Making Question Type Components
 
@@ -212,8 +216,43 @@ Templates are grouped by themes. Themes usually depend on the front-end framewor
 
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
 
+
+#### Dynamic Templates
+Dynamic templates allow allow survey author's and developer to change the html template used by a question type. This is useful for per directive level templates specifiction.
+
+Templates should be organized in the following structure. The theme can be either `ionic` or `yeoman`. The default template location will be at `<QUESTION-TYPE>/templates/ionic/<QUESTION-TYPE>.html` Alternative templates should go in either and ionic or yeoman, with the name <ALTERNATIVE>. This should be specified on `question. options.templateUrl`
+
+```
+- question-types/
+      - <QUESTION-TYPE>/
+        - templates/
+        - theme[ionic | yeoman]/
+          - <QUESTION-TYPE>.html
+          - <ALTERNATIVE>.html   
+        - controllers.js
+        - directives.js
+```
+
+Add the following keyword
+```
+template: '<div ng-include="getContentUrl()"></div>'
+```
+
+Inside the directives link function you will need to define a function to get the template URL
+
+```
+scope.getContentUrl = function() {
+   if(scope.question.options.templateUrl) 
+    return    BASE_URL+'text/templates/text'+scope.question.options.templateUrl+'.html';
+    else
+     return BASE_URL+'text/templates/text.html';
+            }
+    if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+```
+
 ----
-## The Build Process
+
+## 5. The Build Process
 The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
 
 The build process is defined in `/gulpfile.js` and can be configured there. 
@@ -236,10 +275,9 @@ dist/
 
 Once you have a new version build you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 
 ```
-gulp
 git commit -m "Blah blah"
-git tag 0.3.12
-git push origin [BRANCH] --tag
+git tag v0.3.12
+git push origin v0.3 --tag
 ```
 
 To check your vresion, create a temporary folder and boew install it.
@@ -252,7 +290,7 @@ bower install p97-components
 
 
 ----
-## Testing
+## 6. Testing
 
 Test are ran through the example app. 
 
