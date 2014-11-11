@@ -356,6 +356,15 @@ $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(res
                 var contents = element.html(response).contents();
                 $compile(contents)(scope);
             });
+
+```
+
+Remember to also inject your three dependencies (`$http`, `$templateCache`, and `$compile`) within the `module.directive` API.
+
+```
+angular.module('p97.questionTypes')  
+  .directive('<QUESTION-TYPE>', function($http, $templateCache, $compile) {
+  
 ```
 
 ----

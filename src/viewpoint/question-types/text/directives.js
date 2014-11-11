@@ -1,8 +1,8 @@
 angular.module('p97.questionTypes')
-  .directive('text', function(){
+  .directive('text', function($http, $templateCache, $compile){
     
         return {
-            templateUrl: BASE_URL+'textarea/templates/'+TEMPLATE_THEME+'/textarea.html',
+            template:'',
             restrict: 'EA',
 
             // Scope should always look like this in all question types.
@@ -12,6 +12,13 @@ angular.module('p97.questionTypes')
                 control: '='
             },
             link: function(scope, element, attrs) {
+
+                scope.getContentUrl = function() {
+                    if(scope.question.options.templateUrl)
+                        return BASE_URL+'text/templates/text/'+scope.question.options.templateUrl+'.html';
+                    else
+                        return BASE_URL+'text/templates/ionic/text.html';
+                }
                 
                 if (!scope.question) return;
                 var options = scope.question.options;
@@ -77,7 +84,11 @@ angular.module('p97.questionTypes')
 
                 });
 
-
+                // Compile the template into the directive's scope.
+                $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                    var contents = element.html(response).contents();
+                    $compile(contents)(scope);
+                });
 
             }
         }

@@ -28,10 +28,10 @@ angular.module('p97.questionTypes')
 });
 
 angular.module('p97.questionTypes')
-  .directive('datetime', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('datetime', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
-        templateUrl: BASE_URL+'datetime/templates/'+TEMPLATE_THEME+'/datetime.html',
+        template: '',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -41,6 +41,14 @@ angular.module('p97.questionTypes')
             control: '='
         },
         link: function(scope, element, attrs) {
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'datetime/templates/datetime/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'datetime/templates/ionic/datetime.html';
+            }
+
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -76,17 +84,23 @@ angular.module('p97.questionTypes')
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
             };
+
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
             
         }
     };
 });
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('number', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('number', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
-        templateUrl: BASE_URL+'number/templates/'+TEMPLATE_THEME+'/number.html',
+        template: '',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -96,6 +110,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'number/templates/number/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'number/templates/ionic/number.html';
+            }
+            
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -136,17 +158,21 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 scope.value = parseFloat(scope.value, 10);
             };
 
-
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
 
         }
     }
 });
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('textarea', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('textarea', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
-        templateUrl: BASE_URL+'textarea/templates/'+TEMPLATE_THEME+'/textarea.html',
+        template: '',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -156,6 +182,13 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'textarea/templates/textarea/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'textarea/templates/ionic/textarea.html';
+            }
             
             if (!scope.question) return;
             var options = scope.question.options;
@@ -221,18 +254,21 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             });
 
-
-
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
         }
     }
 });
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('yesNo', function(){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('yesNo', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
-        templateUrl: BASE_URL+'yes-no/templates/'+TEMPLATE_THEME+'/yes-no.html',
+        template: '',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -242,6 +278,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'yes-no/templates/yes-no/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'yes-no/templates/ionic/yes-no.html';
+            }
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -262,16 +306,22 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 if (scope.value === null){
                     scope.value = false;
                 }
-            };
+            }
+
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
         }
     }
 });
 
 
 angular.module('p97.questionTypes')
-  .directive('singleSelect', function(){
+  .directive('singleSelect', function($http, $templateCache, $compile){
     return {
-        templateUrl: BASE_URL+'single-select/templates/single-select.html',
+        template: '',
         restrict: 'EA',
 
         // Scope should always look like this in all question types.
@@ -281,6 +331,14 @@ angular.module('p97.questionTypes')
             control: '='
         },
         link: function(scope, element, attrs) {
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'single-select/templates/single-select/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'single-select/templates/ionic/single-select.html';
+            }
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -306,6 +364,12 @@ angular.module('p97.questionTypes')
                 }
             }
 
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
+
         }
     } // end return 
 })
@@ -314,10 +378,10 @@ angular.module('p97.questionTypes')
 
 
 angular.module('p97.questionTypes')
-  .directive('text', function(){
+  .directive('text', function($http, $templateCache, $compile){
     
         return {
-            templateUrl: BASE_URL+'textarea/templates/'+TEMPLATE_THEME+'/textarea.html',
+            template:'',
             restrict: 'EA',
 
             // Scope should always look like this in all question types.
@@ -327,6 +391,13 @@ angular.module('p97.questionTypes')
                 control: '='
             },
             link: function(scope, element, attrs) {
+
+                scope.getContentUrl = function() {
+                    if(scope.question.options.templateUrl)
+                        return BASE_URL+'text/templates/text/'+scope.question.options.templateUrl+'.html';
+                    else
+                        return BASE_URL+'text/templates/ionic/text.html';
+                }
                 
                 if (!scope.question) return;
                 var options = scope.question.options;
@@ -392,7 +463,11 @@ angular.module('p97.questionTypes')
 
                 });
 
-
+                // Compile the template into the directive's scope.
+                $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                    var contents = element.html(response).contents();
+                    $compile(contents)(scope);
+                });
 
             }
         }
