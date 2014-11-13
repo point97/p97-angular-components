@@ -226,17 +226,19 @@ There are several steps required to make a new question type directive but here 
 
 2. Create your directive(s)  in `src/.../<QUESTION-TYPE>/directives.js` (Do the same for the controllers is needed).  You directive should be named with the question type slug. See the [Question Type Directive](#question-type-directives) section below for a description of the scope and methods the directive must have. 
 
-3. Add templates to  `src/viewpoint/question-types/<QUESTION-TYPE>/templates/<THEME-NAME>/`. The THEME-NAME for vpMarket is **ionic**. There should always be a template named `<QUESTION-TYPE>.html` if additional templates are needed, you are free to name them how you want.  
+3. Add templates to  `src/viewpoint/question-types/<QUESTION-TYPE>/templates/<THEME-NAME>/`. The THEME-NAME for vpMarket is **ionic**. There should always be a template named `<QUESTION-TYPE>.html` if additional templates are needed, you are free to name them how you want. 
 
-4. Document the question type and all it's options in p97-angular-components README.md file (this document).
+4. Make sure you add your new question type to the `QUESTION_TYPES` array within the `gulpfile.js` file. 
 
-4. Add your question type to the example app to test it.
+5. Document the question type and all it's options in p97-angular-components README.md file (this document).
 
-5. Write a Jasmine test for the directive. See the [Testing](#testing) section for this. 
+6. Add your question type to the example app to test it.
 
-6. Update the Viewpoint API to add the new question type and its default options.  
+7. Write a Jasmine test for the directive. See the [Testing](#testing) section for this. 
 
-7. Build a new version, tag it and push the tag.  See [The Build Process](#the-build-process) for more info. 
+8. Update the Viewpoint API to add the new question type and its default options.  
+
+9. Build a new version, tag it and push the tag.  See [The Build Process](#the-build-process) for more info. 
 
 #### Source Directory structure
 ```

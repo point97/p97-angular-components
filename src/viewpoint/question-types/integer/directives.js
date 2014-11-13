@@ -42,7 +42,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 }
 
                 if (!isInteger(scope.value) && (!options.required || options.required === false)) {
-                    scope.errors.push('input must be a number');
+                    scope.errors.push('input must be a integer');
                     return false;
                 }
 

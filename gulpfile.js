@@ -18,7 +18,8 @@ var QUESTION_TYPES = [
                       'textarea',
                       'yes-no',
                       'single-select',
-                      'text'
+                      'text',
+                      'integer'
                      ]
 
 
