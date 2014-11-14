@@ -19,7 +19,8 @@ var QUESTION_TYPES = [
                       'yes-no',
                       'single-select',
                       'text',
-                      'integer'
+                      'integer',
+                      'email'
                      ]
 
 
