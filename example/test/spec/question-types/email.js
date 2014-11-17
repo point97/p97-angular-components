@@ -119,14 +119,6 @@ describe('Controller: EmailCtrl', function () {
         expect(is_valid).toBe(true);
     });
 
-    it('should ', function() {
-        var isolated = elm.isolateScope();
-        isolated.value = 11;
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
-    });
-
     it('should be valid when input is entered but not required', function() {
         var isolated = elm2.isolateScope();
         isolated.value = 'coastal@recreation.io';

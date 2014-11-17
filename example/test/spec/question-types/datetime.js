@@ -22,18 +22,18 @@ describe('Controller: DatetimeCtrl', function () {
         $rootScope.current.block = {
             questions: [{
                 "body": "When did that happen?",
-                "label": "mm/dd/yyyy",
+                "label": "mm/dd/yyyy hh:mm:ss",
                 "type": "datetime",
                 "options": {
                     "required": true,
-                    "datejs_format": "MM/dd/yyyy"
+                    "datejs_format": "MM/dd/yyyy HH:mm:ss"
                 }
             },{
                 "body": "What date was that?",
-                "label": "dd/mm/yyyy",
+                "label": "dd/mm/yyyy ss:mm:hh",
                 "type": "datetime",
                 "options": {
-                    "datejs_format": "dd/MM/yyyy"
+                    "datejs_format": "dd/MM/yyyy ss:mm:HH"
                 }
             }]
         };
@@ -82,7 +82,7 @@ describe('Controller: DatetimeCtrl', function () {
 
     it('should be in the proper format', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = '05/25/1986';
+        isolated.value = '05/25/1986 16:30:55';
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
@@ -90,7 +90,7 @@ describe('Controller: DatetimeCtrl', function () {
 
     it('should follow the proper format when not default', function(){    
         var isolated = elm2.isolateScope();
-        isolated.value = '31/03/2014';
+        isolated.value = '31/03/2014 34:15:21';
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
@@ -98,7 +98,15 @@ describe('Controller: DatetimeCtrl', function () {
 
     it('should follow the rules of actual dates', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = '15/12/2010';
+        isolated.value = '15/12/2010 10:14:45';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should follow the rules of actual time', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = '12/10/2010 25:14:45';
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);

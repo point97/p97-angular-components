@@ -60,12 +60,12 @@ angular.module('p97.questionTypes')
                 // 
                 
                 scope.errors = [];
-                var format =  options.datejs_format || 'MM/dd/yyyy';
-                var dateObj = Date.parseExact(scope.value, format)
+                var format =  options.datejs_format || 'MM/dd/yyyy HH:mm:ss';
+                var dateTimeObj = Date.parseExact(scope.value, format)
 
                 if (options.required === true){
                     // if required check for a valid date.
-                    if(dateObj === null || isNaN(dateObj)){
+                    if(dateTimeObj === null || isNaN(dateTimeObj)){
                         scope.errors.push('Invalid format.');
                     }
 
@@ -73,7 +73,7 @@ angular.module('p97.questionTypes')
                         scope.errors.push('This field is required');
                     }
                 } else {
-                    if(scope.value.length > 0 && (dateObj === null  || dateObj === NaN)) {
+                    if(scope.value.length > 0 && (dateTimeObj === null  || dateTimeObj === NaN)) {
                         scope.errors.push('Invalid format.');
                     }
                 }
