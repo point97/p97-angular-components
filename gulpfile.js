@@ -20,7 +20,8 @@ var QUESTION_TYPES = [
                       'single-select',
                       'text',
                       'integer',
-                      'email'
+                      'email',
+                      'date'
                      ]
 
 

@@ -72,7 +72,7 @@ ln -s ../../../../src/ src
 ## 3. Question Types
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
 
-* **datetime** 
+* **datetime** (only date component of datetime was added in v 0.3 - functional in v 0.4)
  options
   * templateUrl: 
 		  * "ionic/inline.html"
