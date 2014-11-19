@@ -1,9 +1,8 @@
-<div class="p97-textarea">
+<div class="p97-single-select">
     <div>{{question.body}}</div>
     <div class="list">
         <label class="item item-input">
             <select 
-                    placeholder="{{ question.label }}" 
                     ng-model="value" 
                     ng-required='question.options.required'
                     ng-class="{'error':errors.length>0}"

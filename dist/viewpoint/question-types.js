@@ -334,12 +334,13 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'single-select/templates/single-select/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/single-select.html';
+                    return BASE_URL+'single-select/templates/ionic/drop-down.html';
             }
 
             if (!scope.question) return;
+
             var options = scope.question.options;
             scope.errors = [];
 
@@ -355,13 +356,16 @@ angular.module('p97.questionTypes')
                         scope.errors.push('This field is required')
                     }
                 }
-            },
+
+                if (options.default) {
+
+                }
+
+                return (scope.errors.length === 0);
+            }
 
             scope.internalControl.clean_answer = function(){
 
-                if (scope.value === null){
-                    scope.value = false;
-                }
             }
 
             // Compile the template into the directive's scope.

@@ -23,7 +23,11 @@ describe('Controller: SingleCtrl', function () {
             questions: [{
                 "body": "Please select a choice from the following",
                 "label": "Which one do you like?",
-                "type": "single-select",
+                "choices": [
+                    {'verbose': 'Hook & Line', 'value': '5'},
+                    {'verbose': 'Trawl Net', 'value': '6'},
+                    {'verbose': 'Trap', 'value': '7'},
+                ],
                 "options": {"required": true}
             }]
         };
@@ -32,7 +36,7 @@ describe('Controller: SingleCtrl', function () {
     $compile = _$compile_;
 
     $elm = angular.element(
-        '<div number' +
+        '<div single-select' +
            ' question="current.block.questions[0]"' +
            ' value="current.value"' +
            ' control="current.block.answers[0].form">' +
