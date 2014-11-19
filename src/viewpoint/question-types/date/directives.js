@@ -15,7 +15,7 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'date/templates/date/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'date/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'date/templates/ionic/date.html';
             }

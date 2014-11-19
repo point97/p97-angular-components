@@ -44,7 +44,7 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'datetime/templates/datetime/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'datetime/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'datetime/templates/ionic/datetime.html';
             }
@@ -113,7 +113,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'number/templates/number/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'number/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'number/templates/ionic/number.html';
             }
@@ -185,7 +185,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'textarea/templates/textarea/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'textarea/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'textarea/templates/ionic/textarea.html';
             }
@@ -281,7 +281,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'yes-no/templates/yes-no/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'yes-no/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'yes-no/templates/ionic/yes-no.html';
             }
@@ -398,7 +398,7 @@ angular.module('p97.questionTypes')
 
                 scope.getContentUrl = function() {
                     if(scope.question.options.templateUrl)
-                        return BASE_URL+'text/templates/text/'+scope.question.options.templateUrl+'.html';
+                        return BASE_URL+'text/templates/'+scope.question.options.templateUrl+'.html';
                     else
                         return BASE_URL+'text/templates/ionic/text.html';
                 }
@@ -495,7 +495,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'integer/templates/integer/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'integer/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'integer/templates/ionic/integer.html';
             }
@@ -573,7 +573,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'email/templates/email/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'email/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'email/templates/ionic/email.html';
             }
@@ -635,7 +635,7 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'date/templates/date/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'date/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'date/templates/ionic/date.html';
             }
@@ -703,7 +703,7 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/phonenumber/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
             }

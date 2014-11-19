@@ -15,7 +15,7 @@ angular.module('p97.questionTypes')
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/phonenumber/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
             }

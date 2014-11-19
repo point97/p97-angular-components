@@ -16,7 +16,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'integer/templates/integer/'+scope.question.options.templateUrl+'.html';
+                    return BASE_URL+'integer/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'integer/templates/ionic/integer.html';
             }
