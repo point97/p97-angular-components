@@ -1,7 +1,6 @@
 <div class="p97-date">
     <div>{{question.body}}</div>
     <div class="list">
-        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         <label class="item item-input" ng-class="{'error':errors.length>0}">
             <input type="date" 
                    placeholder="{{ question.label }}" 
@@ -9,5 +8,6 @@
                    ng-required='question.options.required'
                    />
         </label>
+        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
     </div>
 </div>

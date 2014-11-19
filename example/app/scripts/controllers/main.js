@@ -31,11 +31,11 @@ angular.module('exampleApp')
             }
         },{
             'body': 'When did that happen?',
-            'label': 'mm/dd/yyyy',
+            'label': 'MM/dd/yyyy HH:mm:ss',
             'type': 'datetime',
             'options': {
                 'required': true,
-                'datejs_format': 'MM/dd/yyyy'
+                'datejs_format': 'MM/dd/yyyy HH:mm:ss'
             }
         },{
             'body': 'This is a yes-no question. Do you like cheese?',
@@ -74,6 +74,54 @@ angular.module('exampleApp')
             'options': {
                 'required': true,
                 'templateUrl': 'ionic/radio'
+            }
+        },{
+            'body': 'This is an integer question type. Please enter an integer between -5 and 25.',
+            'label': 'enter an integer',
+            'type': 'integer',
+            'options': {
+                'required': true,
+                'min': -5,
+                'max': 25
+            }
+        },{
+            'body': 'When did that happen?',
+            'label': 'MM/dd/yyyy',
+            'type': 'date',
+            'options': {
+                'required': true,
+                'datejs_format': 'MM/dd/yyyy'
+            }
+        },{
+            'body': 'How are you feeling?',
+            'label': 'how are you feeling?',
+            'slug': 'how-are-you',
+            'type': 'text',
+            'options': {
+                "required": true,
+                "min_word": 2,
+                "max_word": 10,
+                "min_char": 6,
+                "max_char": 45,
+                "show_word_count":true,
+                "show_char_count":true
+            }
+        },{
+            "body": "Please enter an email address",
+            "label": "enter an email",
+            "type": "email",
+            "slug": "email",
+            "options": {
+                "required": true
+            }
+        },{
+            "body": "What is your phone number?",
+            "label": "+1 (888) 123-4567",
+            "type": "phonenumber",
+            "options": { 
+                "required": true,
+                "format": 'North America',
+                "country": '1' 
             }
         }]
     };
