@@ -273,7 +273,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 ### Available in version v0.5
 
 * **map**
-
+This may change to a form type since we want the map to be fullscreen and the we will most likly ask a series of questions for the locations mapped. 
+ 
   `options`
   * layers - [Array] a list of map layers to user.
   * cache_tiles: [Boolean]
