@@ -74,6 +74,39 @@ ln -s ../../../../src/ src
 ```
 
 ## 3. Authentication
+Authentication is handle using the `$vpApi` service. 
+
+Once a user is authentication there API token and account info will be stored in localStorage in a  `user` database.  This is used to check if a user has been autenticated. 
+
+### 3.1 Check if the user is authenticated
+In your router, you should add a resolve function to check if  `user.token` is present. If it is not you should redirect to a login page.  
+```
+.state('app.home', {
+      url: "/home",
+      views: {
+        'menuContent' :{
+          templateUrl: "templates/home.html",
+          controller: 'HomeCtrl'
+        }
+      },
+      resolve: {
+        hasToken: function($localStorage, $location){
+            var user = $localStorage.getObject('user');
+            if( user && user.token ) return;
+            
+            $location.path("/app/login");
+            return false;
+        }
+      }
+    })
+```
+
+### 3.2 Authenticate a user
+To log the user in call `$vpApi.authenticate(data, onSuccess, onError)`. Where data contains the keywords: `username`, `password`, `stayLoggedIn`.     
+
+On successful authentication the service will attempt to download the user's authorized formstack as well as any responses the user already has for that formstack. And if 'stayLoggedIn` is will save the user and token to localStorage. 
+
+
 
 ## 4. Question Types
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
@@ -210,9 +243,31 @@ options
 ----
 ##5. Angular Services
 
-These are located in `services.js`
+These are located in `services.js`. To load these into your app inject `vpApi.services` to your module. Most services defined a load function that loads the data from localStorage. 
 
-###
+###$vpApi
+Handles authentication and base HTTP requests.
+
+###$formstack
+Resource: `/api/v2/pforms/formstack`
+Handles fetching and updates from a read-only endpoint. 
+
+###$form
+Possibly deprecated in v0.5
+###$block
+Possibly deprecated in v0.5
+
+###$formResponse
+Handles creation of form responses with a `cid` as well as some getters.
+
+###$blockResponse
+Handles creation of block responses with a `cid` as well as some getters based on block response index.
+###$answers
+Handles fetching updates from API as well as creating and updating answers locally. 
+
+###$profile
+
+###$localStorage
 
 ---
 
