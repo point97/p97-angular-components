@@ -22,7 +22,8 @@ var QUESTION_TYPES = [
                       'integer',
                       'email',
                       'date',
-                      'phonenumber'
+                      'phonenumber',
+                      'multi-select'
                      ]
 
 

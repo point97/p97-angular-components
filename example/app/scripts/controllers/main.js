@@ -123,6 +123,21 @@ angular.module('exampleApp')
                 "format": 'North America',
                 "country": '1' 
             }
+        },{
+            "body": "Please select a choice from the following",
+            "label": "Which one do you like?",
+            "choices": [
+                {'verbose': 'Hook & Line', 'value': '5'},
+                {'verbose': 'Trawl Net', 'value': '6'},
+                {'verbose': 'Trap', 'value': '7'},
+                {'verbose': 'Siene Net', 'value': '8'},
+                {'verbose': 'Drift Net', 'value': '9'}
+            ],
+            "options": {
+                "required": true,
+                "min_choice": 1,
+                "max_choice": 4,
+            }
         }]
     };
 
