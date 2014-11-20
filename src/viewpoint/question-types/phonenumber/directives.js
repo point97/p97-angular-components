@@ -79,7 +79,8 @@ angular.module('p97.questionTypes')
             }
 
             scope.internalControl.clean_answer = function(){
-                // Nothing to see here.
+                scope.internalControl.cleaned_value = scope.internalControl.parse_phone();
+                return scope.internalControl.cleaned_value;
             }
 
 

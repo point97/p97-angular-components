@@ -336,7 +336,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/drop-down.html';
+                    return BASE_URL+'single-select/templates/ionic/drop-down-single.html';
             }
 
             if (!scope.question) return;
@@ -763,7 +763,8 @@ angular.module('p97.questionTypes')
             }
 
             scope.internalControl.clean_answer = function(){
-                // Nothing to see here.
+                scope.internalControl.cleaned_value = scope.internalControl.parse_phone();
+                return scope.internalControl.cleaned_value;
             }
 
 
@@ -795,7 +796,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'multi-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'multi-select/templates/ionic/drop-down.html';
+                    return BASE_URL+'multi-select/templates/ionic/drop-down-multi.html';
             }
 
             if (!scope.question) return;

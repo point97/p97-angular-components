@@ -32,7 +32,7 @@ describe('Controller: MultiCtrl', function () {
                 ],
                 "options": {
                     "required": true,
-                    "min_choice": 1,
+                    "min_choice": 2,
                     "max_choice": 4,
                 }
             }]
@@ -42,7 +42,7 @@ describe('Controller: MultiCtrl', function () {
     $compile = _$compile_;
 
     $elm = angular.element(
-        '<div single-select' +
+        '<div multi-select' +
            ' question="current.block.questions[0]"' +
            ' value="current.value"' +
            ' control="current.block.answers[0].form">' +
@@ -63,12 +63,39 @@ describe('Controller: MultiCtrl', function () {
         expect(is_valid).toBe(false);
     });
 
-    // it('should be answered if question is required', function(){    
-    //     var isolated = elm.isolateScope();
-    //     isolated.value = null;
+    it('should be answered if question is required', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = null;
 
-    //     var is_valid = isolated.internalControl.validate_answer();
-    //     expect(is_valid).toBe(true);
-    // });
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should not exceed max number of choices if set as an option', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = ["Hook & Line", "Trawl Net", "Trap", "Siene Net", "Drift Net"];
+        isolated.choices_selected = isolated.value.length;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should have at least the min number of choices if set as an option', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = ["Hook & Line"];
+        isolated.choices_selected = isolated.value.length;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should be within a min and max range if defined', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = ["Hook & Line", "Trawl Net", "Trap"];
+        isolated.choices_selected = isolated.value.length;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+    });
 
 });

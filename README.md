@@ -169,7 +169,7 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
   `options`
   
   * templateUrl
-     * "ionic/drop-down.html"
+     * "ionic/drop-down-single.html" (note the '-single' add on, this prevents having templates with the same name across question types)
      * "ionic/radio.html"
   * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
   * choices_from_previous_answer: [String] the question slug who's answers to use as choices for this question.  
@@ -185,7 +185,7 @@ IN PROGRESS - Don't have random order or others.
   `options`
 
   * templateUrl 
-     * "ionic/drop-down.html"
+     * "ionic/drop-down-multi.html"
      * "ionic/expanded.html"
   * min_choice
   * max_choice
