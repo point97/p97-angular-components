@@ -159,6 +159,8 @@ options
   * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
   * choices_from_previous_answer: [String] the question slug who's answers to use as choices for this question.  
   * required: [Boolean] defaults to `true`
+  * allow_other: [Integer] 0 means no other field, if greater than 0, allows the user to enter freetyped answer.
+  * other_max_length: [Integer] Then max length required by the other field.  
   * default
 
 
@@ -237,11 +239,22 @@ options
 
 * **currency**
 options
-* min
-* max
-* code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
-* required
-* default
+	* min
+	* max
+	* code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
+	* required
+	* default
+
+### Available in version v0.5
+
+* **map**
+options
+* layers - [Array] a list of map layers to user.
+* cache_tiles: [Boolean]
+* require_in_bounds: [Boolean]
+* boundary_file: [String] name of boundary GeoJSON file to use (no path required).
+* use_planning_units: [Boolean]
+* planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
 
 ----
 ##5. Angular Services
@@ -274,12 +287,31 @@ Handles fetching updates from API as well as creating and updating answers local
 
 ---
 
-##6. Form and Block Controllers
+##6. Linear Form and Block Controllers
 
-###6.1 FormCtrl.js
+The app URI structure should be as follows
+
+`/app/<formstack-slug>/<formstack-response-uuid>/<form-response-uuid>/<block-response-uuid>/`
+
+Examples
+```
+// For a brand new survey this would look like
+`/app/my-survey/new/new-<form-slug>/new-<block-slug>`
+
+// An existing survey answering a new page on an existing survey
+`/app/my-survey/<formstack-repsponse-uuid>/new-<form-slug>/new-<block-slug>/`
+
+// Editing an existing survey at a specific form and block
+`/app/my-survey/<formstack-repsponse-uuid>/<form-response-uuid>/<block-response-uuid>/`
+
+```
+###6.1 LinearFormstackCtrl
+Is this necessary?
+
+###6.2 LinearFormCtrl
 This controller handles the loading of a **Form** and the display and navigation controls of it's blocks. It also handles the loading of initial values for the questions in a block. The initial values come from either the `question.options.default` of from a previous answer for that Form and Block response, with a previous answer taking precedence over the default value. 
 
-###6.2BlockCtrl.js
+###6.3 LinearBlockCtrl
 The BlockCtrl handles the saving of a block. This controller inherits it's scope from `FormCtrl`. 
 
 
@@ -506,7 +538,6 @@ I am following https://github.com/karma-runner/karma-ng-html2js-preprocessor
 
 And here
 http://angular-tips.com/blog/2014/06/introduction-to-unit-test-directives/
-
 
 
 
