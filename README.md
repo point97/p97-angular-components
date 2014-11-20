@@ -181,12 +181,14 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
 
 ### Available in v 0.4
 * **multi-select**
-
+IN PROGRESS - Don't have random order or others. 
   `options`
 
   * templateUrl 
      * "ionic/drop-down.html"
      * "ionic/expanded.html"
+  * min_choice
+  * max_choice
   * grouping
   * random_order
   * random_order_groups
@@ -196,7 +198,7 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
   * default
 
 * **date** 
-
+   PASSING TEST
    `options`
 
    * templateUrl: 
@@ -211,27 +213,6 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
    * required
    * default
 
-* **time** 
-
-  `options`
-  
-  * templateUrl: 
-		  * "ionic/time.html"
-		  * "ionic/popup.html"
-		  * "yeoman/time.html"
-		  * "yeoman/popup.html"
-  * initial
-  * min 
-  * max
-  * datejs_format: [String] e.g. 'HH:mm:ss'
-  * required
-  * default
-
-* **checkbox**
-  `options`
-  * default: [String] 'checked', 'unchecked'
-  * required
-
 * **toggle**
 
   `options`
@@ -243,7 +224,8 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
   * required
 
 * **phone-number**
-
+  This will save a parsed array of the phone number, e.g. [COUNTRY. 
+  PASSING TESTS
   `options`
 
   * format: "(xxx) xxx-xxxx"
@@ -251,7 +233,7 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
   * default
 
 * **email**
-
+  PASSING TESTS - 
   `options`
 
   * required
@@ -288,6 +270,29 @@ This may change to a form type since we want the map to be fullscreen and the we
   * boundary_file: [String] name of boundary GeoJSON file to use (no path required).
   * use_planning_units: [Boolean]
   * planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
+
+* **time** 
+ 
+  `options`
+  
+  * templateUrl: 
+		  * "ionic/time.html"
+		  * "ionic/popup.html"
+		  * "yeoman/time.html"
+		  * "yeoman/popup.html"
+  * initial
+  * min 
+  * max
+  * datejs_format: [String] e.g. 'HH:mm:ss'
+  * required
+  * default
+
+* **checkbox**
+  A single check box. 
+  `options`
+  * default: [String] 'checked', 'unchecked'
+  * required
+
 
 ----
 ##5. Angular Services
