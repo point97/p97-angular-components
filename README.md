@@ -115,7 +115,9 @@ On successful authentication the service will attempt to download the user's aut
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
 
 * **datetime** (only date component of datetime was added in v 0.3 - functional in v 0.4)
- options
+ 
+ `options`
+ 
   * templateUrl: 
 		  * "ionic/inline.html"
 		  * "ionic/popup.html"
@@ -129,7 +131,9 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * default
 
 * **number** - This can either be a decimal or an integer
- options
+ 
+  `options`
+  
   * min
   * max
   * required
@@ -137,7 +141,9 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
  
 * **textarea**
   `min_word` and `max_word` take precedence over `min_char` and `max_char`
- options
+  
+   `options`
+ 
   * min_word
   * max_word
   * min_char
@@ -148,11 +154,14 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * default
 
 * **yes-no** (deprecated in v 0.4 in favor of toggle)
- options
+   `options`
+   
  * default: 'yes'
 
 * **single-select**
-options
+
+  `options`
+  
   * templateUrl
      * "ionic/drop-down.html"
      * "ionic/radio.html"
@@ -166,7 +175,9 @@ options
 
 ### Available in v 0.4
 * **multi-select**
-options
+
+  `options`
+
   * templateUrl 
      * "ionic/drop-down.html"
      * "ionic/expanded.html"
@@ -179,21 +190,25 @@ options
   * default
 
 * **date** 
- options
-  * templateUrl: 
+
+   `options`
+
+   * templateUrl: 
 		  * "ionic/time.html"
 		  * "ionic/popup.html"
 		  * "yeoman/time.html"
 		  * "yeoman/popup.html"
-  * initial
-  * min 
-  * max
-  * datejs_format: [String] e.g. 'MM/dd/yyyy'
-  * required
-  * default
+   * initial
+   * min 
+   * max
+   * datejs_format: [String] e.g. 'MM/dd/yyyy'
+   * required
+   * default
 
 * **time** 
- options
+
+  `options`
+  
   * templateUrl: 
 		  * "ionic/time.html"
 		  * "ionic/popup.html"
@@ -207,12 +222,14 @@ options
   * default
 
 * **checkbox**
-options
+  `options`
   * default: [String] 'checked', 'unchecked'
   * required
 
 * **toggle**
-options
+
+  `options`
+  
   * positive_value
   * positive_label
   * negative_value
@@ -220,35 +237,44 @@ options
   * required
 
 * **phone-number**
-options
+
+  `options`
+
   * format: "(xxx) xxx-xxxx"
   * required
   * default
 
 * **email**
-options
+
+  `options`
+
   * required
   * default
 
 * **integer**
-options
+
+  `options`
+
   * min
   * max
   * required
   * default
 
 * **currency**
-options
-	* min
-	* max
-	* code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
-	* required
-	* default
+ 
+  `options`
+	
+  * min
+  * max
+  * code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
+  * required
+  * default
 
 ### Available in version v0.5
 
 * **map**
-options
+
+  `options`
   * layers - [Array] a list of map layers to user.
   * cache_tiles: [Boolean]
   * require_in_bounds: [Boolean]
