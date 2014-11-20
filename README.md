@@ -35,8 +35,11 @@ This will install a directory named `p97-components` containing
 
 Then add the files to your html. 
 ```
-<script src="PATH_TO_JS_LIB/p97-components/services.min.js"></script>
-<script src="PATH_TO_JS_LIB/p97-components/question-types.min.js"></script>
+<script src="PATH_TO_JS_LIB/p97-components/dist/viewpoint/services.min.js"></script>
+<script src="PATH_TO_JS_LIB/p97-components/dist/viewpoint/question-types.min.js"></script>
+
+# Coming on v0.5
+<script src="PATH_TO_JS_LIB/p97-components/dist/viewpoint/controllers.min.js"></script>
 ```
 
 See the [Question Types](#3-question-types) section for a detailed list of the question types. 
