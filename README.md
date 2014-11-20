@@ -223,14 +223,6 @@ IN PROGRESS - Don't have random order or others.
   * negative_label
   * required
 
-* **phone-number**
-  This will save a parsed array of the phone number, e.g. [COUNTRY. 
-  PASSING TESTS
-  `options`
-
-  * format: "(xxx) xxx-xxxx"
-  * required
-  * default
 
 * **email**
   PASSING TESTS - 
@@ -240,7 +232,8 @@ IN PROGRESS - Don't have random order or others.
   * default
 
 * **integer**
-
+ This allows user to enter an integer, if you need a decimal input use question type `number`.
+  PASSING TESTS 
   `options`
 
   * min
@@ -248,15 +241,7 @@ IN PROGRESS - Don't have random order or others.
   * required
   * default
 
-* **currency**
- 
-  `options`
-	
-  * min
-  * max
-  * code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
-  * required
-  * default
+
 
 ### Available in version v0.5
 
@@ -293,7 +278,25 @@ This may change to a form type since we want the map to be fullscreen and the we
   * default: [String] 'checked', 'unchecked'
   * required
 
+* **currency**
+ 
+  `options`
+	
+  * min
+  * max
+  * code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
+  * required
+  * default
 
+* **phone-number**
+  This will save a parsed array of the phone number, e.g. []. Need to worko n how to handled the cleaned_answer. 
+  PASSING TESTS
+  `options`
+
+  * format: "(xxx) xxx-xxxx"
+  * required
+  * default
+  
 ----
 ##5. Angular Services
 
