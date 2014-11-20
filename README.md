@@ -7,10 +7,14 @@ A collection of angular component to be used with Viewpoint 2.
 
 * [1. Usage](#1-usage)
 * [2. The Example App](#2-the-example-app) 
-* [3. Question Types](#3-question-types)
-* [4. For Developers](#4-for-developers)
-* [5. The Build Process](#5-the-build-process)
-* [6. Testing](#6-testing)
+* [3. Authentication](#3-authentication)
+* [4. Question Types](#4-question-types)
+* [5. Angular Services](#5-angular-services)
+* [6. Form and Block Controllers](#6-form-and-block-controllers)
+* [7. For Developers](#7-for-developers)
+* [8. The Build Process](#8-the-build-process)
+* [9. Testing](#9-testing)
+
 
 ##1. Usage
 
@@ -69,7 +73,9 @@ cd p97-components
 ln -s ../../../../src/ src
 ```
 
-## 3. Question Types
+## 3. Authentication
+
+## 4. Question Types
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
 
 * **datetime** (only date component of datetime was added in v 0.3 - functional in v 0.4)
@@ -202,7 +208,26 @@ options
 * default
 
 ----
-## 4. For Developers
+##5. Angular Services
+
+These are located in `services.js`
+
+###
+
+---
+
+##6. Form and Block Controllers
+
+###6.1 FormCtrl.js
+This controller handles the loading of a **Form** and the display and navigation controls of it's blocks. It also handles the loading of initial values for the questions in a block. The initial values come from either the `question.options.default` of from a previous answer for that Form and Block response, with a previous answer taking precedence over the default value. 
+
+###6.2BlockCtrl.js
+The BlockCtrl handles the saving of a block. This controller inherits it's scope from `FormCtrl`. 
+
+
+---
+
+## 7. For Developers
 
 ### Getting started
 This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
@@ -218,7 +243,7 @@ This assumes you have Node and NPM installed. See their pages on how to install.
 
 4. See [The Example App](#the-example-app) to get the example app up and running.
 
-### Making Question Type Components
+### 7.1 Making Question Type Components
 
 There are several steps required to make a new question type directive but here is a breif outline.
 
@@ -256,8 +281,8 @@ src/
 ```
 Where `<QUESTION-TYPE>` is the slug of the question type.
 
-
-### Question Type Directives
+---
+### 7.2 Question Type Directives
 
 All question type directives must accept `question` ,  `value`, and `form`  (this was previously named control) on their scopes. These varaibles will then be shared  between the parent controller's scope and the directive's scope.  Options for the questions will be defined. 
 in `question.options`.
@@ -284,7 +309,7 @@ The scope takes three objects.
  * **form** - A handle to attach methods to you want exposed in the parent controller.
  
 
-#### Question Methods
+### 7.3 Question Methods
 Each question type directive will have the following methods available. These are attached to the `form` object passed into the directive and are then available to the parent controller.
 
 ```javascript
@@ -316,7 +341,7 @@ Use this method to do any sort of pre-processing of data before passing it on to
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
 
-### Question Type Templates
+###7.4  Question Type Templates
 Templates are grouped by themes. Themes usually depend on the front-end framework being used (e.g. Boostrap, Ionic, or Foundation) or platform being used, desktop vs. phonegap. 
 
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
@@ -371,12 +396,12 @@ angular.module('p97.questionTypes')
 
 ----
 
-## 5. The Build Process
+## 8. The Build Process
 The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
 
 The build process is defined in `/gulpfile.js` and can be configured there. 
 
-### Distribution Directory Structure
+### 8.1 Distribution Directory Structure
 
 ```
 dist/
@@ -409,7 +434,7 @@ bower install p97-components
 
 
 ----
-## 6. Testing
+## 9. Testing
 
 Test are ran through the example app. 
 
