@@ -112,10 +112,12 @@ On successful authentication the service will attempt to download the user's aut
 
 
 ## 4. Question Types
-Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object.
+Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object. Defaults values are handled by the BlockCtlr not the question type directve. 
+
 
 * **datetime** (only date component of datetime was added in v 0.3 - functional in v 0.4)
- 
+ PASSING TESTS - Looking at time datetime and Ionic UI stuff.
+
  `options`
  
   * templateUrl: 
@@ -131,7 +133,7 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * default
 
 * **number** - This can either be a decimal or an integer
- 
+  PASSING TESTS
   `options`
   
   * min
@@ -140,6 +142,7 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * default
  
 * **textarea**
+  PASSING TESTS 
   `min_word` and `max_word` take precedence over `min_char` and `max_char`
   
    `options`
@@ -154,11 +157,14 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * default
 
 * **yes-no** (deprecated in v 0.4 in favor of toggle)
-   `options`
+  DEPRACTED 
+  `options`
    
  * default: 'yes'
 
 * **single-select**
+  IN PROGRESS - still needs to work on 'other' answer logic.
+The 'other' options allows for a user to enter a single text answer. Other vlaidation is only Upper/lower case text, numbers, ., -, ' and a space. 
 
   `options`
   
@@ -169,7 +175,7 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * choices_from_previous_answer: [String] the question slug who's answers to use as choices for this question.  
   * required: [Boolean] defaults to `true`
   * allow_other: [Integer] 0 means no other field, if greater than 0, allows the user to enter freetyped answer.
-  * other_max_length: [Integer] Then max length required by the other field.  
+  * other_max_length: [Integer] Then max length required by the other field, default to 250.  
   * default
 
 
