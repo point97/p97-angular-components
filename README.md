@@ -249,12 +249,12 @@ options
 
 * **map**
 options
-* layers - [Array] a list of map layers to user.
-* cache_tiles: [Boolean]
-* require_in_bounds: [Boolean]
-* boundary_file: [String] name of boundary GeoJSON file to use (no path required).
-* use_planning_units: [Boolean]
-* planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
+  * layers - [Array] a list of map layers to user.
+  * cache_tiles: [Boolean]
+  * require_in_bounds: [Boolean]
+  * boundary_file: [String] name of boundary GeoJSON file to use (no path required).
+  * use_planning_units: [Boolean]
+  * planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
 
 ----
 ##5. Angular Services
