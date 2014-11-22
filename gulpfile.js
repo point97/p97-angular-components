@@ -29,9 +29,6 @@ var QUESTION_TYPES = [
 
 gulp.task('question-types', function() {
     
-    // var js_srcs = _.map(QUESTION_TYPES, function(type){
-    //     return "example/app/scripts/p97-components/src/question-types/"+type+'/*.js';
-    // });
 
     // Prepend the module.js file.
     // js_srcs.unshift("example/app/scripts/p97-components/src/question-types/module.js");
@@ -56,12 +53,12 @@ gulp.task('question-types', function() {
 
     // Copy the Ionic HMTL templates to dist/templates
     var ionic_templates_srcs = _.map(QUESTION_TYPES, function(type){
-        return "src/viewpoint/question-types/"+type+'/templates/ionic/*.html';
+        return "src/viewpoint/question-types/"+type+'/templates/**/*.html';
     });
-
     console.log(ionic_templates_srcs);
-    return gulp.src(ionic_templates_srcs)
-        .pipe(gulp.dest(DEST+'viewpoint/templates/ionic'));
+    
+    return gulp.src(ionic_templates_srcs, {base:'src/viewpoint/question-types/'})
+        .pipe(gulp.dest(DEST+'viewpoint/questions-types'));
 
 });
 
