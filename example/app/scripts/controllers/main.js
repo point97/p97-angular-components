@@ -61,7 +61,10 @@ angular.module('exampleApp')
                     {'verbose': 'Trawl Net', 'value': '6'},
                     {'verbose': 'Trap', 'value': '7'},
                 ],
-            'options': {'required': true},
+            'options': {
+                'required': false,
+                'allow_other': 1
+            }
         },{
             'body': 'Please choose one of the following',
             'label': 'Select One',
@@ -73,7 +76,8 @@ angular.module('exampleApp')
                 ],
             'options': {
                 'required': true,
-                'templateUrl': 'ionic/radio'
+                'templateUrl': 'ionic/radio',
+                'allow_other': 1
             }
         },{
             'body': 'This is an integer question type. Please enter an integer between -5 and 25.',
@@ -158,10 +162,13 @@ angular.module('exampleApp')
         var isBlockValid = true;
         _.each($scope.current.block.answers, function(answer){
             try {
-                answer.form.clean_answer();
+                var cleaned_value = answer.form.clean_answer();
                 var isValid = answer.form.validate_answer();
                 if (!isValid){
                     isBlockValid = false;
+                }
+                else {
+                    answer.value = cleaned_value; 
                 }
             } catch(err) {
                 console.log(err)

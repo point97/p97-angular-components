@@ -8,6 +8,12 @@
                     ng-class="{'error':errors.length>0}"
                     ng-options='choice.value as choice.verbose for choice in question.choices'>
             </select>
+            <span ng-show="value === 'other'">
+                <input type="text"
+                    ng-blur="otherValueBlur()"
+                    ng-model="otherValue"
+                    placeholder="'Other' Choice">
+            </span>
             <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </label>
     
