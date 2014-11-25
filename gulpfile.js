@@ -58,7 +58,7 @@ gulp.task('question-types', function() {
     console.log(ionic_templates_srcs);
     
     return gulp.src(ionic_templates_srcs, {base:'src/viewpoint/question-types/'})
-        .pipe(gulp.dest(DEST+'viewpoint/questions-types'));
+        .pipe(gulp.dest(DEST+'viewpoint/question-types'));
 
 });
 
