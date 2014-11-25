@@ -1,0 +1,20 @@
+<div class="p97-single-select">
+    <div>{{question.body}}</div>
+    <div class="list">
+        <label class="item item-input">
+            <div ng-repeat="choice in question.choices">
+                <input type="radio"
+                    ng-model="$parent.value"
+                    ng-value="{{choice.value}}"
+                    ng-required='question.options.required'
+                    ng-class="{'error':errors.length>0}">
+                </input>
+                <label> {{choice.verbose}}</label>
+            </div>
+
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+        </label>
+    
+    </div>
+
+</div>

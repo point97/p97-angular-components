@@ -1,0 +1,16 @@
+<div class="p97-single-select">
+    <div>{{question.body}}</div>
+    <div class="list">
+        <label class="item item-input">
+            <select 
+                    ng-model="value" 
+                    ng-required='question.options.required'
+                    ng-class="{'error':errors.length>0}"
+                    ng-options='choice.value as choice.verbose for choice in question.choices'>
+            </select>
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+        </label>
+    
+    </div>
+
+</div>
