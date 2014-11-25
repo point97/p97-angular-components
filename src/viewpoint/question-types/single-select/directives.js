@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('singleSelect', function($http, $templateCache, $compile){
+  .directive('singleSelect', function($http, $templateCache, $compile, $ionicPopup){
     return {
         template: '',
         restrict: 'EA',
@@ -75,19 +75,23 @@ angular.module('p97.questionTypes')
 
             scope.otherValueBlur = function () {
                 if (scope.otherValue.length > 0) {
-                    var res = window.confirm('Are you sure you want this input?')
-                    if (res) {
-                       var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                       scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
-                       scope.value = scope.otherValue; 
-
-                        //scope.value.push(scope.otherValue)
-                       scope.otherValue = '';
-                   }
+                    var confirmPopup = $ionicPopup.confirm({
+                         title: 'Are You Sure',
+                         template: 'Are you sure you want this selection?'
+                       });
+                    confirmPopup.then(function(res) {
+                        if (res) {
+                           var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                           scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                           scope.value = scope.otherValue; 
+                           scope.otherValue = '';
+                        } 
+                    }); //end confirmPopup.then
                 }
             }
         }
     } // end return 
 })
+
 
 

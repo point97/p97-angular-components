@@ -1,27 +1,31 @@
 <div class="p97-single-select">
     <div>{{question.body}}</div>
     <div class="list">
-        <label class="item item-input">
-            <div ng-repeat="choice in question.choices">
-                <input type="radio"
-                    ng-model="$parent.value"
-                    ng-value="choice.value"
-                    name="group"
-                    ng-required='question.options.required'
-                    ng-class="{'error':errors.length>0}">
-                </input>
-                <label> {{choice.verbose}}</label>
-            </div> 
+        <div ng-repeat="choice in question.choices">
+            <label class="item item-radio">
+            <input type="radio"
+                ng-model="$parent.value"
+                ng-value="choice.value"
+                name="group"
+                ng-required='question.options.required'
+                ng-class="{'error':errors.length>0}">
+            </input>
+            <div class="item-content"> {{choice.verbose}}</div>
+            <i class="radio-icon ion-checkmark"></i>
+            </label>
+        </div> 
             <div ng-show="value === 'other'">
                 <input type="text"
+                    name="otherValue"
                     ng-model="otherValue"
                     ng-blur="otherValueBlur()"
                     placeholder="'Other' Choice">
             </div>
 
             <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
-        </label>
+
     
     </div>
 
 </div>
+

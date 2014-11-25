@@ -1,6 +1,6 @@
 <div class="p97-components">
     <div>{{question.body}}</div>
-    <!-- <ul class="list">
+    <ul class="list">
         <li class="item item-toggle">
             <label class="toggle">
                {{question.label}}
@@ -14,6 +14,6 @@
             </label>
             <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </li>
-    </ul> -->
+    </ul>
     <ion-toggle ng-model="value" toggle-class="toggle-calm">{{question.label}}</ion-toggle>
 </div>
