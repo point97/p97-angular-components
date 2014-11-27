@@ -3,13 +3,13 @@
         <div class="list">
             <label class="item item-input">
                 <input 
-                       type="integer" 
+                       type="number" 
                        ng-model="value" 
                        placeholder="{{question.label}}"
                        ng-required='question.options.required'
                        ng-class="{'error':errors.length>0}"
                 />
-                <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
             </label>
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </div>
 </div>

@@ -8,10 +8,11 @@
                     ng-required='question.options.required'
                     ng-class="{'error':errors.length>0}"
             ></textarea>
+            <div ng-show='question.options.show_word_count' class="small">{{word_count}} words</div>
+            <div ng-show='question.options.show_char_count' class="small">{{char_count}} characters</div>
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </label>
-        <div ng-show='question.options.show_word_count' class="small">{{word_count}} words</div>
-        <div ng-show='question.options.show_char_count' class="small">{{char_count}} characters</div>
-        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+    
     </div>
 
 </div>

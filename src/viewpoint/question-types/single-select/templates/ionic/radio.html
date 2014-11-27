@@ -16,6 +16,7 @@
         </div> 
             <div ng-show="value === 'other'">
                 <input type="text"
+                    id="{{question.slug}}-other"
                     name="otherValue"
                     ng-model="otherValue"
                     ng-blur="otherValueBlur()"
