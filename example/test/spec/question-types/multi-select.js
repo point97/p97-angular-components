@@ -93,7 +93,7 @@ describe('Controller: MultiCtrl', function () {
         var isolated = elm.isolateScope();
         isolated.value = ["Hook & Line", "Trawl Net", "Trap"];
         isolated.choices_selected = isolated.value.length;
-
+        debugger;
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
     });

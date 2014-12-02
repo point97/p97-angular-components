@@ -61,6 +61,7 @@ describe('Controller: NumCtrl', function () {
     elm = $compile($elm)(scope);
     elm2 = $compile($elm2)(scope2);
     scope.$digest();
+    scope2.$digest();
     $rootScope.$apply();
 
     }));

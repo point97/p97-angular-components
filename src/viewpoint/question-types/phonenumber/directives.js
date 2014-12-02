@@ -28,7 +28,6 @@ angular.module('p97.questionTypes')
             //regex for North American phone numbers 
             //(US territories, Canada, Bermuda, and 17 Caribbean nations)
             var regNorthAmerica =/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-            //^(?:\+?1[-. ]?)?\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$
 
             //regex for International phone numbers 
             //Industry-standard notation specified by ITU-T E.123
