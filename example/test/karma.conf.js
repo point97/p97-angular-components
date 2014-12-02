@@ -28,7 +28,7 @@ module.exports = function(config) {
       'app/scripts/p97-components/src/viewpoint/question-types/**/*.js', // Get all the directives and controllers
 
       // Our templates
-      'app/scripts/p97-components/src/viewpoint/**/ionic/*.html',
+      'app/scripts/p97-components/src/viewpoint/**/*.html',
 
       'app/scripts/**/*.js',
       'test/mock/**/*.js',

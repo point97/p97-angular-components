@@ -3,12 +3,12 @@
     <div class="list">
         <label class="item item-input">
             <select 
-                    ng-model="value" 
+                    ng-model="inputValue" 
                     ng-required='question.options.required'
                     ng-class="{'error':errors.length>0}"
                     ng-options='choice.value as choice.verbose for choice in question.choices'>
             </select>
-            <span ng-show="value === 'other'">
+            <span ng-show="inputValue === 'other'">
                 <input type="text"
                     ng-blur="otherValueBlur()"
                     ng-model="otherValue"
@@ -16,7 +16,5 @@
             </span>
             <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </label>
-    
     </div>
-
 </div>

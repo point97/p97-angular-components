@@ -6,15 +6,15 @@
             {{question.label}}
         </div>
             <select 
-                    ng-model="value" 
+                    ng-model="inputValue" 
                     ng-required='question.options.required'
                     ng-class="{'error':errors.length>0}"
                     ng-options='choice.value as choice.verbose for choice in question.choices'>
             </select>
             </label>
-            <div ng-show="value === 'other'">
+            <div ng-show="inputValue === 'other'">
                 <input type="text"
-                    id="{{question.slug}}-other"
+
                     name="otherValue"
                     ng-blur="otherValueBlur()"
                     ng-model="otherValue"
@@ -22,19 +22,4 @@
             </div>
         <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
     </div>
-</div>
-
-<!-- <div class="list">
-
-  <label class="item item-input item-select">
-    <div class="input-label">
-      Lightsaber
-    </div>
-    <select>
-      <option>Blue</option>
-      <option selected>Green</option>
-      <option>Red</option>
-    </select>
-  </label>
- -->
 </div>

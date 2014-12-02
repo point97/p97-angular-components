@@ -1,5 +1,8 @@
 angular.module('p97.questionTypes')
-  .directive('singleSelect', function($http, $templateCache, $compile, $ionicPopup){
+  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+    if ($injector.has('$ionicPopup')) {
+        var $ionicPopup = $injector.get('$ionicPopup');
+    }
     return {
         template: '',
         restrict: 'EA',
@@ -12,6 +15,10 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
+            var reg = /^[A-Za-z\d() _.,-]*$/;
+            var options = scope.question.options;
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
@@ -21,17 +28,12 @@ angular.module('p97.questionTypes')
 
             if (!scope.question) return;
 
-            var options = scope.question.options;
-            scope.errors = [];
-
             if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
 
             if (options.allow_other > 0) {
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.question.choices.push(otherChoice);
             }
-
-            var reg = /^[A-Za-z\d() _.,-]*$/;
 
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -45,11 +47,11 @@ angular.module('p97.questionTypes')
 
                 }
 
-                if (!reg.test(scope.otherValue) || !reg.test(scope.value) || !reg.test(scope.clean)) {
+                if (!reg.test(scope.value)) {
                     scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
                 }
 
-                if (scope.value === 'other') {
+                if (scope.inputValue === 'other') {
                     if (!scope.otherValue || scope.otherValue === null) {
                         scope.errors.push("You selected 'Other'. It cannot be blank. Please fill in a response or select another choice")
                     }
@@ -60,11 +62,7 @@ angular.module('p97.questionTypes')
             }
 
             scope.internalControl.clean_answer = function(){
-                scope.cleaned_value = scope.value;
-                if (scope.value === 'other') {
-                    scope.cleaned_value = scope.otherValue;
-                }
-                return scope.cleaned_value;
+                //nothing to see here
             }
 
             // Compile the template into the directive's scope.
@@ -73,25 +71,44 @@ angular.module('p97.questionTypes')
                 $compile(contents)(scope);
             });
 
-            scope.otherValueBlur = function () {
-                if (scope.otherValue.length > 0) {
-                    var confirmPopup = $ionicPopup.confirm({
-                         title: 'Are You Sure',
-                         template: 'Are you sure you want this selection?'
-                       });
-                    confirmPopup.then(function(res) {
-                        if (res) {
-                           var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                           scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
-                           scope.value = scope.otherValue; 
-                           scope.otherValue = '';
-                        } 
-                    }); //end confirmPopup.then
+            scope.$watch('inputValue', function (newValue) {
+                if (newValue === 'other') {
+                    scope.value = scope.otherValue;
+                } else {
+                    scope.value = newValue;
                 }
+            });
+
+            scope.otherValueBlur = function () {
+               if (scope.otherValue.length > 0) {
+                    if ($ionicPopup) {
+                       var confirmPopup = $ionicPopup.confirm({
+                            title: 'Are You Sure',
+                            template: 'Are you sure you want this selection?'
+                          });
+                       confirmPopup.then(function(res) {
+                           if (res) {
+                              var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                              scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                              scope.inputValue = scope.otherValue; 
+                              scope.otherValue = '';
+                           } 
+                       }); //end confirmPopup.then
+                       
+                    } else {
+                        var option = window.confirm("Are You Sure", "Are you sure you want this selection");
+                        if (option == true) {
+                            var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                            scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                            scope.inputValue = scope.otherValue; 
+                            scope.otherValue = '';
+                        }
+                    } //ends else statement
+                }          
             }
         }
     } // end return 
-})
+}])
 
 
 

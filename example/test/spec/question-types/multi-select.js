@@ -57,15 +57,7 @@ describe('Controller: MultiCtrl', function () {
 
     it('should be answered if question is required', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = null;
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
-    });
-
-    it('should be answered if question is required', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = null;
+        isolated.value = [];
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
@@ -73,16 +65,17 @@ describe('Controller: MultiCtrl', function () {
 
     it('should not exceed max number of choices if set as an option', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = ["Hook & Line", "Trawl Net", "Trap", "Siene Net", "Drift Net"];
+        isolated.value = ['3', '4', '5'];
+
         isolated.choices_selected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
+        expect(is_valid).toBe(true);
     });
 
     it('should have at least the min number of choices if set as an option', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = ["Hook & Line"];
+        isolated.value = ['3'];
         isolated.choices_selected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
@@ -91,11 +84,20 @@ describe('Controller: MultiCtrl', function () {
 
     it('should be within a min and max range if defined', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = ["Hook & Line", "Trawl Net", "Trap"];
+        isolated.value = ['3', '4', '5'];
         isolated.choices_selected = isolated.value.length;
-        debugger;
+
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
+    });
+
+    it('should have an actual value if "other" is selected', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = ['3', '4', 'other'];
+        isolated.choices_selected = isolated.value.length;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
     });
 
 });

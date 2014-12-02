@@ -30,7 +30,8 @@ describe('Controller: SingleCtrl', function () {
                 ],
                 "options": {
                     "required": true,
-                    "allow_other": 1
+                    "allow_other": 1,
+                    "templateUrl": 'yeoman/radio'
                 }
             },{
                 "body": "Please select a choice from the following",
@@ -42,7 +43,8 @@ describe('Controller: SingleCtrl', function () {
                 ],
                 "options": {
                     "required": false,
-                    "allow_other": 1
+                    "allow_other": 1,
+                    "templateUrl": 'yeoman/drop-down-single'
                 }
             }]
         };
@@ -89,50 +91,29 @@ describe('Controller: SingleCtrl', function () {
         expect(is_valid).toBe(true);
     });
 
-    it('should have the user input equal a cleaned value', function(){    
+    it('should have the user input equal a valid answer', function(){    
         var isolated = elm.isolateScope();
         isolated.value = 'test123';
-
-        var clean = isolated.internalControl.clean_answer();
-        expect(clean).toEqual(isolated.value);
-    });
-
-    it('should have an input if the otherOption is selected', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = 'other';
-        isolated.otherValue = null;
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toEqual(false);
-    });
-
-    it('should not allow symbols or other random characters for otherValue', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = 'other';
-        isolated.otherValue = '&@&#!!fdgkljdf'
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
-    });
-
-
-    it('should only allow valid inputs for otherValue', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = 'other';
-        isolated.otherValue = 'This, is a valid input123.'
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
     });
 
-
-    it('should equal the otherValue if user inputs text upon Other selection', function(){    
+    it('should have an input if the otherOption is selected', function(){    
         var isolated = elm.isolateScope();
-        isolated.value = 'other';
-        isolated.otherValue = 'test'
+        isolated.inputValue = 'other';
+        isolated.otherValue = null;
 
-        var clean = isolated.internalControl.clean_answer();
-        expect(clean).toEqual("test");
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should not allow symbols or other random characters for otherValue', function(){    
+        var isolated = elm.isolateScope();
+        isolated.value = '&@&#!!fdgkljdf'
+        
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
     });
 
 });

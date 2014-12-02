@@ -4,7 +4,7 @@
         <div ng-repeat="choice in question.choices">
             <label class="item item-radio">
             <input type="radio"
-                ng-model="$parent.value"
+                ng-model="$parent.inputValue"
                 ng-value="choice.value"
                 name="group"
                 ng-required='question.options.required'
@@ -14,7 +14,7 @@
             <i class="radio-icon ion-checkmark"></i>
             </label>
         </div> 
-            <div ng-show="value === 'other'">
+            <div ng-show="inputValue === 'other'">
                 <input type="text"
                     id="{{question.slug}}-other"
                     name="otherValue"

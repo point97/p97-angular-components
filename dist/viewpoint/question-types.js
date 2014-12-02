@@ -319,7 +319,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
 angular.module('p97.questionTypes')
-  .directive('singleSelect', function($http, $templateCache, $compile, $ionicPopup){
+  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+    if ($injector.has('$ionicPopup')) {
+        var $ionicPopup = $injector.get('$ionicPopup');
+    }
     return {
         template: '',
         restrict: 'EA',
@@ -332,6 +335,10 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
+            var reg = /^[A-Za-z\d() _.,-]*$/;
+            var options = scope.question.options;
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
@@ -341,17 +348,12 @@ angular.module('p97.questionTypes')
 
             if (!scope.question) return;
 
-            var options = scope.question.options;
-            scope.errors = [];
-
             if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
 
             if (options.allow_other > 0) {
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.question.choices.push(otherChoice);
             }
-
-            var reg = /^[A-Za-z\d() _.,-]*$/;
 
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -365,11 +367,11 @@ angular.module('p97.questionTypes')
 
                 }
 
-                if (!reg.test(scope.otherValue) || !reg.test(scope.value) || !reg.test(scope.clean)) {
+                if (!reg.test(scope.value)) {
                     scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
                 }
 
-                if (scope.value === 'other') {
+                if (scope.inputValue === 'other') {
                     if (!scope.otherValue || scope.otherValue === null) {
                         scope.errors.push("You selected 'Other'. It cannot be blank. Please fill in a response or select another choice")
                     }
@@ -380,11 +382,7 @@ angular.module('p97.questionTypes')
             }
 
             scope.internalControl.clean_answer = function(){
-                scope.cleaned_value = scope.value;
-                if (scope.value === 'other') {
-                    scope.cleaned_value = scope.otherValue;
-                }
-                return scope.cleaned_value;
+                //nothing to see here
             }
 
             // Compile the template into the directive's scope.
@@ -393,25 +391,44 @@ angular.module('p97.questionTypes')
                 $compile(contents)(scope);
             });
 
-            scope.otherValueBlur = function () {
-                if (scope.otherValue.length > 0) {
-                    var confirmPopup = $ionicPopup.confirm({
-                         title: 'Are You Sure',
-                         template: 'Are you sure you want this selection?'
-                       });
-                    confirmPopup.then(function(res) {
-                        if (res) {
-                           var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                           scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
-                           scope.value = scope.otherValue; 
-                           scope.otherValue = '';
-                        } 
-                    }); //end confirmPopup.then
+            scope.$watch('inputValue', function (newValue) {
+                if (newValue === 'other') {
+                    scope.value = scope.otherValue;
+                } else {
+                    scope.value = newValue;
                 }
+            });
+
+            scope.otherValueBlur = function () {
+               if (scope.otherValue.length > 0) {
+                    if ($ionicPopup) {
+                       var confirmPopup = $ionicPopup.confirm({
+                            title: 'Are You Sure',
+                            template: 'Are you sure you want this selection?'
+                          });
+                       confirmPopup.then(function(res) {
+                           if (res) {
+                              var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                              scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                              scope.inputValue = scope.otherValue; 
+                              scope.otherValue = '';
+                           } 
+                       }); //end confirmPopup.then
+                       
+                    } else {
+                        var option = window.confirm("Are You Sure", "Are you sure you want this selection");
+                        if (option == true) {
+                            var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                            scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                            scope.inputValue = scope.otherValue; 
+                            scope.otherValue = '';
+                        }
+                    } //ends else statement
+                }          
             }
         }
     } // end return 
-})
+}])
 
 
 
@@ -818,7 +835,10 @@ angular.module('p97.questionTypes')
 });
 
 angular.module('p97.questionTypes')
-  .directive('multiSelect', function($http, $templateCache, $compile, $ionicPopup){
+  .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+    if ($injector.has('$ionicPopup')) {
+            var $ionicPopup = $injector.get('$ionicPopup');
+        } 
     return {
         template: '',
         restrict: 'EA',
@@ -860,18 +880,8 @@ angular.module('p97.questionTypes')
                 scope.errors = [];
 
                 if (options.required && options.required === true) {
-                    if (scope.value === null) {
+                    if (scope.value.length === 0) {
                         scope.errors.push('This field is required')
-                    }
-                }
-
-                if (!reg.test(scope.otherValue) || !reg.test(scope.value) || !reg.test(scope.clean)) {
-                    scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
-                }
-
-                if (scope.value === 'other') {
-                    if (!scope.otherValue || scope.otherValue === null) {
-                        scope.errors.push("You selected 'Other'. It cannot be blank. Please fill in a response or select another choice")
                     }
                 }
 
@@ -887,13 +897,21 @@ angular.module('p97.questionTypes')
                     }
                 }
 
+                if (scope.value.length > 0) {
+                    _.each(scope.value, function(i) { 
+                        if (!reg.test(i)) {
+                            scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
+                        } else if (i === 'other' && (!scope.otherValue || scope.otherValue === null)) {
+                            scope.errors.push("You selected 'Other'. It cannot be blank. Please fill in a response or select another choice")
+                        } 
+                    })
+                }
+
                 return (scope.errors.length === 0);
             }
 
             scope.internalControl.clean_answer = function(){
-                scope.cleaned_value = scope.value;
-
-                return scope.cleaned_value;
+                //nothing to see here
             }
 
             scope.toggleAnswers = function(choiceValue) {
@@ -914,40 +932,50 @@ angular.module('p97.questionTypes')
             //notification confirmation for 'other' answer
             scope.otherValueBlur = function() {
                 if (scope.otherValue.length > 0) {
-                    var confirmPopup = $ionicPopup.confirm({
-                        title: 'Are You Sure',
-                        template: 'Are you sure you want this selection?'
-                    });
-                    confirmPopup.then(function(res) {
-                        if (res) {
-                           var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue, 'checked': true};
+                    if (_.contains(scope.value, scope.otherValue)) {
+                        ($ionicPopup ? $ionicPopup.alert({
+                                            title: 'Duplicate Entries',
+                                            template: 'You have typed a duplicate answer. Please try again.'
+                                        }) 
+                                     :  alert('You have typed a duplicate answer. Please try again.')
+                        )
+                        return false;
+                    }; //end contains duplicate
 
-                           //inserts newChoice into question.choices in front of 'Other'
-                           scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                    ($ionicPopup ? confirmPopup = $ionicPopup.confirm({  
+                                                            title: 'Are You Sure',
+                                                            template: 'Are you sure you want this selection?'
+                                                       })
+                                 : confirmPopup = window.confirm('Are you sure what this selection')
+                    ); 
+                    
+                    if(confirmPopup == true) {
+                       var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue, 'checked': true};
 
-                           //removes 'other' item from valueArray and replaces it with user defined otherValue
-                           scope.valueArray[scope.valueArray.indexOf('other')] = scope.otherValue;
+                       //inserts newChoice into question.choices in front of 'Other'
+                       scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
 
-                           //toggle off 'other' item
-                           scope.question.choices[scope.question.choices.length - 1].checked = false;
+                       //removes 'other' item from valueArray and replaces it with user defined otherValue
+                       scope.value[scope.value.indexOf('other')] = scope.otherValue;
 
-                           scope.showOtherInput = false; 
-                           scope.otherValue = '';
-                        }
-                    });
+                       //toggle off 'other' item
+                       scope.question.choices[scope.question.choices.length - 1].checked = false;
+
+                       scope.showOtherInput = false; 
+                       scope.otherValue = '';
+                    }; //end confirmPopup
                 }
             }
 
-            scope.$watchCollection('valueArray', function(newValues, oldValues){
+            scope.$watchCollection('value', function(newValues, oldValues){
                 if (!newValues) return;
 
                 //watch  the number of choices selected within valueArray
-                //useful for defining number of choices users are allow to select
                 var choices_selected = newValues.length;
                 scope.choices_selected = choices_selected;
 
                 //show or hides text input depending on if valueArray contains an 'other' value
-                if (_.contains(scope.valueArray, 'other')) {
+                if (_.contains(scope.value, 'other')) {
                     scope.showOtherInput = true;
                 } else {
                     scope.showOtherInput = false;
@@ -961,6 +989,6 @@ angular.module('p97.questionTypes')
             });
         }
     } // end return 
-})
+}])
 
 
