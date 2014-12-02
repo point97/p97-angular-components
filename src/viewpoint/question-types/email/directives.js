@@ -1,6 +1,6 @@
 var reg = 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('email', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('email', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -60,4 +60,4 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
         }
     }
-});
+}]);

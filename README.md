@@ -521,7 +521,7 @@ Remember to also inject your three dependencies (`$http`, `$templateCache`, and 
 
 ```
 angular.module('p97.questionTypes')  
-  .directive('<QUESTION-TYPE>', function($http, $templateCache, $compile) {
+  .directive('<QUESTION-TYPE>', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile) {
   
 ```
 

@@ -28,7 +28,7 @@ angular.module('p97.questionTypes')
 });
 
 angular.module('p97.questionTypes')
-  .directive('datetime', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('datetime', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -93,10 +93,10 @@ angular.module('p97.questionTypes')
             
         }
     };
-});
+}]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('number', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('number', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -166,10 +166,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
         }
     }
-});
+}]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('textarea', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('textarea', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -261,10 +261,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             });
         }
     }
-});
+}]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('yesNo', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('yesNo', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -315,7 +315,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             });
         }
     }
-});
+}]);
 
 
 angular.module('p97.questionTypes')
@@ -435,7 +435,7 @@ angular.module('p97.questionTypes')
 
 
 angular.module('p97.questionTypes')
-  .directive('text', function($http, $templateCache, $compile){
+  .directive('text', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){
     
         return {
             template:'',
@@ -528,10 +528,10 @@ angular.module('p97.questionTypes')
 
             }
         }
-    });
+    }]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('integer', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('integer', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -605,11 +605,11 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
         }
     }
-});
+}]);
 
 var reg = 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('email', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('email', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -669,10 +669,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
         }
     }
-});
+}]);
 
 angular.module('p97.questionTypes')
-  .directive('date', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('date', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -737,10 +737,10 @@ angular.module('p97.questionTypes')
             
         }
     };
-});
+}]);
 
 angular.module('p97.questionTypes')
-  .directive('phonenumber', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('phonenumber', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -832,7 +832,7 @@ angular.module('p97.questionTypes')
             
         }
     };
-});
+}]);
 
 angular.module('p97.questionTypes')
   .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
