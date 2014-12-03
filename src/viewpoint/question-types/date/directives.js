@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('date', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('date', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -64,4 +64,4 @@ angular.module('p97.questionTypes')
             
         }
     };
-});
+}]);

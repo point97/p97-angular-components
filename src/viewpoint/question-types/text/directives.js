@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('text', function($http, $templateCache, $compile){
+  .directive('text', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){
     
         return {
             template:'',
@@ -92,4 +92,4 @@ angular.module('p97.questionTypes')
 
             }
         }
-    });
+    }]);

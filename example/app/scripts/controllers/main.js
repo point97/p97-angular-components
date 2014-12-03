@@ -63,7 +63,8 @@ angular.module('exampleApp')
                 ],
             'options': {
                 'required': false,
-                'allow_other': 1
+                'allow_other': 1,
+                'templateUrl': 'yeoman/drop-down-single'
             }
         },{
             'body': 'Please choose one of the following',
@@ -76,7 +77,7 @@ angular.module('exampleApp')
                 ],
             'options': {
                 'required': true,
-                'templateUrl': 'ionic/radio',
+                'templateUrl': 'yeoman/radio',
                 'allow_other': 1
             }
         },{
@@ -141,7 +142,8 @@ angular.module('exampleApp')
                 "required": true,
                 "min_choice": 1,
                 "max_choice": 4,
-                'allow_other': 2
+                'allow_other': 2,
+                'templateUrl': 'yeoman/drop-down-multi'
             }
         },{
             "body": "Please select a choice from the following",
@@ -158,7 +160,7 @@ angular.module('exampleApp')
                 "min_choice": 1,
                 "max_choice": 4,
                 'allow_other': 2,
-                'templateUrl': 'ionic/checkbox'
+                'templateUrl': 'yeoman/checkbox'
             }
         }]
     };
