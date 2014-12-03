@@ -57,12 +57,21 @@ angular.module('p97.questionTypes')
                     }
                 }
 
-                
                 return (scope.errors.length === 0);
             }
 
             scope.internalControl.clean_answer = function(){
                 //nothing to see here
+            }
+
+            scope.internalControl.unclean_answer = function() {
+                //append previously saved 'Other' answer to question.choices
+                choiceValues = _.pluck(scope.question.choices, "value");
+                if (choiceValues.indexOf(scope.value) > -1) {
+                    var addOther = { 'verbose': 'User Entered', 'value': scope.value }
+                    scope.question.choices.splice(scope.question.choices.length -1, 0, addOther);
+                }
+                return scope.question.choices
             }
 
             // Compile the template into the directive's scope.

@@ -377,12 +377,21 @@ angular.module('p97.questionTypes')
                     }
                 }
 
-                
                 return (scope.errors.length === 0);
             }
 
             scope.internalControl.clean_answer = function(){
                 //nothing to see here
+            }
+
+            scope.internalControl.unclean_answer = function() {
+                //append previously saved 'Other' answer to question.choices
+                choiceValues = _.pluck(scope.question.choices, "value");
+                if (choiceValues.indexOf(scope.value) > -1) {
+                    var addOther = { 'verbose': 'User Entered', 'value': scope.value }
+                    scope.question.choices.splice(scope.question.choices.length -1, 0, addOther);
+                }
+                return scope.question.choices
             }
 
             // Compile the template into the directive's scope.
@@ -901,8 +910,8 @@ angular.module('p97.questionTypes')
                     _.each(scope.value, function(i) { 
                         if (!reg.test(i)) {
                             scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
-                        } else if (i === 'other' && (!scope.otherValue || scope.otherValue === null)) {
-                            scope.errors.push("You selected 'Other'. It cannot be blank. Please fill in a response or select another choice")
+                        } else if (i === 'other' || !scope.otherValue || scope.otherValue === null) {
+                            scope.errors.push("You selected 'Other'. Please fill in a response or type in another choice")
                         } 
                     })
                 }
@@ -912,6 +921,18 @@ angular.module('p97.questionTypes')
 
             scope.internalControl.clean_answer = function(){
                 //nothing to see here
+            }
+
+            scope.internalControl.unclean_answer = function() {
+                //append previously saved 'Other' answers to question.choices
+                otherAnswerArray = _.difference(scope.value, _.pluck(scope.question.choices, "value"));
+                if (otherAnswerArray.length > 0) {
+                    _.each(otherAnswerArray, function(i) {
+                    var addOther = { 'verbose': 'User Entered', 'value': i }
+                    scope.question.choices.splice(scope.question.choices.length -1, 0, addOther);
+                    })
+                }
+                return scope.question.choices
             }
 
             scope.toggleAnswers = function(choiceValue) {
@@ -938,7 +959,8 @@ angular.module('p97.questionTypes')
                                             template: 'You have typed a duplicate answer. Please try again.'
                                         }) 
                                      :  alert('You have typed a duplicate answer. Please try again.')
-                        )
+                        );
+
                         return false;
                     }; //end contains duplicate
 
@@ -949,7 +971,7 @@ angular.module('p97.questionTypes')
                                  : confirmPopup = window.confirm('Are you sure what this selection')
                     ); 
                     
-                    if(confirmPopup == true) {
+                    if (confirmPopup) {
                        var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue, 'checked': true};
 
                        //inserts newChoice into question.choices in front of 'Other'
