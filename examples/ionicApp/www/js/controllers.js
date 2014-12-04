@@ -40,9 +40,13 @@ angular.module('starter')
                 'datejs_format': 'MM/dd/yyyy HH:mm:ss'
             }
         },{
-            'body': 'This is a yes-no question. Do you like cheese?',
-            'label': 'do you like cheese',
-            'type': 'yes-no',
+            'body': 'Do you agree?',
+            'label': 'Do you agree',
+            'type': 'toggle',
+            'choices': [
+                    {'positive_label': 'yes', 'positive_value': '10'},
+                    {'negative_label': 'no', 'negative_value': '5'}
+            ],
             'options': {'required': true}
         },{
             'body': 'This is a number question. I can be a decimal. Enter a number between 1 and 10',
