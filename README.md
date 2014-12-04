@@ -10,7 +10,7 @@ A collection of angular component to be used with Viewpoint 2.
 * [3. Authentication](#3-authentication)
 * [4. Question Types](#4-question-types)
 * [5. Angular Services](#5-angular-services)
-* [6. Form and Block Controllers](#6-form-and-block-controllers)
+* [6. Linear Form and Block Controllers](#6-linear-form-and-block-controllers)
 * [7. For Developers](#7-for-developers)
 * [8. The Build Process](#8-the-build-process)
 * [9. Testing](#9-testing)
@@ -105,9 +105,33 @@ In your router, you should add a resolve function to check if  `user.token` is p
 ```
 
 ### 3.2 Authenticate a user
-To log the user in call `$vpApi.authenticate(data, onSuccess, onError)`. Where data contains the keywords: `username`, `password`, `stayLoggedIn`.     
+To log the user use the `$vpApi.authenticate(data, onSuccess, onError)` method, where data contains the keywords: `username`, `password`, `stayLoggedIn`.
 
-On successful authentication the service will attempt to download the user's authorized formstack as well as any responses the user already has for that formstack. And if 'stayLoggedIn` is will save the user and token to localStorage. 
+```
+# For example this could go in your login controller.
+
+$vpApi.authenticate($scope.loginData, 
+    function(data, status){
+        $state.go('app.home');
+        $ionicLoading.hide();
+    },
+    function(data, status){
+        $scope.errorMsg = "Invalid username or password. Please try again.";
+        $ionicLoading.hide();
+    }
+); // end authenticate
+
+```
+In the background this will
+  1. Use the username and password to fetch the user's api token from Viewpoint. 
+
+  1. Store the authenticated users token nad username in $vpApi.user, add it to the $vpApi.users collection in loki and then save the users collection to localStorage. 
+
+  2. It will then broadcast an 'authenticated' event. 
+
+  3. The `$user` service responsds to the 'authenticated' event by fetching the users profile and updating $vpApi.user and saving it to local storage.
+
+  4. It then fetches the first formstack in $vpApi.user.profile.allowed_formstacks[0] and saves that to localStorage.
 
 
 
@@ -344,7 +368,7 @@ Examples
 `/app/my-survey/new/new-<form-slug>/new-<block-slug>`
 
 // An existing survey answering a new page on an existing survey
-`/app/my-survey/<formstack-repsponse-uuid>/new-<form-slug>/new-<block-slug>/`
+`/app/my-survey/<formstack-repsponse-uuid>/new-<form-id>/new-<block-id>/`
 
 // Editing an existing survey at a specific form and block
 `/app/my-survey/<formstack-repsponse-uuid>/<form-response-uuid>/<block-response-uuid>/`
@@ -354,11 +378,27 @@ Examples
 Is this necessary?
 
 ###6.2 LinearFormCtrl
-This controller handles the loading of a **Form** and the display and navigation controls of it's blocks. It also handles the loading of initial values for the questions in a block. The initial values come from either the `question.options.default` of from a previous answer for that Form and Block response, with a previous answer taking precedence over the default value. 
+This controller handles the loading of a **Formstack Response**, **Form**, **Form Response**, **Block**, **Block Response** and sets these varaibles on $scope.current (which is acessable in LinearBlockCtrl). It also broadcasts a 'saveBlock' event when the navigation buttons are pressed. 
+
+#### Options
+
 
 ###6.3 LinearBlockCtrl
-The BlockCtrl handles the saving of a block. This controller inherits it's scope from `FormCtrl`. 
 
+The BlockCtrl handles the loading a block and it's answers, saving of a block, and determines the state change when a 'saveBlock' event is recieved. This controller inherits it's scope from `LinearFormCtrl`, so anything defined on LinearFormCtrl.$scope is available here. 
+
+####Skip Logic (Conditional Branching)
+A block or form can be skipped with logic based on answers from a previous question
+
+####Options
+  * **skip_when**: A string to be evaluated in the survey.
+    * "{{getAnswerTo('age')}} > 18"
+    * "{{getAnswers('activites').length}}" > 0
+
+  * **repeat** An expression that defines how to repeat the question block. If < 0, is will repeat an unlimited numer of times. If == 0, it will not repeat, and if > 0 it will repeat as many times as specified.
+    * "{{getAnswers('activites').length}}"
+
+  * **repeat_based_on_previous_answer**: [String] Slug of previous question. Repeats the block based on the length of the array of a previous answer (note this only works on previous questions that are multi-select). The block will is aware of the previous answer it is looping over. This value will be recorded in the answer object for each question under the keyword "previous_answer_value".
 
 ---
 
