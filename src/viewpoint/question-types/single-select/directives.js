@@ -89,7 +89,25 @@ angular.module('p97.questionTypes')
             });
 
             scope.otherValueBlur = function () {
-               if (scope.otherValue.length > 0) {
+
+                setValue = function() {
+                    var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
+                    scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                    scope.inputValue = scope.otherValue; 
+                    scope.otherValue = '';
+                };
+
+                if (scope.otherValue.length > 0) {
+                    if (scope.otherValue.length > scope.question.options.other_max_length) {
+                        ($ionicPopup ? $ionicPopup.alert({
+                                            title: 'Too long',
+                                            template: 'You have typed an answer that is too long. Please try again.'
+                                        }) 
+                                     :  alert('You have typed an answer that is too long. Please try again.')
+                        );
+                        return false;
+                    }; //end lengthy input
+
                     if ($ionicPopup) {
                        var confirmPopup = $ionicPopup.confirm({
                             title: 'Are You Sure',
@@ -97,20 +115,14 @@ angular.module('p97.questionTypes')
                           });
                        confirmPopup.then(function(res) {
                            if (res) {
-                              var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                              scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
-                              scope.inputValue = scope.otherValue; 
-                              scope.otherValue = '';
+                              setValue();
                            } 
                        }); //end confirmPopup.then
                        
                     } else {
                         var option = window.confirm("Are You Sure", "Are you sure you want this selection");
                         if (option == true) {
-                            var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                            scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
-                            scope.inputValue = scope.otherValue; 
-                            scope.otherValue = '';
+                            setValue();
                         }
                     } //ends else statement
                 }          

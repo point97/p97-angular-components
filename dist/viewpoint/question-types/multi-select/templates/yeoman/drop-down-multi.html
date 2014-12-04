@@ -1,7 +1,6 @@
 <div class="p97-multi-select">
     <div>{{question.body}}</div>
-    <div class="list">
-        <label class="item item-input">
+        <div class="item item-input">
              <select 
                 class="multiselect" 
                 ng-model="value"
@@ -11,15 +10,12 @@
                 multiple="multiple" 
                 multiselect-dropdown > 
             </select>
-            <span ng-show="showOtherInput">
+            <div ng-show="showOtherInput">
                 <input type="text"
                     ng-blur="otherValueBlur()"
                     ng-model="otherValue"
                     placeholder="'Other' Choice">
-            </span>
+            </div>
             <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
-        </label>
-    
-    </div>
-
+        </div>
 </div>

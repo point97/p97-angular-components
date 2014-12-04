@@ -70,7 +70,8 @@ angular.module('starter')
                 ],
             'options': {
                 'required': false,
-                'allow_other': 1
+                'allow_other': 1,
+                "other_max_length": 10
             }
         },{
             'body': 'Please choose one of the following',
@@ -85,7 +86,8 @@ angular.module('starter')
             'options': {
                 'required': true,
                 'templateUrl': 'ionic/radio',
-                'allow_other': 1
+                'allow_other': 1,
+                "other_max_length": 10
             }
         },{
             'body': 'This is an integer question type. Please enter an integer between -5 and 25.',
@@ -150,7 +152,8 @@ angular.module('starter')
                 "required": true,
                 "min_choice": 1,
                 "max_choice": 4,
-                'allow_other': 2
+                "allow_other": 2,
+                "other_max_length": 10
             }
         },{
             "body": "Please select a choice from the following",
@@ -168,6 +171,7 @@ angular.module('starter')
                 "min_choice": 1,
                 "max_choice": 4,
                 'allow_other': 2,
+                "other_max_length": 25,
                 'templateUrl': 'ionic/checkbox'
             }
         }]

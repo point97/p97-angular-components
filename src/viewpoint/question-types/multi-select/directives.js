@@ -65,18 +65,18 @@ angular.module('p97.questionTypes')
                     _.each(scope.value, function(i) { 
                         if (!reg.test(i)) {
                             scope.errors.push("Your 'Other' input is invalid. Please try again without using special characters or symbols")
-                        } else if (i === 'other' || !scope.otherValue || scope.otherValue === null) {
+                        } else if ((i === 'other') && !scope.otherValue || scope.otherValue === null) {
                             scope.errors.push("You selected 'Other'. Please fill in a response or type in another choice")
-                        } 
+                        }
                     })
                 }
 
                 return (scope.errors.length === 0);
-            }
+            };
 
             scope.internalControl.clean_answer = function(){
                 //nothing to see here
-            }
+            };
 
             scope.internalControl.unclean_answer = function() {
                 //append previously saved 'Other' answers to question.choices
@@ -88,7 +88,7 @@ angular.module('p97.questionTypes')
                     })
                 }
                 return scope.question.choices
-            }
+            };
 
             scope.toggleAnswers = function(choiceValue) {
                 var index = scope.valueArray.indexOf(choiceValue);
@@ -107,6 +107,19 @@ angular.module('p97.questionTypes')
 
             //notification confirmation for 'other' answer
             scope.otherValueBlur = function() {
+
+                setValue = function() {
+                    var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue, 'checked': true};
+                    //inserts newChoice into question.choices in front of 'Other'
+                    scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                    //removes 'other' item from valueArray and replaces it with user defined otherValue
+                    scope.value[scope.value.indexOf('other')] = scope.otherValue;
+                    //toggle off 'other' item
+                    scope.question.choices[scope.question.choices.length - 1].checked = false;
+                    scope.showOtherInput = false; 
+                    scope.otherValue = '';
+                };
+
                 if (scope.otherValue.length > 0) {
                     if (_.contains(scope.value, scope.otherValue)) {
                         ($ionicPopup ? $ionicPopup.alert({
@@ -119,30 +132,36 @@ angular.module('p97.questionTypes')
                         return false;
                     }; //end contains duplicate
 
-                    ($ionicPopup ? confirmPopup = $ionicPopup.confirm({  
-                                                            title: 'Are You Sure',
-                                                            template: 'Are you sure you want this selection?'
-                                                       })
-                                 : confirmPopup = window.confirm('Are you sure what this selection')
-                    ); 
-                    
-                    if (confirmPopup) {
-                       var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue, 'checked': true};
+                    if (scope.otherValue.length > scope.question.options.other_max_length) {
+                        ($ionicPopup ? $ionicPopup.alert({
+                                            title: 'Too long',
+                                            template: 'You have typed an answer that is too long. Please try again.'
+                                        }) 
+                                     :  alert('You have typed an answer that is too long. Please try again.')
+                        );
 
-                       //inserts newChoice into question.choices in front of 'Other'
-                       scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                        return false;
+                    }; //end lengthy input
 
-                       //removes 'other' item from valueArray and replaces it with user defined otherValue
-                       scope.value[scope.value.indexOf('other')] = scope.otherValue;
-
-                       //toggle off 'other' item
-                       scope.question.choices[scope.question.choices.length - 1].checked = false;
-
-                       scope.showOtherInput = false; 
-                       scope.otherValue = '';
-                    }; //end confirmPopup
+                    if ($ionicPopup) {
+                       var confirmPopup = $ionicPopup.confirm({
+                            title: 'Are You Sure',
+                            template: 'Are you sure you want this selection?'
+                          });
+                       confirmPopup.then(function(res) {
+                           if (res) {
+                              setValue();
+                           } 
+                       }); //end confirmPopup.then
+                       
+                    } else {
+                        var option = window.confirm("Are You Sure", "Are you sure you want this selection");
+                        if (option == true) {
+                            setValue();
+                        }
+                    } //ends else statement
                 }
-            }
+            };
 
             scope.$watchCollection('value', function(newValues, oldValues){
                 if (!newValues) return;
