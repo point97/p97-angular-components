@@ -583,13 +583,11 @@ dist/
   - viewpoint/
     - services.min.js
     - question-types.min.js 
-    - templates/
-      - ionic/
-        - question-types/
-          - <QUESTION-TYPE>/
-            - <QUESTION-TYPE>.html
-        - other-template.html   
-
+    - question-types/
+      - <QUESTION-TYPE>/
+        - templates/
+          - ionic/   
+            - <QUESTION_TYPE>.html
 ```
 
 Once you have a new version build you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 

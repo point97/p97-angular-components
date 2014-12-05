@@ -24,7 +24,8 @@
     "README.md",
     "gulpfile.js",
     "package.json",
-    "example"
+    "example",
+    "examples"
   ],
   "dependencies": {
     "underscore": "~1.7.0",
