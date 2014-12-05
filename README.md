@@ -576,6 +576,11 @@ The process compiles all the ccs, js, and html templates needed for p97 componen
 
 The build process is defined in `/gulpfile.js` and can be configured there. 
 
+To build the dist folder run 
+```
+gulp
+```
+
 ### 8.1 Distribution Directory Structure
 
 ```
@@ -590,7 +595,9 @@ dist/
             - <QUESTION_TYPE>.html
 ```
 
-Once you have a new version build you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 
+
+
+Once you have a new version built you will need to tag it and then push. For instance of you are working on the v0.3 branch and our satisifed with your changes, you can push using 
 ```
 git commit -m "Blah blah"
 git tag v0.3.12

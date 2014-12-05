@@ -64,7 +64,7 @@ gulp.task('question-types', function() {
 });
 
 gulp.task('viewpoint', function() {
-    gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean());
+    gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean())
     
     return gulp.src(['src/viewpoint/*.js'])
    
