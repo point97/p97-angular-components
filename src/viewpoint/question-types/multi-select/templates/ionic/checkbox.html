@@ -1,6 +1,6 @@
 <div class="p97-multi-select">
     <div class="item item-divider">{{question.body}}</div>
-        <ion-checkbox ng-repeat="choice in question.choices"
+        <ion-checkbox ng-repeat="choice in localChoices"
                       ng-click="toggleAnswers(choice.value)"
                       ng-value="choice.value"
                       ng-model="choice.checked"

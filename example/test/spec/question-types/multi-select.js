@@ -67,7 +67,7 @@ describe('Controller: MultiCtrl', function () {
         var isolated = elm.isolateScope();
         isolated.value = ['3', '4', '5'];
 
-        isolated.choices_selected = isolated.value.length;
+        isolated.choicesSelected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
@@ -76,7 +76,7 @@ describe('Controller: MultiCtrl', function () {
     it('should have at least the min number of choices if set as an option', function(){    
         var isolated = elm.isolateScope();
         isolated.value = ['3'];
-        isolated.choices_selected = isolated.value.length;
+        isolated.choicesSelected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
@@ -85,7 +85,7 @@ describe('Controller: MultiCtrl', function () {
     it('should be within a min and max range if defined', function(){    
         var isolated = elm.isolateScope();
         isolated.value = ['3', '4', '5'];
-        isolated.choices_selected = isolated.value.length;
+        isolated.choicesSelected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
@@ -94,7 +94,7 @@ describe('Controller: MultiCtrl', function () {
     it('should have an actual value if "other" is selected', function(){    
         var isolated = elm.isolateScope();
         isolated.value = ['3', '4', 'other'];
-        isolated.choices_selected = isolated.value.length;
+        isolated.choicesSelected = isolated.value.length;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
