@@ -7,7 +7,7 @@ angular.module('vpApi.services', [])
     this.user = {};
     this.users;
 
-    this.init = function(){
+    this.dbinit = function(){
         /*
             Loads or creates the database. 
 
@@ -129,7 +129,7 @@ angular.module('vpApi.services', [])
     }
 
 
-    this.init();
+    this.dbinit();
 }])
 
 
@@ -350,4 +350,157 @@ angular.module('vpApi.services', [])
   var obj = this;
   this.resource_name = "pforms/answer";
 
+}])
+
+.service('$tilecache', ['$vpApi', '$formstack', function($vpApi, $formstack){
+    /*
+    Handles tiles caching.
+    */
+
+    var obj = this;
+    this.regions = [];
+
+    this.isCached = function(){
+        var rs = localStorage.getItem('tilesCached');
+        var out = (rs === 'true') ? true : false;
+        return out;
+
+    }
+    this.getMaxCacheZoom = function(){
+        var fs = $vpApi.getFormstack();
+        var mapForm = _.find(fs.forms, function(form){
+            return (form.options.type === 'map-form');
+        })
+
+        if (mapForm) {
+            return mapForm.options.maxCacheZoom;
+        } else {
+            return null;
+        }
+
+    }
+
+    this.getRegions = function(){
+        /* 
+        Look for forms with Regions. 
+        Returns the list of regions or an empty list.
+        */
+        console.log("[$tilecache.getRegions()] WTF");
+        out = [];
+        
+        var fs = $vpApi.getFormstack();
+        
+        _.each(fs.forms, function(form){
+            if (form.type === 'map-form' && form.options.regions) {
+                out = _.uniq( out.concat(form.options.regions) );
+            }
+        console.log("[$tilecache.getRegions()] Found " + out.length + " regions");
+        });
+        obj.regions = out;
+        return out;
+    }
+
+    this.getTileSources = function(){
+        /* 
+        Look for forms with regions. 
+        Returns the list of regions or an empty list.
+        */
+        console.log("[$tilecache.getTileSources()] WTF");
+        out = [];
+        
+        var fs = $vpApi.getFormstack();
+        
+        _.each(fs.forms, function(form){
+            if (form.type === 'map-form' && form.options.tileSources) {
+                out = _.uniq( out.concat(form.options.tileSources) );
+            }
+        console.log("[$tilecache.getTileSources()] Found " + out.length + " regions");
+        });
+        obj.tileSources = out;
+        return out;
+    }
+
+
+    this.loadRegions = function(onSuccess, onError){
+        if (obj.regions.length === 0) {
+            obj.getRegions();
+            if (obj.regions.length === 0);
+            return
+        }
+        var maxZoom = obj.getMaxCacheZoom();
+
+        var nbTiles = obj.offlineLayer.calculateNbTiles(maxZoom, obj.regions);
+        if (nbTiles < 10000) {
+            console.log("Will be saving: " + nbTiles + " tiles")
+            obj.offlineLayer.saveRegions(obj.regions, maxZoom, 
+              function(){
+                console.log('[saveRegions] onStarted');
+
+              },
+              function(){
+                console.log('[saveRegions] onSuccess');
+                localStorage.setItem('tilesCached', 'true');
+                onSuccess();
+              },
+              function(error){
+                console.log('onError');
+                console.log(error);
+                onError();
+              })
+        } else {
+            alert("You are trying to save " + nbTiles + " tiles. There is currently a limit of 10,000 tiles.");
+        }
+
+    } // end loadRegions.
+
+    this.run = function(success, error){
+        console.log("[$tilecache.run()]");
+
+        // These need to be passed in from form.options
+        // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
+        // var subDomains = ['otile1','otile2','otile3','otile4']
+        // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+        
+        var tileSource = obj.getTileSources()[0];
+
+
+        onError = function(errorType, errorData1, errorData2){
+            /*
+                Fires when $tilecache errors out during tile caching.
+            */
+            console.log("[$tilecache.run.onError()] ");
+            localStorage.setItem('tilesCached', 'false');
+            console.log(errorType)
+            console.log(errorData1)
+            console.log(errorData2)
+            error();
+        }
+
+
+        // Initalize a map
+        var map = L.map('cache-map').setView([-2.9, -79], 13);
+        var options = { 
+            map: map,
+            maxZoom: 12, 
+            attribution: tileSource.attrib, 
+            dbOnly: true, 
+            onReady: function(){console.log("onReady for what?")}, // Not sure what these do
+            onError: function(){console.log("onError for what?")},  // Not sure what this does
+            storeName:tileSource.storeName, 
+            dbOption:"WebSQL"  // "IndexedDB"
+        }
+        obj.offlineLayer = new OfflineLayer( tileSource.url, options);
+        obj.loadRegions(success, error);
+    };
+
+    clearTiles = function(){
+        console.log('clearing tiles...');
+        obj.offlineLayer.clearTiles(
+            function(){
+                console.log('[clearTiles] success')
+            },function(error) {
+                console.log('[clearTiles] fail')
+            }
+        );
+    }
 }])
