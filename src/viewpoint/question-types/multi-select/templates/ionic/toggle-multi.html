@@ -1,6 +1,6 @@
 <div class="p97-multi-select">
     <div class="item item-divider">{{question.body}}</div>
-        <ion-toggle ng-repeat="choice in question.choices"
+        <ion-toggle ng-repeat="choice in localChoices"
                     ng-click="toggleAnswers(choice.value)"
                     ng-value="choice.value"
                     ng-model="choice.checked"
@@ -15,7 +15,6 @@
                    placeholder="'Other' Choice">
         </span>
         <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
-        {{value}}
 </div>
 
 
