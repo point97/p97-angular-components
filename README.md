@@ -9,11 +9,12 @@ A collection of angular component to be used with Viewpoint 2.
 * [2. The Example App](#2-the-example-app) 
 * [3. Authentication](#3-authentication)
 * [4. Question Types](#4-question-types)
-* [5. Angular Services](#5-angular-services)
-* [6. Linear Form and Block Controllers](#6-linear-form-and-block-controllers)
-* [7. For Developers](#7-for-developers)
-* [8. The Build Process](#8-the-build-process)
-* [9. Testing](#9-testing)
+* [5. Forms and Form Options](#5-forms-and-form-options)
+* [6. Angular Services](#6-angular-services)
+* [7. Linear Form and Block Controllers](#7-linear-form-and-block-controllers)
+* [8. For Developers](#8-for-developers)
+* [9. The Build Process](#9-the-build-process)
+* [10. Testing](#10-testing)
 
 
 ##1. Usage
@@ -273,12 +274,15 @@ IN PROGRESS - Don't have random order.
 
 ### Available in version v0.5
 
-* **map**
-This may change to a form type since we want the map to be fullscreen and the we will most likly ask a series of questions for the locations mapped. 
- 
+* **geojson**
+  This question type collects geo spatial data as a GeoJson feature group. It displays a map that users can click toggle features on and off. 
   `options`
-  * layers - [Array] a list of map layers to user.
+  * center: [Array] Coordinates to use for intial loading lat, lon 
+  * zoom: [Integer] Inital zoom level, defaults to 10.
   * cache_tiles: [Boolean]
+  * geojsonChoices: [Object]
+    * - url: [String] URL to get the geojson Feature Group. Each feature in the group must have an `ID` on it's properites object. 
+    * - style: [Object] A leaflet layer style object. See [Leaflet docs](http://leafletjs.com/reference.html).
   * require_in_bounds: [Boolean]
   * boundary_file: [String] name of boundary GeoJSON file to use (no path required).
   * use_planning_units: [Boolean]
@@ -326,6 +330,63 @@ This may change to a form type since we want the map to be fullscreen and the we
   * default
   
 ----
+
+##5. Forms and Form Types
+
+The are two form types, the default, and a map form.
+
+
+###5.1 Map Form
+A map form consists of a map and a side panel. The side panel contains the question and survey naivigation controls. When defined a map form there should only be one block. The first question in the block is the *map question* and is where the map geojson is stored. The remaining questions will be presented to the user one at a time. 
+
+Currently the map form can cache tiles. Tile caching regions and srouceTiles should be defined on the first map form. Any other map from will use the same settings.
+
+
+```
+    app/map-form/<fs-resp-id>/</form-resp-id>/<block-resp-id>/<question-id>
+
+```
+
+**Options**
+
+* **cacheTiles**: [Boolean] A flag to prompt the use to cache the tiles.
+
+* **tileSources** [Array] A list of tile soruce obejcts.
+  - verbose - The label that shows in the map controls
+  - url - The url to use for fetching tiles, must contain {x}, {y}, {z}
+  - attrib - The attribute to use.
+  - storeName - The name to use for client side storage.
+
+
+* **regions**: [Array] 
+
+    ```
+    [
+        {
+            name: "Region 1 - Coos Bay to OR/CA Border",
+            nLat: 43.5,
+            sLat: 42.0,
+            wLng: -124.7,
+            eLng: -124.2
+        },
+        {
+            name: "Region 2 - OR/CA Border to Shelter Cove",
+            nLat: 42.0,
+            sLat: 40.0,
+            wLng: -124.5,
+            eLng: -123.8
+        },
+        {
+            name: "Region 3 - Shelter Cove to Point Arena",
+            nLat: 40.0,
+            sLat: 32.0,
+            wLng: -124.0,
+            eLng: -123.5
+        }
+    ]
+    ```
+
+
 ##5. Angular Services
 
 These are located in `services.js`. To load these into your app inject `vpApi.services` to your module. Most services defined a load function that loads the data from localStorage. 
@@ -352,7 +413,8 @@ Handles fetching updates from API as well as creating and updating answers local
 
 ###$profile
 
-###$localStorage
+###$tilecache
+A service to handle tile cahcing for map forms.
 
 ---
 
@@ -368,16 +430,14 @@ Examples
 `/app/my-survey/new/new-<form-slug>/new-<block-slug>`
 
 // An existing survey answering a new page on an existing survey
-`/app/my-survey/<formstack-repsponse-uuid>/new-<form-id>/new-<block-id>/`
+`/app/my-survey/<formstack-repsponse-uuid>/<form-response-id>/new-<block-id>/`
 
 // Editing an existing survey at a specific form and block
 `/app/my-survey/<formstack-repsponse-uuid>/<form-response-uuid>/<block-response-uuid>/`
 
 ```
-###6.1 LinearFormstackCtrl
-Is this necessary?
 
-###6.2 LinearFormCtrl
+###6.1 LinearFormCtrl
 This controller handles the loading of a **Formstack Response**, **Form**, **Form Response**, **Block**, **Block Response** and sets these varaibles on $scope.current (which is acessable in LinearBlockCtrl). It also broadcasts a 'saveBlock' event when the navigation buttons are pressed. 
 
 #### Options
