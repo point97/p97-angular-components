@@ -15,7 +15,7 @@ angular.module('p97.questionTypes')
                 DOM and then compile with Angular.
                 */
                 _.each($scope.questions, function(q, i){
-                    q.form = {show:true};
+                    q.form = {};
                     if (typeof(q.value) === 'undefined') q.value = '';
                     var html = '<div '+q.type+' question="questions['+i+']" value="questions['+i+'].value" control="questions['+i+'].form" ng-show="questions['+i+'].form.show"></div>';
                     var el = $compile(html)($scope);
