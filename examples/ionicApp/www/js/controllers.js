@@ -49,14 +49,14 @@ angular.module('starter')
             ],
             'options': {'required': true}
         },{
-            'body': 'This is a number question. I can be a decimal. Enter a number between 1 and 10',
-            'label': 'enter a number',
+            'body': 'Enter your age. This will skip the next for if you are under 18."',
+            'label': 'your age',
             'type': 'number',
-            'slug': 'num',
+            'slug': 'age',
             'options': {
                 'required': true,
                 'min': 1,
-                'max': 10
+                'max': 150
             }
         },{
             'body': 'Please choose one of the following',

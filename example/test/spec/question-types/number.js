@@ -108,6 +108,15 @@ describe('Controller: NumCtrl', function () {
 
     });
 
+    it('should not allow blank responses when required', function() {
+        var isolated = elm.isolateScope();
+        isolated.value = NaN;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+
+    });
+
     it('should be within a value when not required', function() {
         var isolated = elm2.isolateScope();
         isolated.value = 3;

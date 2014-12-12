@@ -32,7 +32,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                if (typeof scope.value !== 'number' && options.required && options.required === true) {
+                if ((typeof scope.value !== 'number' || isNaN(scope.value)) && options.required && options.required === true) {
                     scope.errors.push('input must be a number');
                     return false;
                 }
