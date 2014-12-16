@@ -197,6 +197,7 @@ angular.module('vpApi.services', [])
   var obj = this;
   this.resource_name = 'pforms/formstack';
 
+  this.formRepeatItem;  // TODO Find a better place for this. Mayeb a state service, will probably want the rest of the state stored to.
 
   this.fetchBySlug = function(slug, successCallback, errorCallback){
     /*

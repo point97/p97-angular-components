@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')  
-  .directive('toggle', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  
+.directive('toggle', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  
 
 
     return {
@@ -25,10 +25,18 @@ angular.module('p97.questionTypes')
             var options = scope.question.options;
             scope.errors = [];
             
+            // Load intial data
+            if (typeof(scope.question.value) !== 'undefined'){
+                scope.localValue = scope.question.value;
+            }
+
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
-
+                if (scope.value === scope.question.options.positiveValue
+                    || scope.value === scope.question.options.negativeValue) {
+                    return true;
+                }
             }
 
             scope.internalControl.clean_answer = function(){
@@ -38,13 +46,23 @@ angular.module('p97.questionTypes')
                 }
             }
 
-            scope.showPositiveLabel = function() {
-                if (scope.value === scope.question.choices[0].positive_value){ 
-                    return true;
+            // scope.showPositiveLabel = function() {
+            //     if (scope.value === scope.question.choices[0].positiveValue){ 
+            //         return true;
+            //     } else`uu {
+            //         return false;
+            //     };
+            // };
+
+            scope.$watch('localValue', function(newValue){
+                if (typeof(newValue) === 'undefined') return;
+                if (newValue === true){
+                    scope.value = scope.question.options.positiveValue || true;
                 } else {
-                    return false;
-                };
-            };
+                    scope.value = scope.question.options.negativeValue || false;
+                }
+                console.log(scope.value)
+            })
 
             // Compile the template into the directive's scope.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {

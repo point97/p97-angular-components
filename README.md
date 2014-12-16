@@ -243,14 +243,15 @@ IN PROGRESS - Don't have random order.
    * default
 
 * **toggle**
+  
 
   `options`
   
-  * positive_value
-  * positive_label
-  * negative_value
-  * negative_label
-  * required
+  * positiveValue
+  * positiveLabel
+  * negativeValue
+  * negativeLabel
+  * default
 
 
 * **email**

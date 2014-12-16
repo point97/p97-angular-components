@@ -1,10 +1,7 @@
 <div class="p97-toggle">
     <div class="item item-divider">{{question.body}}</div>
-        <ion-toggle ng-model='value'
-                    ng-true-value='{{question.choices[0].positive_value}}'
-                    ng-false-value='{{question.choices[1].negative_value}}' >
-            <label ng-show="showPositiveLabel(value)">"{{question.choices[0].positive_label}}"</label>
-            <label ng-show="!showPositiveLabel(value)">"{{question.choices[1].negative_label}}"</label>
+        <ion-toggle ng-model='localValue'>
+            {{question.options.positiveLabel}}
         </ion-toggle>
         <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
 </div>
