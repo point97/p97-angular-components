@@ -243,23 +243,18 @@ IN PROGRESS - Don't have random order.
    * default
 
 * **toggle**
-  
+  Dispalys a toggle UI to the user. This automatically requires an answer and will default to default if nothing is provided. 
 
   `options`
   
-  * positiveValue
-  * positiveLabel
-  * negativeValue
-  * negativeLabel
-  * default
+  * positiveValue - [String]
+  * positiveLabel - [String]
+  * negativeValue - [String]
+  * negativeLabel - [String] Not used.
+  * default - [String]
 
 
-* **email**
-  PASSING TESTS - 
-  `options`
 
-  * required
-  * default
 
 * **integer**
  This allows user to enter an integer, if you need a decimal input use question type `number`.
@@ -270,10 +265,6 @@ IN PROGRESS - Don't have random order.
   * max
   * required
   * default
-
-
-
-### Available in version v0.5
 
 * **geojson**
   This question type collects geo spatial data as a GeoJson feature group. It displays a map that users can click toggle features on and off. 
@@ -288,6 +279,17 @@ IN PROGRESS - Don't have random order.
   * boundary_file: [String] name of boundary GeoJSON file to use (no path required).
   * use_planning_units: [Boolean]
   * planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
+
+
+### Available in version v0.5
+* **email**
+  PASSING TESTS - 
+  `options`
+
+  * required
+  * default
+
+
 
 * **time** 
  
@@ -336,8 +338,13 @@ IN PROGRESS - Don't have random order.
 
 The are two form types, the default, and a map form.
 
+###5.1 Default Form
 
-###5.1 Map Form
+* **repeatable** - [Boolean] Dafaults to false
+
+
+
+###5.2 Map Form
 A map form consists of a map and a side panel. The side panel contains the question and survey naivigation controls. When defined a map form there should only be one block. The first question in the block is the *map question* and is where the map geojson is stored. The remaining questions will be presented to the user one at a time. 
 
 Currently the map form can cache tiles. Tile caching regions and srouceTiles should be defined on the first map form. Any other map from will use the same settings.
@@ -349,6 +356,12 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
 ```
 
 **Options**
+
+* **repeatable**: [Integer] The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
+
+* **forEach**: [Array] an array of expression that validates to an array. Uses items in the array as formRepeatItem.
+
+* **forEachAnswer**: [String] a question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem.
 
 * **cacheTiles**: [Boolean] A flag to prompt the use to cache the tiles.
 
@@ -388,7 +401,22 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
     ```
 
 
-##5. Angular Services
+##6. Blocks and Block Types
+
+###6.1 Blocks
+
+ **Options**
+
+
+* **repeatable**: [Integer] The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
+
+* **forEach**: [Array] an array of expression that validates to an array. Uses items in the array as formRepeatItem.
+
+* **forEachAnswer**: [String] a question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem.
+
+
+
+##7. Angular Services
 
 These are located in `services.js`. To load these into your app inject `vpApi.services` to your module. Most services defined a load function that loads the data from localStorage. 
 
