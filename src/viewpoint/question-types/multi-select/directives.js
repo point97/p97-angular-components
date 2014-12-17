@@ -21,7 +21,7 @@ angular.module('p97.questionTypes')
             scope.choicesSelected = 0;
             scope.errors = [];
             scope.valueArray = [];
-            scope.localChoices = scope.question.choices;
+            scope.localChoices =  JSON.parse(JSON.stringify(scope.question.choices));
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
