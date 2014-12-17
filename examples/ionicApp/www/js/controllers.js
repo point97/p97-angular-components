@@ -85,7 +85,7 @@ angular.module('starter')
                 ],
             'options': {
                 'required': true,
-                'templateUrl': 'ionic/radio',
+                'templateUrl': 'ionic/drop-down-single',
                 'allow_other': 1,
                 "other_max_length": 10
             }

@@ -343,7 +343,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/drop-down-single.html';
+                    return BASE_URL+'single-select/templates/ionic/radio.html';
             }
 
             if (!scope.question) return;
@@ -878,7 +878,7 @@ angular.module('p97.questionTypes')
             scope.choicesSelected = 0;
             scope.errors = [];
             scope.valueArray = [];
-            scope.localChoices = scope.question.choices;
+            scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)

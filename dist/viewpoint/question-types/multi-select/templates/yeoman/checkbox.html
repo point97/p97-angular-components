@@ -1,5 +1,5 @@
 <div class="p97-multi-select">
-    <div>{{question.body}}</div>
+    <div ng-bind-html="question.body"></div>
     <div class="list">
         <div ng-repeat="choice in question.choices">
             <input type="checkbox"

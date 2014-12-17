@@ -1,5 +1,5 @@
 <div class="p97-single-select">
-    <div>{{question.body}}</div>
+    <div ng-bind-html="question.body"></div>
     <div class="list">
         <label class="item item-input item-select">
         <div class="input-label">
@@ -8,18 +8,24 @@
             <select 
                     ng-model="inputValue" 
                     ng-required='question.options.required'
-                    ng-class="{'error':errors.length>0}"
                     ng-options='choice.value as choice.verbose for choice in question.choices'>
             </select>
             </label>
             <div ng-show="inputValue === 'other'">
-                <input type="text"
-
+            <div class="item item-input-inset">
+                <label class="item-input-wrapper">
+                    <input type="text"
                     name="otherValue"
                     ng-blur="otherValueBlur()"
                     ng-model="otherValue"
                     placeholder="'Other' Choice">
+                </label>
             </div>
-        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+            </div>
+        <div class="item item-divider warning" ng-show="errors.length>0"> 
+            <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+        </div>
     </div>
 </div>
+
+

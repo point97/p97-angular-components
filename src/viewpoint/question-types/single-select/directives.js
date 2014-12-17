@@ -23,7 +23,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/drop-down-single.html';
+                    return BASE_URL+'single-select/templates/ionic/radio.html';
             }
 
             if (!scope.question) return;
