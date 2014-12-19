@@ -6,33 +6,52 @@ angular.module('vpApi.services', [])
     this.username = '';
     this.user = {};
     this.users;
-
-    this.dbinit = function(){
+    this.dbLoaded = false
+    this.dbinit = function(initCallback){
         /*
             Loads or creates the database. 
 
             Sets
 
             this.db
-            this.user
+            this.user - A user object with keys: username, token
         */
+
         // Makes the loki database available at $vpApi.db.
-        this.db = new loki(config.dbFilename);
-        var dbJson = localStorage.getItem(config.dbFilename);
+        obj.db = data.db;
+        obj.user = data.user;
+        obj.users = data.db.getCollection('user');
+        obj.dbLoaded = true;
+        return;
 
-        if (dbJson){
-            this.db.loadJSON(dbJson);
-        } else {
-            console.log("[$vpApi] Database not found");
-            console.log("[$vpApi] creating database " + config.dbFilename);
-            obj._createDb();
+        if (obj.dbLoaded === true) { 
+            initCallback();
+            return;
         }
-        this.users = this.db.getCollection('user');
 
-        if (this.users.data.length > 0 && this.users.data[0].username){
-            this.user = this.users.data[0];
+        obj.loadHandler = function(){
+            console.log("")
+            obj.users = obj.db.getCollection('user');
 
-        }
+            if (obj.users && obj.users.data.length > 0 && obj.users.data[0].username){
+                obj.user = obj.users.data[0];
+            } else {
+                console.log('[loadDatabase] Could not find users collection');
+                obj._createDb();
+            }
+            obj.dbLoaded = true;
+            $rootScope.$broadcast('db_loaded');
+            console.log('[loadDatabase] done');
+            initCallback();
+
+        };
+
+        var idbAdapter = new lokiIndexedAdapter('vpsurvey');
+        obj.db = new loki(config.dbFilename, { 
+            'adapter': idbAdapter,
+            'autoload': true,
+            'autoloadCallback': obj.loadHandler
+        });
     }
 
     this._createDb = function(){
@@ -47,8 +66,9 @@ angular.module('vpApi.services', [])
         obj.db.addCollection('formResp');
         obj.db.addCollection('blockResp');
         obj.db.addCollection('answer');
-
+        console.log("[$vpApi._createDb] Created tables. About to save to local storage.");
         obj.db.save();
+        console.log("[$vpApi._createDb] Saved db to local storage.");
     }
 
 
@@ -80,17 +100,19 @@ angular.module('vpApi.services', [])
         var headers = {}// {'Authorization':'Token ' + this.user.token};  
         $http.post(url, data, headers)
             .success(function(res, status){
-                var user = obj.users.find({'username': data.username});
-                if (user.length === 0){
+                var users = obj.users.find({'username': data.username});
+                if (users.length === 0){
                     user = obj.users.insert({'username':data.username, token:res.token})
                 } else {
-                    user[0].token = res.token;
-                    user[0].username = data.username;
-                    obj.users.update(user[0]);
+                    user = users[0];
+                    user.token = res.token;
+                    user.username = data.username;
+                    obj.users.update(user);
                 }
                 obj.user = user;
                 
                 obj.db.save();
+                localStorage.setItem('user', JSON.stringify(obj.user));
                 console.log('broadcasting authenticated')
                 
                 $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
@@ -101,8 +123,8 @@ angular.module('vpApi.services', [])
     }
 
 
-
     this.fetch  = function(resource, data, success, fail){
+
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
         $http.get(url, config).success(function(data, status){
@@ -127,7 +149,6 @@ angular.module('vpApi.services', [])
           fail(data, status);
         });
     }
-
 
     this.dbinit();
 }])
@@ -175,7 +196,7 @@ angular.module('vpApi.services', [])
         /*
         Fetches profile and updates the obj.db. DOSE NOT save to localStorage
         */ 
-        var url = apiBase +'account/profile/?user__username=';
+        var url = apiBase +'account/info/?user__username=';
         var token = $vpApi.user.token;
 
         var headers = {headers: {'Authorization':'Token ' + token}};
@@ -190,55 +211,99 @@ angular.module('vpApi.services', [])
                 errorCallback()
             });
     };
+
 }])
 
 
 .service('$formstack', ['$vpApi', function($vpApi) {
-  var obj = this;
-  this.resource_name = 'pforms/formstack';
+    var obj = this;
+    this.resource_name = 'pforms/formstack';
 
-  this.formRepeatItem;  // TODO Find a better place for this. Mayeb a state service, will probably want the rest of the state stored to.
+    this.formRepeatItem;  // TODO Find a better place for this. Mayeb a state service, will probably want the rest of the state stored to.
 
-  this.fetchBySlug = function(slug, successCallback, errorCallback){
-    /*
-    Get the formstack from the VP2 server. 
-    */
 
-    if(HAS_CONNECTION){
-      console.log("[$formstack.fetchBySlug] About to fetch formstack.");
-      $vpApi.fetch(
-        this.resource_name, 
-        {'slug':slug}, 
-        function(data, status){
-          obj.objects = data;
-          console.log("[$formstack.fetchBySlug] got data");
-          
-          var formstacks = $vpApi.db.getCollection('formstack');
-          var formstack = formstacks.find({'slug':slug});
-          if (formstack.length > 0){
+    this._fetchSuccess = function(data, status){
+        obj.objects = data;
+        console.log("[$formstack.fetchSuccess] got data, now updating formstack collection");
+        var formstacks = $vpApi.db.getCollection('formstack');
+        var formstack = formstacks.find({'slug':data[0].slug});
+        if (formstack.length > 0){
             formstacks.remove(formstack);
-          }
-          formstacks.insert(data[0]);
-          successCallback(data[0], status);
-
-        },
-        function(data, status){
-          console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
-          console.log(data);
-          errorCallback(data, status)
         }
-      );
+        formstacks.insert(data[0]);
+    };
 
-    }else{
-        debugger
+    this._fetchFail = function(data, status){
+        console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
+        console.log(data);
     }
 
-  };
+    this.fetchBySlug = function(slug, successCallback, errorCallback){
+        /*
+        Get the formstack from the VP2 server. 
+        */
+
+        if(HAS_CONNECTION){
+          console.log("[$formstack.fetchBySlug] About to fetch formstack.");
+          $vpApi.fetch(
+            this.resource_name, 
+            {'slug':slug}, 
+            function(data, status){
+                obj.objects = data;
+                console.log("[$formstack.fetchBySlug] got data");
+
+                var formstacks = $vpApi.db.getCollection('formstack');
+                var formstack = formstacks.find({'slug':slug});
+                if (formstack.length > 0){
+                    formstacks.remove(formstack);
+                }
+                formstacks.insert(data[0]);
+                successCallback(data[0], status);
+            },
+            function(data, status){
+                console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
+                console.log(data);
+                errorCallback(data, status)
+            }
+          );
+
+        }else{
+            debugger
+        }
+
+    }; // fetchBySlug
+
+    this.updateBySlug = function(slug, success, error) {
+        /*
+        Inputs:
+            slug - [String]
+
+            success - [Function] the success callback. This will called with arguements 
+                        formstack, status from the $http.get. 
+            
+            error -  [Fucntion] the error callback. This will be called with arguments 
+                         data, status from the $http.get
+        */
+
+        console.log("[$formstack.fetchBySlug] About to fetch formstack.");
+        var data = {'slug':slug};
+        
+        $vpApi.fetch(this.resource_name, data, 
+            function(data, status){
+                obj._fetchSuccess(data, status);
+                success(data[0]);
+            },
+            function(data, status){
+                obj._fetchFail(data, status);
+                error(data, status);
+            }
+        );
+    };
 
 }])
 
 
-.service('$fsResp', ['$vpApi', function($vpApi){
+.service('$fsResp', ['$vpApi', '$rootScope', function($vpApi, $rootScope){
     /*
         A form response is of the form
         {
@@ -250,13 +315,15 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/formstack-response';
 
-    this.objects = $vpApi.db.getCollection('fsResp');
+    $rootScope.$on('db_loaded', function(e){
+        console.log('$fsResp received db_loaded')
+        this.objects = $vpApi.db.getCollection('fsResp');
+    })
+    
 
-    this.objects.all = function(){
-        return this.data; // This this is a reference to the loki collection
-    }
 
     this.delete = function(fsRespId){
+        
         var fsResp = obj.objects.get(fsRespId);
         obj.objects.remove(fsResp);
 
@@ -300,11 +367,9 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/form-response';
 
-    this.objects = $vpApi.db.getCollection('formResp');
+    //this.objects = $vpApi.db.getCollection('formResp');
 
-    this.objects.all = function(){
-        return this.data; // This this is a reference to the loki collection
-    }
+
     
 }])
 
