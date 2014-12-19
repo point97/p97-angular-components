@@ -33,7 +33,9 @@ describe('Controller: DateCtrl', function () {
                 "label": "dd/mm/yyyy",
                 "type": "date",
                 "options": {
-                    "datejs_format": "dd/MM/yyyy"
+                    "datejs_format": "yyyy",
+                    "min": 2000,
+                    "max": 2002 
                 }
             }]
         };
@@ -74,7 +76,7 @@ describe('Controller: DateCtrl', function () {
 
     it('does not have to be answered if not required', function(){    
         var isolated = elm2.isolateScope();
-        isolated.value = '';
+        isolated.value = null;
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
@@ -90,10 +92,10 @@ describe('Controller: DateCtrl', function () {
 
     it('should follow the proper format when not default', function(){    
         var isolated = elm2.isolateScope();
-        isolated.value = '27/12/2010';
+        isolated.value = '08/21/2001';
 
         var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(true);
+        expect(is_valid).toBe(false);
     });
 
     it('should follow the rules of actual dates', function(){    
@@ -104,5 +106,36 @@ describe('Controller: DateCtrl', function () {
         expect(is_valid).toBe(false);
     });
 
+    it('should be a realistic year if the format is defined as yyyy', function(){    
+        var isolated = elm2.isolateScope();
+        isolated.value = '1731';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should not be lower than the defined min', function(){    
+        var isolated = elm2.isolateScope();
+        isolated.value = '1999';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should not be higher than the defined max', function(){    
+        var isolated = elm2.isolateScope();
+        isolated.value = '2001';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+    });
+
+    it('should be within range', function(){    
+        var isolated = elm2.isolateScope();
+        isolated.value = '2001';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+    });
 
 });

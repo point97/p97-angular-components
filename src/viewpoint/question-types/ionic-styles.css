@@ -1,0 +1,41 @@
+/* 
+Styles for Ionic Question Types 
+===============================
+*/
+
+
+/* UX Controls */
+
+.checkbox input:before, 
+.checkbox .checkbox-icon:before {
+	border-color: #16A085;
+}
+.checkbox input:checked:before, 
+.checkbox input:checked + .checkbox-icon:before {
+	background: #1abc9c;
+}
+
+.ion-checkmark {
+	color: #1abc9c;
+}
+
+.toggle input:checked + .track {
+	border-color: #16A085;
+    background-color: #1abc9c;
+}
+
+.button.button-positive {
+	background-color: #1abc9c;
+	border-color: #16A085;
+}
+
+/* Validation */
+
+.error {
+	text-align: center;
+	font-size: 13px;
+	color: red;
+}
+
+
+

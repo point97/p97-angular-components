@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+  .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', function($http, $templateCache, $compile, $injector, $sce){
     if ($injector.has('$ionicPopup')) {
             var $ionicPopup = $injector.get('$ionicPopup');
         } 
@@ -29,6 +29,10 @@ angular.module('p97.questionTypes')
                 else
                     return BASE_URL+'multi-select/templates/ionic/toggle-multi.html';
             }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
 
             if (!scope.question) return;
 

@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('text', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){
+  .directive('text', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
     
         return {
             template:'',
@@ -19,6 +19,10 @@ angular.module('p97.questionTypes')
                     else
                         return BASE_URL+'text/templates/ionic/text.html';
                 }
+
+                scope.renderHtml = function(htmlCode) {
+                    return $sce.trustAsHtml(htmlCode);
+                };  
                 
                 if (!scope.question) return;
                 var options = scope.question.options;

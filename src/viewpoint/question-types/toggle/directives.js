@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')  
-.directive('toggle', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  
+.directive('toggle', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  
 
 
     return {
@@ -21,6 +21,10 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'toggle/templates/ionic/toggle.html';
             }
 
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -29,7 +33,7 @@ angular.module('p97.questionTypes')
             if (typeof(scope.question.value) !== 'undefined'){
                 scope.localValue = scope.question.value;
             }
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){

@@ -139,17 +139,15 @@ In the background this will
 ## 4. Question Types
 Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/v2/formstack/question-type/ to see the list. Each question type has a corresponding directive. By default a question does not require an answer. To require an answer user `'require': true` in the options object. Defaults values are handled by the BlockCtlr not the question type directve. 
 
+**Question Types default to ionic templates, unless otherwise specified. Ie. - if Yeoman templates are not included, it refers to ionic. This is particularly relevant in instances related to the `hideInput` function on each question - where Ionic's icons are not available in yeoman's view.
 
 * **datetime** (only date component of datetime was added in v 0.3 - functional in v 0.4)
  PASSING TESTS - Looking at time datetime and Ionic UI stuff.
 
  `options`
  
-  * templateUrl: 
-		  * "ionic/inline.html"
-		  * "ionic/popup.html"
-		  * "yeoman/inline.hmtl"
-		  * "yeoman/popup.html"
+  * templateUrl (yeoman templates currently unavailable): 
+      * ionic/datetime.html
   * initial
   * min 
   * max
@@ -160,7 +158,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 * **number** - This can either be a decimal or an integer
   PASSING TESTS
   `options`
-  
+   * templateUrl (yeoman templates currently unavailable): 
+      * ionic/number.html
   * min
   * max
   * required
@@ -180,6 +179,9 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * show_char_count
   * required
   * default
+  *   templateUrl : 
+      * ionic/textarea.html
+      * yeoman/textarea.html
 
 * **yes-no** (deprecated in v 0.4 in favor of toggle)
   DEPRACTED 
@@ -188,13 +190,13 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
  * default: 'yes'
 
 * **single-select**
-  IN PROGRESS 
-The 'other' options allows for a user to enter a single text answer. Other vlaidation is only Upper/lower case text, numbers, ., -, ' and a space. 
+PASSING TESTS 
+The 'other' options allows for a user to enter a single text answer. Other validation is only Upper/lower case text, numbers, ., -, ' and a space. 
 
   `options`
   
   * templateUrl
-     * "ionic/drop-down-single.html" (note the '-single' add on, this prevents having templates with the same name across question types)
+     * "ionic/drop-down-single.html" 
      * "ionic/radio.html"
      * "yeoman/drop-down-single.html"
      * "yeoman/radio.html"
@@ -208,7 +210,9 @@ The 'other' options allows for a user to enter a single text answer. Other vlaid
 
 ### Available in v 0.4
 * **multi-select**
-IN PROGRESS - Don't have random order. 
+IN PROGRESS but otherwise PASSING TESTS
+ Don't have random order. 
+ 
   `options`
 
   * templateUrl 
@@ -227,22 +231,22 @@ IN PROGRESS - Don't have random order.
   * default
 
 * **date** 
-   PASSING TEST
+   PASSING TESTS
    `options`
 
-   * templateUrl: 
-		  * "ionic/time.html"
-		  * "ionic/popup.html"
-		  * "yeoman/time.html"
-		  * "yeoman/popup.html"
+   * templateUrl (yeoman templates currently unavailable): 
+      * "ionic/date.html"
    * initial
    * min 
    * max
-   * datejs_format: [String] e.g. 'MM/dd/yyyy'
    * required
-   * default
+   * default  
+    * datejs_format: [String] e.g. 'MM/dd/yyyy'
+     * allows for Years - validates any year between 1900 and 2099
+   
 
 * **toggle**
+PASSING TESTS
   Dispalys a toggle UI to the user. This automatically requires an answer and will default to default if nothing is provided. 
 
   `options`
@@ -252,19 +256,24 @@ IN PROGRESS - Don't have random order.
   * negativeValue - [String]
   * negativeLabel - [String] Not used.
   * default - [String]
+  * templateUrl (specific to Ionic): 
+      * "ionic/toggle.html"
 
 
 
 
 * **integer**
+PASSING TESTS
  This allows user to enter an integer, if you need a decimal input use question type `number`.
-  PASSING TESTS 
   `options`
 
   * min
   * max
   * required
   * default
+  * templateUrl : 
+      * "ionic/integer.html"
+      * "yeoman/integer.html"
 
 * **geojson**
   This question type collects geo spatial data as a GeoJson feature group. It displays a map that users can click toggle features on and off. 
@@ -296,10 +305,10 @@ IN PROGRESS - Don't have random order.
   `options`
   
   * templateUrl: 
-		  * "ionic/time.html"
-		  * "ionic/popup.html"
-		  * "yeoman/time.html"
-		  * "yeoman/popup.html"
+      * "ionic/time.html"
+      * "ionic/popup.html"
+      * "yeoman/time.html"
+      * "yeoman/popup.html"
   * initial
   * min 
   * max
@@ -316,7 +325,7 @@ IN PROGRESS - Don't have random order.
 * **currency**
  
   `options`
-	
+  
   * min
   * max
   * code: [String] ISO 4217 currecny code e.g. 'USD', 'EUR'
@@ -328,9 +337,12 @@ IN PROGRESS - Don't have random order.
   PASSING TESTS
   `options`
 
-  * format: "(xxx) xxx-xxxx"
   * required
   * default
+  *  format: "(xxx) xxx-xxxx"
+    * "North America" (US territories, Canada, Bermuda, and 17 Caribbean nations)
+    * "International" (Industry-standard notation specified by ITU-T E.123)
+
   
 ----
 

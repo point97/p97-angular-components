@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('textarea', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('textarea', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -20,12 +20,16 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     return BASE_URL+'textarea/templates/ionic/textarea.html';
             }
             
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
             scope.char_count = 0;
             scope.word_count = 0;
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
