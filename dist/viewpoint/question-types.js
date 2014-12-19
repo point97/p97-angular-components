@@ -28,7 +28,7 @@ angular.module('p97.questionTypes')
 });
 
 angular.module('p97.questionTypes')
-  .directive('datetime', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('datetime', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -42,6 +42,11 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'datetime/templates/'+scope.question.options.templateUrl+'.html';
@@ -49,10 +54,9 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'datetime/templates/ionic/datetime.html';
             }
 
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };   
             
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -96,7 +100,7 @@ angular.module('p97.questionTypes')
 }]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('number', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('number', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -111,18 +115,22 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'number/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'number/templates/ionic/number.html';
             }
-            
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
-            
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };  
+                     
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             
@@ -169,7 +177,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 }]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('textarea', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('textarea', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -190,12 +198,16 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     return BASE_URL+'textarea/templates/ionic/textarea.html';
             }
             
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
             scope.char_count = 0;
             scope.word_count = 0;
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
@@ -264,7 +276,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 }]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('yesNo', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('yesNo', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -285,6 +297,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 else
                     return BASE_URL+'yes-no/templates/ionic/yes-no.html';
             }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };  
 
             if (!scope.question) return;
             var options = scope.question.options;
@@ -319,7 +335,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
 angular.module('p97.questionTypes')
-  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', function($http, $templateCache, $compile, $injector, $sce){
     if ($injector.has('$ionicPopup')) {
         var $ionicPopup = $injector.get('$ionicPopup');
     }
@@ -346,6 +362,10 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'single-select/templates/ionic/radio.html';
             }
 
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
 
             if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
@@ -354,7 +374,7 @@ angular.module('p97.questionTypes')
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.question.choices.push(otherChoice);
             }
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
@@ -456,7 +476,7 @@ angular.module('p97.questionTypes')
 
 
 angular.module('p97.questionTypes')
-  .directive('text', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){
+  .directive('text', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
     
         return {
             template:'',
@@ -476,6 +496,10 @@ angular.module('p97.questionTypes')
                     else
                         return BASE_URL+'text/templates/ionic/text.html';
                 }
+
+                scope.renderHtml = function(htmlCode) {
+                    return $sce.trustAsHtml(htmlCode);
+                };  
                 
                 if (!scope.question) return;
                 var options = scope.question.options;
@@ -552,7 +576,7 @@ angular.module('p97.questionTypes')
     }]);
 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('integer', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('integer', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -567,17 +591,21 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            scope.errors = [];
+            
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'integer/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'integer/templates/ionic/integer.html';
             }
-            
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
             
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -630,7 +658,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 var reg = 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('email', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('email', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -645,18 +673,22 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'email/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'email/templates/ionic/email.html';
             }
-            
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
-            
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };   
+                     
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             
@@ -693,7 +725,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 }]);
 
 angular.module('p97.questionTypes')
-  .directive('date', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('date', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -721,7 +753,11 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'date/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'date/templates/ionic/date.html';
-            }         
+            }    
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };     
 
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -782,7 +818,7 @@ angular.module('p97.questionTypes')
 }]);
 
 angular.module('p97.questionTypes')
-  .directive('phonenumber', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('phonenumber', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -796,13 +832,6 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
-            scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
-                else
-                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
-            }
-
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -815,7 +844,18 @@ angular.module('p97.questionTypes')
             //regex for International phone numbers 
             //Industry-standard notation specified by ITU-T E.123
             var regInternational = /^[0-9 ]+$/;
-            
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
+            }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };  
+          
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
@@ -877,7 +917,7 @@ angular.module('p97.questionTypes')
 }]);
 
 angular.module('p97.questionTypes')
-  .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+  .directive('multiSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', function($http, $templateCache, $compile, $injector, $sce){
     if ($injector.has('$ionicPopup')) {
             var $ionicPopup = $injector.get('$ionicPopup');
         } 
@@ -907,6 +947,10 @@ angular.module('p97.questionTypes')
                 else
                     return BASE_URL+'multi-select/templates/ionic/toggle-multi.html';
             }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
 
             if (!scope.question) return;
 
@@ -1072,7 +1116,7 @@ angular.module('p97.questionTypes')
 
 
 angular.module('p97.questionTypes')  
-.directive('toggle', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  
+.directive('toggle', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  
 
 
     return {
@@ -1094,6 +1138,10 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'toggle/templates/ionic/toggle.html';
             }
 
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
@@ -1102,7 +1150,7 @@ angular.module('p97.questionTypes')
             if (typeof(scope.question.value) !== 'undefined'){
                 scope.localValue = scope.question.value;
             }
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){

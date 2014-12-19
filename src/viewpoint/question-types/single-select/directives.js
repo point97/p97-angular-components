@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', function($http, $templateCache, $compile, $injector){
+  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', function($http, $templateCache, $compile, $injector, $sce){
     if ($injector.has('$ionicPopup')) {
         var $ionicPopup = $injector.get('$ionicPopup');
     }
@@ -26,6 +26,10 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'single-select/templates/ionic/radio.html';
             }
 
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };
+
             if (!scope.question) return;
 
             if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
@@ -34,7 +38,7 @@ angular.module('p97.questionTypes')
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.question.choices.push(otherChoice);
             }
-
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){

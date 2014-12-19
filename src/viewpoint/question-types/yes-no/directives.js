@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('yesNo', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('yesNo', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
 
     return {
@@ -20,6 +20,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 else
                     return BASE_URL+'yes-no/templates/ionic/yes-no.html';
             }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };  
 
             if (!scope.question) return;
             var options = scope.question.options;

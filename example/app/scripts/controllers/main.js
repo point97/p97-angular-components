@@ -8,7 +8,7 @@
  * Controller of the exampleApp
  */
 angular.module('exampleApp')
-  .controller('MainCtrl', function ($scope, $sce) {
+  .controller('MainCtrl', function ($scope) {
     
     $scope.numberControl = {};
 
@@ -165,10 +165,6 @@ angular.module('exampleApp')
                 'templateUrl': 'yeoman/checkbox'
             }
         }]
-    };
-
-    $scope.renderHtml = function(htmlCode) {
-        return $sce.trustAsHtml(htmlCode);
     };
 
     //Create empty answers array (one for each question)

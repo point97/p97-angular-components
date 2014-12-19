@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('phonenumber', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('phonenumber', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -13,13 +13,6 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
-            scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
-                else
-                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
-            }
-
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -32,7 +25,18 @@ angular.module('p97.questionTypes')
             //regex for International phone numbers 
             //Industry-standard notation specified by ITU-T E.123
             var regInternational = /^[0-9 ]+$/;
-            
+
+            scope.getContentUrl = function() {
+                if(scope.question.options.templateUrl)
+                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
+                else
+                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
+            }
+
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };  
+          
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){

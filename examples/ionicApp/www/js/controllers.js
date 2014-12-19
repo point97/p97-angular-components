@@ -10,7 +10,7 @@ angular.module('starter.controllers', [])
  * Controller of the exampleApp
  */
 angular.module('starter')
-  .controller('HomeCtrl', function ($scope, $sce) {
+  .controller('HomeCtrl', function ($scope) {
     
 
     $scope.numberControl = {};
@@ -177,10 +177,6 @@ angular.module('starter')
                 'templateUrl': 'ionic/checkbox'
             }
         }]
-    };
-
-    $scope.renderHtml = function(htmlCode) {
-        return $sce.trustAsHtml(htmlCode);
     };
 
     //Create empty answers array (one for each question)

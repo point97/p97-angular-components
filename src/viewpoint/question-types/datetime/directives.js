@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('datetime', ['$http', '$templateCache', '$compile', function($http, $templateCache, $compile){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+  .directive('datetime', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -13,6 +13,11 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'datetime/templates/'+scope.question.options.templateUrl+'.html';
@@ -20,10 +25,9 @@ angular.module('p97.questionTypes')
                     return BASE_URL+'datetime/templates/ionic/datetime.html';
             }
 
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
+            scope.renderHtml = function(htmlCode) {
+                return $sce.trustAsHtml(htmlCode);
+            };   
             
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
