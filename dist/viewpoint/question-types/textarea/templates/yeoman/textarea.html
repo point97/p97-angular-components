@@ -1,18 +1,21 @@
 <div class="p97-textarea">
     <div ng-bind-html="renderHtml(question.body)"></div>
     <div class="list">
-        <label class="item item-input">
+        <a ng-click="question.options.hideInput = (question.options.hideInput === false)">
+          <span class="glyphicon glyphicon-folder-close"></span>
+        </a>
+        </br>
+        <label class="item item-input" ng-hide="(question.options.hideInput === true)" >
             <textarea 
-                    placeholder="{{ question.label }}" 
+                    placeholder="{{ question.label }}"
                     ng-model="value" 
                     ng-required='question.options.required'
-                    ng-class="{'error':errors.length>0}"
             ></textarea>
-            <div ng-show='question.options.show_word_count' class="small">{{word_count}} words</div>
-            <div ng-show='question.options.show_char_count' class="small">{{char_count}} characters</div>
-            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </label>
-    
+
+        <div ng-show='question.options.show_word_count' class="small">{{word_count}} words</div>
+        <div ng-show='question.options.show_char_count' class="small">{{char_count}} characters</div>
+        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>  
     </div>
 
 </div>

@@ -26,7 +26,8 @@ angular.module('exampleApp')
                 'min_word': 3,
                 'max_word': 10,
                 'show_word_count':true,
-                'show_char_count':true
+                'show_char_count':true,
+                'templateUrl': 'yeoman/textarea'
             }
         },{
             'body': 'When did that happen?',
@@ -86,7 +87,8 @@ angular.module('exampleApp')
             'options': {
                 'required': true,
                 'min': -5,
-                'max': 25
+                'max': 25,
+                'templateUrl': 'yeoman/integer'
             }
         },{
             'body': 'When did that happen?',
@@ -108,7 +110,8 @@ angular.module('exampleApp')
                 "min_char": 6,
                 "max_char": 45,
                 "show_word_count":true,
-                "show_char_count":true
+                "show_char_count":true,
+                'templateUrl': 'yeoman/text'
             }
         },{
             "body": "Please enter an email address",

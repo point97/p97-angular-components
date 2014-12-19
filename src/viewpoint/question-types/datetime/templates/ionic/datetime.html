@@ -1,13 +1,17 @@
 <div class="p97-datetime">
     <div ng-bind-html="renderHtml(question.body)"></div>
     <div class="list">
-        <label class="item item-input" ng-class="{'error':errors.length>0}">
+      <a ng-click="question.options.hideInput = (question.options.hideInput === false)"><i class="icon ion-clipboard"></i></a>
+      <div class="item item-input-inset" ng-hide="(question.options.hideInput === true)">
+          <label class="item-input-wrapper">
             <input type="datetime" 
                    placeholder="{{ question.label }}" 
                    ng-model="value"
                    ng-required='question.options.required'
                    />
-        </label>
-        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+          </label>
+    </div>
+    <div class="item item-divider" ng-show="errors.length>0"> 
+      <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
     </div>
 </div>

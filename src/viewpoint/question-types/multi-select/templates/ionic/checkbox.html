@@ -1,25 +1,27 @@
 <div class="p97-multi-select">
     <div ng-bind-html="renderHtml(question.body)"></div>
-        <ion-checkbox ng-repeat="choice in localChoices"
-                      ng-click="toggleAnswers(choice.value)"
-                      ng-value="choice.value"
-                      ng-model="choice.checked"
-                      ng-required="question.option.required">
-            <label> {{choice.verbose}}</label>
-        </ion-checkbox>
-        <span ng-show="showOtherInput">
-        <div class="item item-input-inset">
-            <label class="item-input-wrapper">
-                <input type="text"
-                       ng-blur="otherValueBlur()"
-                       ng-model="otherValue"
-                       placeholder="'Other' Choice">
-            </label>
-        </div>
-        </span>
-        <div class="item item-divider warning" ng-show="errors.length>0"> 
-            <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
-        </div>
+      <a ng-click="question.options.hideInput = (question.options.hideInput === false)"><i class="icon ion-clipboard"></i></a>
+      <ion-checkbox ng-repeat="choice in localChoices"
+                    ng-hide="(question.options.hideInput === true)"
+                    ng-click="toggleAnswers(choice.value)"
+                    ng-value="choice.value"
+                    ng-model="choice.checked"
+                    ng-required="question.option.required">
+          <label> {{choice.verbose}}</label>
+      </ion-checkbox>
+      <span ng-show="showOtherInput">
+      <div class="item item-input-inset">
+          <label class="item-input-wrapper">
+              <input type="text"
+                     ng-blur="otherValueBlur()"
+                     ng-model="otherValue"
+                     placeholder="'Other' Choice">
+          </label>
+      </div>
+      </span>
+      <div class="item item-divider warning" ng-show="errors.length>0"> 
+          <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+      </div>
 </div>
 
 
