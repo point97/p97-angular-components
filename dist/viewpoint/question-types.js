@@ -585,7 +585,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                function isInteger(x) {
+                isInteger = function (x) {
                     return (typeof x === 'number') && (x % 1 === 0);
                 }
 
@@ -707,39 +707,60 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
+            if (!scope.question) return;
+            var options = scope.question.options;
+            
+            //validates years between 1900-2100
+            //we can expanded if needed
+            var regYear = /^(19|20)\d{2}$/;
+
+            scope.errors = [];
+
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'date/templates/'+scope.question.options.templateUrl+'.html';
                 else
                     return BASE_URL+'date/templates/ionic/date.html';
-            }
+            }         
 
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
-            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
-                // 
                 
                 scope.errors = [];
+
                 var format =  options.datejs_format || 'MM/dd/yyyy';
-                var dateObj = Date.parseExact(scope.value, format)
 
-                if (options.required === true){
-                    // if required check for a valid date.
-                    if(dateObj === null || isNaN(dateObj)){
-                        scope.errors.push('Invalid format.');
+                if (options && options.required === true) {
+                    if (scope.value == null || scope.value == "") {
+                        scope.errors.push('This field is required')
+                        return false;
                     }
+                }
 
-                    if(scope.value.length === 0){
-                        scope.errors.push('This field is required');
+                if (scope.value !== null && scope.value !== undefined) {
+                    // check for a valid date.
+                    var dateObj = Date.parseExact(scope.value, format);
+                    if (dateObj == null || isNaN(dateObj)) {
+                        scope.errors.push('You date is in an invalid format')
                     }
-                } else {
-                    if(scope.value.length > 0 && (dateObj === null  || dateObj === NaN)) {
-                        scope.errors.push('Invalid format.');
+                
+                    if (format && format === 'yyyy') {
+                        if (!regYear.test(scope.value)) {
+                            scope.errors.push('Input must be a valid year')
+                        }
+
+                        if (options.min && regYear.test(options.min)) {
+                            if (scope.value < options.min){
+                                scope.errors.push('Year must not be lower than ' + options.min);
+                            }
+                        }
+
+                        if (options.max && regYear.test(options.max)) {
+                            if (scope.value > options.max){
+                                scope.errors.push('Year must not be higher than ' + options.max);
+                            }
+                        }    
                     }
                 }
 

@@ -103,8 +103,10 @@ angular.module('starter')
             'label': 'MM/dd/yyyy',
             'type': 'date',
             'options': {
-                'required': true,
-                'datejs_format': 'MM/dd/yyyy'
+                'required': false,
+                'datejs_format': 'yyyy',
+                'min': 1998,
+                'max': 2015
             }
         },{
             'body': 'How are you feeling?',

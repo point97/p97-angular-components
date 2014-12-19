@@ -1,8 +1,16 @@
 <div class="p97-date">
-    <div ng-bind-html="question.body"></div>
+    <div ng-bind-html="renderHtml(question.body)"></div>
     <div class="list">
-        <label class="item item-input" ng-class="{'error':errors.length>0}">
-            <input type="date" 
+        <label class="item item-input">
+            <input type="date"
+                   ng-hide="format === yyyy" 
+                   placeholder="{{ question.label }}" 
+                   ng-model="value"
+                   ng-required='question.options.required'
+                   />
+
+            <input type="tel"
+                   ng-show="format === yyyy" 
                    placeholder="{{ question.label }}" 
                    ng-model="value"
                    ng-required='question.options.required'

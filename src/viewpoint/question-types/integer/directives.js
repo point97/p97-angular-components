@@ -32,7 +32,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                function isInteger(x) {
+                isInteger = function (x) {
                     return (typeof x === 'number') && (x % 1 === 0);
                 }
 
