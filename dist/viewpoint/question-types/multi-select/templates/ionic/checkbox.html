@@ -1,6 +1,5 @@
 <div class="p97-multi-select">
     <div ng-bind-html="renderHtml(question.body)"></div>
-      <a ng-click="question.options.hideInput = (question.options.hideInput === false)"><i class="icon ion-clipboard"></i></a>
       <ion-checkbox ng-repeat="choice in localChoices"
                     ng-hide="(question.options.hideInput === true)"
                     ng-click="toggleAnswers(choice.value)"

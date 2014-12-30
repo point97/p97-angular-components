@@ -1,6 +1,5 @@
 <div class="p97-toggle">
     <div ng-bind-html="renderHtml(question.body)"></div>
-    	<a ng-click="question.options.hideInput = (question.options.hideInput === false)"><i class="icon ion-clipboard"></i></a>
         <ion-toggle ng-model='localValue' ng-hide="(question.options.hideInput === true)">
             {{question.options.positiveLabel}}
         </ion-toggle>
