@@ -124,5 +124,14 @@ describe('Controller: IntCtrl', function () {
 
     });
 
+    it('should be allow null values when not required', function() {
+        var isolated = elm2.isolateScope();
+        isolated.value = null;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+
+    });
+
     //
 });

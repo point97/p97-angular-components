@@ -5,9 +5,14 @@
           <label class="item-input-wrapper">
             <input 
                    type="tel" 
-                   ng-model="value" 
+                   ng-model="dummyValue" 
                    placeholder="{{question.label}}"
-                   ng-required='question.options.required'
+
+            />
+            <input
+                  type="hidden"
+                  ng-model="value"
+                  ng-required='question.options.required'
             />
           </label>
         </div>

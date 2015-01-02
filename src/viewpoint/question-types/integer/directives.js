@@ -45,20 +45,23 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     return false;
                 }
 
-                if (!isInteger(scope.value) && (!options.required || options.required === false)) {
-                    scope.errors.push('input must be a integer');
-                    return false;
-                }
+                if (scope.value !== null && scope.value !== undefined) {
 
-                if (options.min && isInteger(options.min)) {
-                    if (scope.value < options.min){
-                        scope.errors.push('value must not be less than ' + options.min);
+                    if (!isInteger(scope.value) && (!options.required || options.required === false)) {
+                        scope.errors.push('input must be a integer');
+                        return false;
                     }
-                }
 
-                if (options.max && isInteger(options.max)) {
-                    if (scope.value > options.max){
-                        scope.errors.push('value must not be more than ' + options.max);
+                    if (options.min && isInteger(options.min)) {
+                        if (scope.value < options.min){
+                            scope.errors.push('value must not be less than ' + options.min);
+                        }
+                    }
+
+                    if (options.max && isInteger(options.max)) {
+                        if (scope.value > options.max){
+                            scope.errors.push('value must not be more than ' + options.max);
+                        }
                     }
                 }
 
@@ -66,8 +69,15 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-                scope.value = parseFloat(scope.value, 10);
+
             };
+
+
+            scope.$watch('dummyValue', function(newValue){
+                if (!newValue) return;
+                scope.value = newValue;
+
+            });
 
             // Compile the template into the directive's scope.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
