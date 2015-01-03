@@ -8,7 +8,7 @@
             <select 
                     ng-model="inputValue" 
                     ng-required='question.options.required'
-                    ng-options='choice.value as choice.verbose for choice in question.choices'>
+                    ng-options='choice.value as choice.verbose for choice in localChoices'>
             </select>
             </label>
             <div ng-show="inputValue === 'other'">

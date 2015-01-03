@@ -18,6 +18,7 @@ angular.module('p97.questionTypes')
             var reg = /^[A-Za-z\d() _.,-]*$/;
             var options = scope.question.options;
             scope.errors = [];
+            scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
@@ -36,7 +37,7 @@ angular.module('p97.questionTypes')
 
             if (options.allow_other > 0) {
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
-                scope.question.choices.push(otherChoice);
+                scope.localChoices.push(otherChoice);
             }
             
             // This is availible in the main controller.
@@ -68,14 +69,14 @@ angular.module('p97.questionTypes')
                 //nothing to see here
             }
 
-            scope.internalControl.unclean_answer = function() {
+            scope.buildOtherChoices = function() {
                 //append previously saved 'Other' answer to question.choices
-                choiceValues = _.pluck(scope.question.choices, "value");
+                choiceValues = _.pluck(scope.localChoices, "value");
                 if (choiceValues.indexOf(scope.value) > -1) {
                     var addOther = { 'verbose': 'User Entered', 'value': scope.value }
-                    scope.question.choices.splice(scope.question.choices.length -1, 0, addOther);
+                    scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                 }
-                return scope.question.choices
+                return scope.localChoices
             }
 
             // Compile the template into the directive's scope.
@@ -93,15 +94,30 @@ angular.module('p97.questionTypes')
             });
 
             scope.otherValueBlur = function () {
-
                 setValue = function() {
                     var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                    scope.question.choices.splice(scope.question.choices.length -1, 0, newChoice);
+                    scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
                     scope.inputValue = scope.otherValue; 
                     scope.otherValue = '';
                 };
 
                 if (scope.otherValue.length > 0) {
+
+                    localContains = (_.some(scope.localChoices, function(i) {
+                        return i.value == scope.otherValue
+                    }))
+                    
+                    if (localContains) {
+                        ($ionicPopup ? $ionicPopup.alert({
+                                            title: 'Duplicate Entries',
+                                            template: 'You have typed a duplicate answer. Please try again.'
+                                        }) 
+                                     :  alert('You have typed a duplicate answer. Please try again.')
+                        );
+                        scope.otherValue = '';
+                        return false;
+                    }; //end contains duplicate
+
                     if (scope.otherValue.length > scope.question.options.other_max_length) {
                         ($ionicPopup ? $ionicPopup.alert({
                                             title: 'Too long',

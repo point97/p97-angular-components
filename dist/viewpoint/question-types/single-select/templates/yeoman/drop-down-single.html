@@ -6,7 +6,7 @@
                     ng-model="inputValue" 
                     ng-required='question.options.required'
                     ng-class="{'error':errors.length>0}"
-                    ng-options='choice.value as choice.verbose for choice in question.choices'>
+                    ng-options='choice.value as choice.verbose for choice in localChoices'>
             </select>
             <span ng-show="inputValue === 'other'">
                 <input type="text"
