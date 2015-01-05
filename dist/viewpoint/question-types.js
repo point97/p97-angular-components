@@ -638,7 +638,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     return false;
                 }
 
-                if (scope.value !== null && scope.value !== undefined) {
+                if (scope.value !== null && scope.value !== undefined && scope.value.length > 0) {
 
                     if (!isInteger(scope.value) && (!options.required || options.required === false)) {
                         scope.errors.push('input must be a integer');
@@ -800,7 +800,7 @@ angular.module('p97.questionTypes')
                     }
                 }
 
-                if (scope.value !== null && scope.value !== undefined) {
+                if (scope.value !== null && scope.value !== undefined && scope.value.length > 0) {
                     // check for a valid date.
                     var dateObj = Date.parseExact(scope.value, format);
                     if (dateObj == null || isNaN(dateObj)) {
