@@ -630,7 +630,8 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 scope.errors = []
 
                 isInteger = function (x) {
-                    return (typeof x === 'number') && (x % 1 === 0);
+                    y = parseInt(x);
+                    return (typeof y === 'number') && (y % 1 === 0);
                 }
 
                 if (!isInteger(scope.value) && options.required && options.required === true) {
