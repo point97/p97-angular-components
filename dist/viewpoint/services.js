@@ -54,23 +54,6 @@ angular.module('vpApi.services', [])
         });
     }
 
-    this._createDb = function(){
-        /* 
-        Creates the database and adds all the collections needed
-        then saves to local storage. 
-        */
-        
-        obj.db.addCollection('user');
-        obj.db.addCollection('formstack');
-        obj.db.addCollection('fsResp');
-        obj.db.addCollection('formResp');
-        obj.db.addCollection('blockResp');
-        obj.db.addCollection('answer');
-        console.log("[$vpApi._createDb] Created tables. About to save to local storage.");
-        obj.db.save();
-        console.log("[$vpApi._createDb] Saved db to local storage.");
-    }
-
 
     this.getFormstack = function(){
         var out = null;
@@ -88,6 +71,14 @@ angular.module('vpApi.services', [])
         return new Date().toISOString();
     }
 
+    this.serialize = function(obj) {
+        var str = [];
+        for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+        return str.join("&");
+    }
 
     this.authenticate = function(data, success_callback, error_callback) { 
         /*
@@ -126,7 +117,11 @@ angular.module('vpApi.services', [])
     this.fetch  = function(resource, data, success, fail){
 
         var url = apiBase + resource + '/';
+        var qs = this.serialize(data);
+        url += "?" + qs;
+
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        
         $http.get(url, config).success(function(data, status){
           success(data, status);
         })
@@ -213,7 +208,6 @@ angular.module('vpApi.services', [])
     };
 
 }])
-
 
 .service('$formstack', ['$vpApi', function($vpApi) {
     var obj = this;
@@ -415,6 +409,74 @@ angular.module('vpApi.services', [])
 
   var obj = this;
   this.resource_name = "pforms/answer";
+
+}])
+
+
+.service('$mediacache', ['$vpApi', '$formstack', '$http', function($vpApi, $formstack, $http){
+    var obj = this;
+    obj.isCached = false;
+    
+
+    this.run = function(){
+        /* 
+        This should run when the app first loads. 
+
+        It uses getFileNames to return  alist of file names to
+        request from the server and caches them in a Colleciton named
+        'media' with a keywords 'filename' and 'data'
+        
+
+        */ 
+        var fnames = obj.getFilenames();
+        // Cache all geojsonChoices
+        _.each(fnames, function(fname){
+            $http({ 
+                method: 'GET',
+                withCredentials: true,
+                url: fname
+            }).success(function(data) {
+                // Save this to persistent storage
+
+                var medias = $vpApi.db.getCollection('media');
+                var entry = medias.find({'fname':fname});
+                if (entry.length > 0){
+                    entry.cupdate = $vpApi.getTimestamp();
+                    medias.update(entry);
+                } else {
+                    entry = {
+                        'fname':fname,
+                        'data':data,
+                        'cupdate': $vpApi.getTimestamp()
+                    }
+                    medias.insert(entry);
+                }
+                $vpApi.db.save();
+
+            }).error(function(data, status){
+                console.log("Could not load media file ")
+            });
+        });
+    };
+
+    this.getFilenames = function(){
+        // Get loop over formstack and get a list of files names to cache
+        var fs = $vpApi.getFormstack();
+        var fnames = [];
+        _.each(fs.forms, function(form){
+            _.each(form.blocks, function(block){
+                _.each(block.questions, function(q){
+                    if (q.options.geojsonChoices && q.options.geojsonChoices.url){
+                        console.log("[getFilenames] found media file "+q.options.geojsonChoices.url);
+                        fnames.push(q.options.geojsonChoices.url);
+                    }
+                }); // End questions loop
+            }); // End block loop
+        }); // End forms loop
+        console.log("[getFilenames] File to cache: ");
+        console.log(fnames);
+        return fnames;
+    }
 
 }])
 

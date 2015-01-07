@@ -71,6 +71,14 @@ angular.module('vpApi.services', [])
         return new Date().toISOString();
     }
 
+    this.serialize = function(obj) {
+        var str = [];
+        for(var p in obj)
+        if (obj.hasOwnProperty(p)) {
+          str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+        }
+        return str.join("&");
+    }
 
     this.authenticate = function(data, success_callback, error_callback) { 
         /*
@@ -109,7 +117,11 @@ angular.module('vpApi.services', [])
     this.fetch  = function(resource, data, success, fail){
 
         var url = apiBase + resource + '/';
+        var qs = this.serialize(data);
+        url += "?" + qs;
+
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        
         $http.get(url, config).success(function(data, status){
           success(data, status);
         })
