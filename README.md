@@ -10,7 +10,7 @@ A collection of angular component to be used with Viewpoint 2.
 * [3. Authentication](#3-authentication)
 * [4. Question Types](#4-question-types)
 * [5. Forms and Form Options](#5-forms-and-form-options)
-* [6. Angular Services](#6-angular-services)
+* [7. Angular Services](#7-angular-services)
 * [7. Linear Form and Block Controllers](#7-linear-form-and-block-controllers)
 * [8. For Developers](#8-for-developers)
 * [9. The Build Process](#9-the-build-process)
@@ -430,32 +430,43 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
 
 ##7. Angular Services
 
-These are located in `services.js`. To load these into your app inject `vpApi.services` to your module. Most services defined a load function that loads the data from localStorage. 
+These are located in `services.js`. This file contains to modules: `vpApi.services` and `survey.services`. To load these into your app inject `vpApi.services` and/or `survey.services` into your module. 
 
-###$vpApi
-Handles authentication and base HTTP requests.
 
-###$formstack
+###vpApi.services
+
+####$vpApi
+Handles authentication and base HTTP requests, tile and media caching. These services are angular services so they are persistent across the entire app once the are loaded.
+
+####$formstack
 Resource: `/api/v2/pforms/formstack`
 Handles fetching and updates from a read-only endpoint. 
 
-###$form
+####$form
 Possibly deprecated in v0.5
-###$block
+####$block
 Possibly deprecated in v0.5
 
-###$formResponse
+####$formResponse
 Handles creation of form responses with a `cid` as well as some getters.
 
-###$blockResponse
+####$blockResponse
 Handles creation of block responses with a `cid` as well as some getters based on block response index.
-###$answers
+####$answers
 Handles fetching updates from API as well as creating and updating answers locally. 
 
-###$profile
+####$profile
 
-###$tilecache
+####$tilecache
 A service to handle tile cahcing for map forms.
+
+####$mediacache
+A service to handle file cahcing for things like images and geojson files.
+
+
+###survey.services
+
+This is a singalton that contains logic that should be share across the Form and Block controllers.
 
 ---
 
