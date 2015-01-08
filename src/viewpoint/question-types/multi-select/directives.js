@@ -43,7 +43,7 @@ angular.module('p97.questionTypes')
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.localChoices.push(otherChoice);
             }
-            
+
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
@@ -84,34 +84,25 @@ angular.module('p97.questionTypes')
                 //nothing to see here
             };
 
-            scope.buildOtherChoices = function() {
-                //append previously saved 'Other' answers to question.choices
-                otherAnswerArray = _.difference(scope.value, _.pluck(scope.localChoices, "value"));
-                if (otherAnswerArray.length > 0) {
-                    _.each(otherAnswerArray, function(i) {
-                    var addOther = { 'verbose': 'User Entered', 'value': i }
-                    scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
-                    })
-                }
-                return scope.localChoices
-            };
+            //adds respondant's choices to a valueArray
+            scope.addChoicesToArray = function(choiceValue) {
 
-            scope.toggleAnswers = function(choiceValue) {
+                //check there are previousAnswers and are not empty responses
+                if (scope.value && scope.value !== "") {
+                    scope.valueArray = scope.value;
+                }
+
                 var index = scope.valueArray.indexOf(choiceValue);
                 if (index > -1) {
+                    //remove items from valueArray
                     scope.valueArray.splice(index, 1);
-                }
-                else {
+                } else {
+                    //add items to valueArray
                     scope.valueArray.push(choiceValue);
                 }
-                // Sort and update DOM display
-                scope.valueArray.sort(function(a, b) {
-                    return a - b
-                });
-
                 (scope.valueArray.length > 0) ? scope.value = scope.valueArray : scope.value;
             };
-
+            
             //notification confirmation for 'other' answer
             scope.otherValueBlur = function() {
 
@@ -170,7 +161,7 @@ angular.module('p97.questionTypes')
                 }
             };
 
-            scope.$watchCollection('value', function(newValues, oldValues){
+            scope.$watchCollection('valueArray', function(newValues, oldValues){
                 if (!newValues) return;
 
                 //watch  the number of choices selected within valueArray
@@ -190,6 +181,33 @@ angular.module('p97.questionTypes')
                 var contents = element.html(response).contents();
                 $compile(contents)(scope);
             });
+
+            //toggles and checks UI on localChoices for previousAnswers - will only run at start
+            scope.togglePrevAnswers = function () {
+ 
+                //set all choices as unchecked
+                _.each(scope.localChoices, function(i) {
+                    i.checked = false;
+                });
+
+                //loops through all previousAnswers
+                _.each(scope.value, function(i) {
+                    choiceValues = _.pluck(scope.localChoices, "value");
+                    if (!_.contains(choiceValues, i)) {
+                        //append previously saved 'Other' answer to question.choices
+                        var addOther = { 'verbose': 'User Entered: '+i, 'value': i, 'checked': true }
+                        scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
+                    } else {
+                        //find index location and toggle choice as checked
+                        var choice = _.find(scope.localChoices, function(item) {
+                            return item.value === i;
+                        });
+                        choice.checked = true;
+                    }
+                });
+            };
+
+            scope.togglePrevAnswers();
         }
     } // end return 
 }])

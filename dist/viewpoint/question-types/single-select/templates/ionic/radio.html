@@ -3,14 +3,23 @@
     <div class="list">
         <div ng-repeat="choice in localChoices" ng-hide="(question.options.hideInput === true)">
             <label class="item item-radio">
-            <input type="radio"
-                ng-model="$parent.inputValue"
-                ng-value="choice.value"
-                name="group"
-                ng-required='question.options.required'>
-            </input>
-            <div class="item-content"> {{choice.verbose}}</div>
-            <i class="radio-icon ion-checkmark"></i>
+                <input type="radio"
+                    ng-model="$parent.inputValue"
+                    ng-value="choice.value"
+                    name="group"
+                    ng-required='question.options.required'>
+                </input>
+
+                <div class="item item-thumbnail-left" ng-if="choice.img">
+                    <img ng-src="{{choice.img}}"/>
+                    <span class="verbose-image">{{choice.verbose}}</span>
+                </div>
+                <div ng-hide="choice.img" class="item-content">
+                    {{choice.verbose}}
+                </div>
+                
+                <i class="radio-icon ion-checkmark"></i>
+
             </label>
         </div> 
             <div ng-show="inputValue === 'other'">

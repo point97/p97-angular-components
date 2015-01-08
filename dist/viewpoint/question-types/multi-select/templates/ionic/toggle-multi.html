@@ -2,11 +2,19 @@
     <div ng-bind-html="renderHtml(question.body)"></div>
         <ion-toggle ng-repeat="choice in localChoices"
                     ng-hide="(question.options.hideInput === true)"
-                    ng-click="toggleAnswers(choice.value)"
+                    ng-click="addChoicesToArray(choice.value)"
                     ng-value="choice.value"
                     ng-model="choice.checked"
                     ng-required="question.option.required">
+
+            <div class="item item-thumbnail-left" ng-if="choice.img">
+                <img ng-src="{{choice.img}}"/>
+                <span class="verbose-image">{{choice.verbose}}</span>
+            </div>
+            <div ng-hide="choice.img"> 
                 {{choice.verbose}}
+            </div>
+
         </ion-toggle>
         <span ng-show="showOtherInput">
         <div class="item item-input-inset">

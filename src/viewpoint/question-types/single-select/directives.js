@@ -39,6 +39,22 @@ angular.module('p97.questionTypes')
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.localChoices.push(otherChoice);
             }
+
+            //if previousAnswer exists - check it upon return to the question
+            scope.checkPreviousAnswer = function() {
+
+                if (scope.value && scope.value !== "") {
+                    choiceValues = _.pluck(scope.localChoices, "value");
+
+                    //user responses not one of the default values - it must be an 'other' answer
+                    if (!_.contains(choiceValues, scope.value)) {
+                        //append previously saved 'Other' answer to question.choices
+                        var addOther = { 'verbose': 'User Entered: '+scope.value, 'value': scope.value }
+                        scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
+                    }
+                    scope.inputValue = scope.value;
+                }
+            };
             
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
@@ -147,6 +163,7 @@ angular.module('p97.questionTypes')
                     } //ends else statement
                 }          
             }
+            scope.checkPreviousAnswer();
         }
     } // end return 
 }])
