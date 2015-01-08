@@ -17,7 +17,7 @@ angular.module('p97.questionTypes')
                 _.each($scope.questions, function(q, i){
                     q.form = {show: true};
                     if (typeof(q.value) === 'undefined') q.value = '';
-                    var html = '<div '+q.type+' question="questions['+i+']" value="questions['+i+'].value" control="questions['+i+'].form" ng-show="questions['+i+'].form.show"></div>';
+                    var html = '<div class="question '+q.type+'" '+q.type+' question="questions['+i+']" value="questions['+i+'].value" control="questions['+i+'].form" ng-show="questions['+i+'].form.show"></div>';
                     var el = $compile(html)($scope);
                     $element.parent().append(el);
                 });
