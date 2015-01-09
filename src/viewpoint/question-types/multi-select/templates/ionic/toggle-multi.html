@@ -16,16 +16,6 @@
             </div>
 
         </ion-toggle>
-        <span ng-show="showOtherInput">
-        <div class="item item-input-inset">
-            <label class="item-input-wrapper">
-                <input type="text"
-                       ng-blur="otherValueBlur()"
-                       ng-model="otherValue"
-                       placeholder="'Other' Choice">
-            </label>
-        </div>
-        </span>
         <div class="item item-divider" ng-show="errors.length>0"> 
             <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
         </div>

@@ -19,6 +19,7 @@ angular.module('p97.questionTypes')
             var options = scope.question.options;
             scope.errors = [];
             scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+            scope.obj = {'otherValue': null}
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
@@ -88,11 +89,54 @@ angular.module('p97.questionTypes')
             scope.buildOtherChoices = function() {
                 //append previously saved 'Other' answer to question.choices
                 choiceValues = _.pluck(scope.localChoices, "value");
+
                 if (choiceValues.indexOf(scope.value) > -1) {
                     var addOther = { 'verbose': 'User Entered', 'value': scope.value }
                     scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                 }
                 return scope.localChoices
+            }
+
+            //show Other Input in Modal on click
+            scope.otherInputModal = function() {
+                var otherInputPopup = $ionicPopup.show({
+                  template: '<input type="text" ng-model="obj.otherValue">',
+                  title: 'Other Option',
+                  scope: scope,
+                  subTitle: 'Please enter your input below',
+                  buttons: [
+                    { 
+                      text: 'Cancel',
+                      onTap: function(e) {
+                        scope.value = '';
+                        return false;
+                      } 
+                    },
+                    {
+                      text: '<b>Confirm</b>',
+                      type: 'button-positive',
+                      onTap: function(e) {
+                          if (scope.otherValueCheck() == false) {
+                            return false;
+                          };
+
+                          _.each(scope.localChoices, function (i) {
+                            if ((i.verbose.substring(0, 13)) === 'User Entered:') {
+                                scope.localChoices = _.reject(scope.localChoices, i)
+                                }
+                                return scope.localChoices;
+                            });
+
+                          var newChoice = { 'verbose': 'User Entered: '+scope.obj.otherValue, 'value': scope.obj.otherValue};
+                          //inserts newChoice into question.choices in front of 'Other'
+                          scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
+
+                          scope.inputValue = scope.obj.otherValue; 
+                          scope.obj.otherValue = '';
+                      }
+                    }
+                  ]
+                });
             }
 
             // Compile the template into the directive's scope.
@@ -103,24 +147,18 @@ angular.module('p97.questionTypes')
 
             scope.$watch('inputValue', function (newValue) {
                 if (newValue === 'other') {
-                    scope.value = scope.otherValue;
+                    scope.otherInputModal();
                 } else {
                     scope.value = newValue;
                 }
             });
 
-            scope.otherValueBlur = function () {
-                setValue = function() {
-                    var newChoice = { 'verbose': 'User Entered: '+scope.otherValue, 'value': scope.otherValue };
-                    scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
-                    scope.inputValue = scope.otherValue; 
-                    scope.otherValue = '';
-                };
+            scope.otherValueCheck = function () {
 
-                if (scope.otherValue.length > 0) {
+                if (scope.obj.otherValue.length > 0) {
 
                     localContains = (_.some(scope.localChoices, function(i) {
-                        return i.value == scope.otherValue
+                        return i.value == scope.obj.otherValue
                     }))
                     
                     if (localContains) {
@@ -130,11 +168,12 @@ angular.module('p97.questionTypes')
                                         }) 
                                      :  alert('You have typed a duplicate answer. Please try again.')
                         );
-                        scope.otherValue = '';
+                        scope.obj.otherValue = '';
+                        scope.value = '';
                         return false;
                     }; //end contains duplicate
 
-                    if (scope.otherValue.length > scope.question.options.other_max_length) {
+                    if (scope.obj.otherValue.length > scope.question.options.other_max_length) {
                         ($ionicPopup ? $ionicPopup.alert({
                                             title: 'Too long',
                                             template: 'You have typed an answer that is too long. Please try again.'
@@ -144,23 +183,23 @@ angular.module('p97.questionTypes')
                         return false;
                     }; //end lengthy input
 
-                    if ($ionicPopup) {
-                       var confirmPopup = $ionicPopup.confirm({
-                            title: 'Are You Sure',
-                            template: 'Are you sure you want this selection?'
-                          });
-                       confirmPopup.then(function(res) {
-                           if (res) {
-                              setValue();
-                           } 
-                       }); //end confirmPopup.then
+                    // if ($ionicPopup) {
+                    //    var confirmPopup = $ionicPopup.confirm({
+                    //         title: 'Are You Sure',
+                    //         template: 'Are you sure you want this selection?'
+                    //       });
+                    //    confirmPopup.then(function(res) {
+                    //        if (res) {
+                    //           setValue();
+                    //        } 
+                    //    }); //end confirmPopup.then
                        
-                    } else {
-                        var option = window.confirm("Are You Sure", "Are you sure you want this selection");
-                        if (option == true) {
-                            setValue();
-                        }
-                    } //ends else statement
+                    // } else {
+                    //     var option = window.confirm("Are You Sure", "Are you sure you want this selection");
+                    //     if (option == true) {
+                    //         setValue();
+                    //     }
+                    // } //ends else statement
                 }          
             }
             scope.checkPreviousAnswer();

@@ -11,17 +11,6 @@
                     ng-options='choice.value as choice.verbose for choice in localChoices'>
             </select>
             </label>
-            <div ng-show="inputValue === 'other'">
-            <div class="item item-input-inset">
-                <label class="item-input-wrapper">
-                    <input type="text"
-                    name="otherValue"
-                    ng-blur="otherValueBlur()"
-                    ng-model="otherValue"
-                    placeholder="'Other' Choice">
-                </label>
-            </div>
-            </div>
         <div class="item item-divider warning" ng-show="errors.length>0"> 
             <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
         </div>
