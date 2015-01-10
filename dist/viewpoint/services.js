@@ -473,6 +473,7 @@ angular.module('vpApi.services', [])
                 }); // End questions loop
             }); // End block loop
         }); // End forms loop
+        fnames = _.uniq(fnames);
         console.log("[getFilenames] File to cache: ");
         console.log(fnames);
         return fnames;
@@ -480,13 +481,15 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$tilecache', ['$vpApi', '$formstack', function($vpApi, $formstack){
+.service('$tilecache', ['$vpApi', '$formstack', '$timeout', function($vpApi, $formstack, $timeout){
     /*
     Handles tiles caching.
     */
 
     var obj = this;
     this.regions = [];
+    this.cacheTimer = {'start':null, 'stop':null, 'elasped':null};
+
 
     this.isCached = function(){
         var rs = localStorage.getItem('tilesCached');
@@ -513,9 +516,8 @@ angular.module('vpApi.services', [])
         Look for forms with Regions. 
         Returns the list of regions or an empty list.
         */
-        console.log("[$tilecache.getRegions()] WTF");
-        out = [];
         
+        var out = [];
         var fs = $vpApi.getFormstack();
         
         _.each(fs.forms, function(form){
@@ -533,9 +535,8 @@ angular.module('vpApi.services', [])
         Look for forms with regions. 
         Returns the list of regions or an empty list.
         */
-        console.log("[$tilecache.getTileSources()] WTF");
-        out = [];
         
+        var out = [];
         var fs = $vpApi.getFormstack();
         
         _.each(fs.forms, function(form){
@@ -556,42 +557,42 @@ angular.module('vpApi.services', [])
             return
         }
         var maxZoom = obj.getMaxCacheZoom();
-
         var nbTiles = obj.offlineLayer.calculateNbTiles(maxZoom, obj.regions);
-        if (nbTiles < 10000) {
-            console.log("Will be saving: " + nbTiles + " tiles")
-            obj.offlineLayer.saveRegions(obj.regions, maxZoom, 
-              function(){
-                console.log('[saveRegions] onStarted');
 
-              },
-              function(){
-                console.log('[saveRegions] onSuccess');
-                localStorage.setItem('tilesCached', 'true');
-                onSuccess();
-              },
-              function(error){
-                console.log('onError');
-                console.log(error);
-                onError();
-              })
-        } else {
-            alert("You are trying to save " + nbTiles + " tiles. There is currently a limit of 10,000 tiles.");
-        }
+        console.log("Will be saving: " + nbTiles + " tiles")
+        obj.offlineLayer.saveRegions(obj.regions, maxZoom, 
+          function(){
+            console.log('[saveRegions] onStarted');
+
+          },
+          function(){
+            console.log('[saveRegions] onSuccess');
+            obj.cacheTimer.stop = new Date();
+            obj.cacheTimer.elasped = obj.cacheTimer.stop - obj.cacheTimer.start;
+            console.log("Cache timer elapsed time (sec): " + obj.cacheTimer.elasped/1000/60)
+
+            localStorage.setItem('tilesCached', 'true');
+            onSuccess();
+          },
+          function(error){
+            console.log('onError');
+            console.log(error);
+            onError();
+          })
+
 
     } // end loadRegions.
 
     this.run = function(success, error){
         console.log("[$tilecache.run()]");
-
+        obj.cacheTimer.start = new Date();
         // These need to be passed in from form.options
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
         
+        
         var tileSource = obj.getTileSources()[0];
-
-
         onError = function(errorType, errorData1, errorData2){
             /*
                 Fires when $tilecache errors out during tile caching.
@@ -614,14 +615,17 @@ angular.module('vpApi.services', [])
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
             onError: function(){console.log("onError for what?")},  // Not sure what this does
-            storeName:tileSource.storeName, 
-            dbOption:"WebSQL"  // "IndexedDB"
+            storeName:tileSource.storeName,  // this is the objectStore name. 
+            dbOption:"IndexedDB" // "WebSQL"
         }
-        obj.offlineLayer = new OfflineLayer( tileSource.url, options);
-        obj.loadRegions(success, error);
+        obj.offlineLayer = new OfflineLayer(tileSource.url, options);
+        $timeout(function(){
+            obj.loadRegions(success, error);
+        }, 1000);
+        
     };
 
-    clearTiles = function(){
+    this.clearTiles = function(){
         console.log('clearing tiles...');
         obj.offlineLayer.clearTiles(
             function(){
@@ -631,6 +635,39 @@ angular.module('vpApi.services', [])
             }
         );
     }
+
+
+    clearTilesDb = function(){
+        /*
+        A testing function to clear indexedDB tiles. This should not be used in 
+        prodcution. Jsut left here for reference.
+        */
+
+        tilesSources = obj.getTileSources();
+
+
+        osTableName = tilesSources[0].storeName;
+        dbName = "IDBWrapper-" + osTableName;
+        
+
+        var openRequest = window.indexedDB.open(dbName, 1); //version used
+        openRequest.onerror = function (e) {
+            console.log("[openTilesDb] Database error: " + e.target.errorCode);
+        };
+        openRequest.onsuccess = function (event) {
+            
+            window.db = openRequest.result;
+            console.log("[openTilesDb] Opened "+dbName+" with dataStores");
+            console.log(window.db.objectStoreNames);
+
+            var store = window.db.transaction(osTableName, "readwrite").objectStore(osTableName);
+                      
+             store.clear().onsuccess = function (event) {
+                localStorage.removeItem("tilesCached");
+                console.log('Finished clearing records');
+            };
+        };
+    };
 }])
 
 angular.module('survey.services', [])
