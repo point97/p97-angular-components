@@ -44,7 +44,6 @@ angular.module('survey.services', [])
         
         if (state.current.name === 'app.map-form-foreach'
             || state.current.name === 'app.map-form') {
-            console.log('[setState] setting map-from-foreach specific variables here');
             scope.repeatCount = 0;
             if ($location.hash().length === 0){
                 $location.hash("intro");

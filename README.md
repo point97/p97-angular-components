@@ -363,7 +363,8 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
 
 
 ```
-    app/map-form/<fs-resp-id>/</form-resp-id>/<block-resp-id>/<question-id>
+    app/map-form/<fsRespId>/</formId>#<formRespId>/<blockRespId>/<qIndex>
+    app/map-form-foreach/<fsRespId>/</formId>#<formRespId>/<blockRespId>/<qIndex>
 
 ```
 
@@ -383,6 +384,11 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
   - attrib - The attribute to use.
   - storeName - The name to use for client side storage.
 
+* **maxZoom** [Integer] The maximum allowed zoom level of the map. Note if this value is larger than maxCacheZoom tiles at the higher zoom levels will not show up when offline.
+
+* **maxCacheZoom** [Integer] The maximum allowed zoom level used for tile caching. This differs from the maxZoom options in that it only effects the max zoom level that the tiles are cached for, the map may have a different max zoom level. Generally maxZoom should match maxCacheZoom. 
+
+Setting maxCacheZoom = 14, it took 17 minutes to cach 273MB with 36,000 GET requests. 
 
 * **regions**: [Array] 
 

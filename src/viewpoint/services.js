@@ -30,18 +30,15 @@ angular.module('vpApi.services', [])
         }
 
         obj.loadHandler = function(){
-            console.log("")
             obj.users = obj.db.getCollection('user');
 
             if (obj.users && obj.users.data.length > 0 && obj.users.data[0].username){
                 obj.user = obj.users.data[0];
             } else {
-                console.log('[loadDatabase] Could not find users collection');
                 obj._createDb();
             }
             obj.dbLoaded = true;
             $rootScope.$broadcast('db_loaded');
-            console.log('[loadDatabase] done');
             initCallback();
 
         };
@@ -60,7 +57,7 @@ angular.module('vpApi.services', [])
         try {
             out = obj.db.getCollection('formstack').find({'slug':obj.user.profile.allowed_formstacks[0]})[0];
         } catch(e) {
-            console.log('[$vpApi.getFormstack()] Could not find formstack');
+            console.error('[$vpApi.getFormstack()] Could not find formstack');
             console.log(e);
         }
         return out;
@@ -85,7 +82,6 @@ angular.module('vpApi.services', [])
         Inputs:
             data : object with keywords username, password, stayLoginIn
         */
-        console.log('[$vpApi.authenticate]');
         var url = apiBase + 'authenticate/';
 
         var headers = {}// {'Authorization':'Token ' + this.user.token};  
@@ -103,9 +99,7 @@ angular.module('vpApi.services', [])
                 obj.user = user;
                 
                 obj.db.save();
-                localStorage.setItem('user', JSON.stringify(obj.user));
-                console.log('broadcasting authenticated')
-                
+                localStorage.setItem('user', JSON.stringify(obj.user));                
                 $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
         })
             .error(function(data, status){
@@ -154,19 +148,19 @@ angular.module('vpApi.services', [])
 
     $rootScope.$on('authenticated', function(event, args){
         $profile.fetch(function(){
-            console.log('[$user] got profile');
-            $vpApi.db.save(); // This is to save the profile to local storage.
+            $vpApi.db.save(); // This is to save the profile to indexedDB.
             
-            try {
-                var formstackSlug = $vpApi.user.profile.allowed_formstacks[0];
-            } catch(e){
-                console.log("No allowed formstacks found.");
-                debugger
+            allowedFormstacks = $vpApi.user.profile.allowed_formstacks;
+            if (allowedFormstacks.length > 0) {
+                formstackSlug = allowedFormstacks[0];
+            } else {
+                console.error("There are no allowed formstacks for this user.");
+                // TODO Handle the no formstack case.
             }
+            
 
             // Now use the allowed_formstacks to get first formstack.
             $formstack.fetchBySlug(formstackSlug, function(data, status){
-                console.log('[$user] succesfully fetched formstack');
                 $vpApi.db.save();
                 args.onSuccess();
             },
@@ -195,10 +189,8 @@ angular.module('vpApi.services', [])
         var token = $vpApi.user.token;
 
         var headers = {headers: {'Authorization':'Token ' + token}};
-        console.log("[$profile.fetch()] About to fetch profile");
         $http.get(url+$vpApi.user.username, headers)
             .success(function(data, status){
-                console.log("[$profile.fetch() callback] got data");
                 $vpApi.user.profile = data[0];
                 $vpApi.users.update($vpApi.user);
                 successCallback();
@@ -218,7 +210,6 @@ angular.module('vpApi.services', [])
 
     this._fetchSuccess = function(data, status){
         obj.objects = data;
-        console.log("[$formstack.fetchSuccess] got data, now updating formstack collection");
         var formstacks = $vpApi.db.getCollection('formstack');
         var formstack = formstacks.find({'slug':data[0].slug});
         if (formstack.length > 0){
@@ -238,13 +229,11 @@ angular.module('vpApi.services', [])
         */
 
         if(HAS_CONNECTION){
-          console.log("[$formstack.fetchBySlug] About to fetch formstack.");
           $vpApi.fetch(
             this.resource_name, 
             {'slug':slug}, 
             function(data, status){
                 obj.objects = data;
-                console.log("[$formstack.fetchBySlug] got data");
 
                 var formstacks = $vpApi.db.getCollection('formstack');
                 var formstack = formstacks.find({'slug':slug});
@@ -279,7 +268,6 @@ angular.module('vpApi.services', [])
                          data, status from the $http.get
         */
 
-        console.log("[$formstack.fetchBySlug] About to fetch formstack.");
         var data = {'slug':slug};
         
         $vpApi.fetch(this.resource_name, data, 
@@ -310,7 +298,6 @@ angular.module('vpApi.services', [])
     this.resource_name = 'pforms/formstack-response';
 
     $rootScope.$on('db_loaded', function(e){
-        console.log('$fsResp received db_loaded')
         this.objects = $vpApi.db.getCollection('fsResp');
     })
     
@@ -327,17 +314,14 @@ angular.module('vpApi.services', [])
         var answers = $vpApi.db.getCollection('answer').find({'fsRespId': fsRespId});
 
 
-        console.log("Deleting " + formResps.length + " form responses");
         _.each(formResps, function(resp){
             $vpApi.db.getCollection('formResp').remove(resp);
         });
 
-        console.log("Deleting " + blockResps.length + " block responses");
         _.each(blockResps, function(resp){
             $vpApi.db.getCollection('blockResp').remove(resp);
         });
         
-        console.log("Deleting " + answers.length + " answers")
         _.each(answers, function(resp){
             $vpApi.db.getCollection('answer').remove(resp);
         });
@@ -467,14 +451,13 @@ angular.module('vpApi.services', [])
             _.each(form.blocks, function(block){
                 _.each(block.questions, function(q){
                     if (q.options.geojsonChoices && q.options.geojsonChoices.url){
-                        console.log("[getFilenames] found media file "+q.options.geojsonChoices.url);
                         fnames.push(q.options.geojsonChoices.url);
                     }
                 }); // End questions loop
             }); // End block loop
         }); // End forms loop
         fnames = _.uniq(fnames);
-        console.log("[getFilenames] File to cache: ");
+        console.log("[getFilenames] Files to cache: ");
         console.log(fnames);
         return fnames;
     }
@@ -498,17 +481,21 @@ angular.module('vpApi.services', [])
 
     }
     this.getMaxCacheZoom = function(){
+        /*
+        returns the options.maxCacheZoom from the first map-form it finds in forms.
+        */ 
+        var out;
         var fs = $vpApi.getFormstack();
         var mapForm = _.find(fs.forms, function(form){
-            return (form.options.type === 'map-form');
+            return (form.type === 'map-form');
         })
 
         if (mapForm) {
-            return mapForm.options.maxCacheZoom;
+            out =  mapForm.options.maxCacheZoom;
         } else {
-            return null;
+            out =  null;
         }
-
+        return out;
     }
 
     this.getRegions = function(){
@@ -524,7 +511,6 @@ angular.module('vpApi.services', [])
             if (form.type === 'map-form' && form.options.regions) {
                 out = _.uniq( out.concat(form.options.regions) );
             }
-        console.log("[$tilecache.getRegions()] Found " + out.length + " regions");
         });
         obj.regions = out;
         return out;
@@ -543,7 +529,6 @@ angular.module('vpApi.services', [])
             if (form.type === 'map-form' && form.options.tileSources) {
                 out = _.uniq( out.concat(form.options.tileSources) );
             }
-        console.log("[$tilecache.getTileSources()] Found " + out.length + " regions");
         });
         obj.tileSources = out;
         return out;
@@ -569,7 +554,7 @@ angular.module('vpApi.services', [])
             console.log('[saveRegions] onSuccess');
             obj.cacheTimer.stop = new Date();
             obj.cacheTimer.elasped = obj.cacheTimer.stop - obj.cacheTimer.start;
-            console.log("Cache timer elapsed time (sec): " + obj.cacheTimer.elasped/1000/60)
+            console.log("Cache timer elapsed time (min): " + obj.cacheTimer.elasped/1000/60)
 
             localStorage.setItem('tilesCached', 'true');
             onSuccess();
@@ -584,7 +569,6 @@ angular.module('vpApi.services', [])
     } // end loadRegions.
 
     this.run = function(success, error){
-        console.log("[$tilecache.run()]");
         obj.cacheTimer.start = new Date();
         // These need to be passed in from form.options
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
@@ -610,7 +594,7 @@ angular.module('vpApi.services', [])
         var map = L.map('cache-map').setView([-2.9, -79], 13);
         var options = { 
             map: map,
-            maxZoom: 12, 
+            maxZoom: obj.getMaxCacheZoom(), 
             attribution: tileSource.attrib, 
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
@@ -626,6 +610,9 @@ angular.module('vpApi.services', [])
     };
 
     this.clearTiles = function(){
+        /*
+        Depracted 1/11/2015. Do not use
+        */
         console.log('clearing tiles...');
         obj.offlineLayer.clearTiles(
             function(){
@@ -637,10 +624,9 @@ angular.module('vpApi.services', [])
     }
 
 
-    clearTilesDb = function(){
+    this.clearTilesDb = function(){
         /*
-        A testing function to clear indexedDB tiles. This should not be used in 
-        prodcution. Jsut left here for reference.
+        Use this to clear the tiles database from indexedDB
         */
 
         tilesSources = obj.getTileSources();
