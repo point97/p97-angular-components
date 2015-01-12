@@ -42,13 +42,14 @@ angular.module('survey.services', [])
         }
 
         
-
-        // Map specific settings
         if (state.current.name === 'app.map-form-foreach'
             || state.current.name === 'app.map-form') {
-            console.log('[setState] setting map-from-foreach specific variables here');
             scope.repeatCount = 0;
-            scope.hash;
+            if ($location.hash().length === 0){
+                $location.hash("intro");
+            }
+            scope.hash = $location.hash();
+
             scope.medias = $vpApi.db.getCollection('media');
             stateParams.formRespId = 'new';
             scope.selectedFeatures = {
@@ -74,7 +75,7 @@ angular.module('survey.services', [])
 
             // Check for forEach options and populate scope.forEach
             if (scope.current.form.options.forEach && scope.current.form.options.forEach.length > 0) {
-                scope.forEach = eval($form.options.forEach);
+                debugger
             } else if (scope.current.form.options.forEachAnswer && scope.current.form.options.forEachAnswer.length > 0) {
                 var ans = _getAnswer(scope, scope.current.form.options.forEachAnswer, scope.current.fsRespId);
                 var verbose;
@@ -95,8 +96,8 @@ angular.module('survey.services', [])
                 q.form = {show:false};
             });
 
-        // Default form case. Sets the form and block resps.
-        } else {  
+
+        } else {  // Default form case. Sets the form and block resps.
             // Get or create a form response. This should be moved to $formResp.objects.getOrCreate()
             if (stateParams.formRespId.split('-')[0] === 'new') {
                 var rs = stateParams.formRespId.split('-');
@@ -147,26 +148,21 @@ angular.module('survey.services', [])
                 scope.current.blockIndex = scope.current.blockResp.blockIndex;
                 scope.current.block = scope.current.form.blocks[scope.current.blockIndex];
             }
+
+            if (scope.current.block.options.forEachAnswer && scope.current.block.options.forEachAnswer.length > 0) {
+                var ans = _getAnswer(scope, scope.current.block.options.forEachAnswer, scope.current.fsRespId);
+                var verbose;
+                scope.forEach = [];
+                _.each(ans.value, function(val){
+                    // TODO Look up verbose value from question.choices.
+                    //verbose = _.find(question.choices, function(choice){return(choice.value === val);}) || val;
+                    scope.forEach.push({'verbose': val, 'value':val});
+                });
+            }
         }
 
 
-        // if (state.current.name === 'app.map-form') {
-        //     /* 
-        //     This is not a forEach map-form so I should jump into the first 
-        //     question of the first block.            
-        //     */
-        //     var hash = $location.hash();
-        //     if (hash.length === 0) {
-        //         var blockRespId = "new-" + scope.current.block.id;
-        //         var formRespId = "new-" + scope.current.form.id;
-        //         $location.hash([formRespId, blockRespId, 0].join("/"));
-        //     }
 
-        //     console.log('[setState] setting map-from specific variables here');
-        //     // scope.current.form = _.find(scope.formstack.forms, function(form){
-        //     //     return (form.id === parseInt(stateParams.formId, 10));
-        //     // });
-        // }
     };
 
 
@@ -225,7 +221,7 @@ angular.module('survey.services', [])
                     rs = eval(block.options.skipWhen);
 
                     console.log('answer ')
-                    console.log(getAnswer('age'))
+                    console.log(getAnswer('marine-activities'))
                     if (rs){
                         console.log('[_getNextBlock()] I need to skip this block and get the next one');
 
