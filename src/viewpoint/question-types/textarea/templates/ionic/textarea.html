@@ -3,7 +3,8 @@
     <div class="list">
         <div class="item item-input-inset" ng-hide="(question.options.hideInput === true)">
             <label class="item-input-wrapper">
-                <textarea 
+                <textarea
+                    msd-elastic 
                     style="background: transparent;"
                     placeholder="{{ question.label }}" 
                     ng-model="value" 
