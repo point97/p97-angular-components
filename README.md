@@ -9,12 +9,15 @@ A collection of angular component to be used with Viewpoint 2.
 * [2. The Example App](#2-the-example-app) 
 * [3. Authentication](#3-authentication)
 * [4. Question Types](#4-question-types)
-* [5. Forms and Form Options](#5-forms-and-form-options)
-* [7. Angular Services](#7-angular-services)
-* [7. Linear Form and Block Controllers](#7-linear-form-and-block-controllers)
-* [8. For Developers](#8-for-developers)
-* [9. The Build Process](#9-the-build-process)
-* [10. Testing](#10-testing)
+* [5. Apps and App Options](#5-apps-and-app-options)
+* [6. Formstacks and Formstack Options](#6-formstacks-and-formstack-options)
+* [7. Forms and Form Options](#7-forms-and-form-options)
+* [8. Blocks and Block Options](#8-blocks-and-block-options)
+* [9. Angular Services](#9-angular-services)
+* [10. Linear Form and Block Controllers](#10-linear-form-and-block-controllers)
+* [11. For Developers](#11-for-developers)
+* [12. The Build Process](#12-the-build-process)
+* [13. Testing](#13-testing)
 
 
 ##1. Usage
@@ -208,7 +211,6 @@ The 'other' options allows for a user to enter a single text answer. Other valid
   * default
 
 
-### Available in v 0.4
 * **multi-select**
 IN PROGRESS but otherwise PASSING TESTS
  Don't have random order. 
@@ -290,7 +292,7 @@ PASSING TESTS
   * planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
 
 
-### Available in version v0.5
+### Available in version v0.6
 * **email**
   PASSING TESTS - 
   `options`
@@ -343,20 +345,32 @@ PASSING TESTS
     * "North America" (US territories, Canada, Bermuda, and 17 Caribbean nations)
     * "International" (Industry-standard notation specified by ITU-T E.123)
 
-  
-----
 
-##5. Forms and Form Types
+---
+
+## 5. Apps and App Options  
+
+---
+## 6. Formstacks and Formstack Options
+
+----
+## 7. Forms and Form Options
 
 The are two form types, the default, and a map form.
 
-###5.1 Default Form
+###7.1 Default Form
 
-* **repeatable** - [Boolean] Dafaults to false
+* **skipWhen**: [Expression] A javascript expression that will be evaluted in the current $scope on the client. Exposes the following functions `getAnswer(SLUG)`.
+  * Examples
+      * "getAnswer('age').value > 18"
+      * "getAnswer('activites').value.length > 0
+
+
+* **forEachAnswer**: [String] A question slug, should be a multi-select (or a question type who’s answer.value is a array.) Uses items in the answer as formRepeatItem. For each map forms have an intro and end page.
 
 
 
-###5.2 Map Form
+###7.2 Map Form
 A map form consists of a map and a side panel. The side panel contains the question and survey naivigation controls. When defined a map form there should only be one block. The first question in the block is the *map question* and is where the map geojson is stored. The remaining questions will be presented to the user one at a time. 
 
 Currently the map form can cache tiles. Tile caching regions and srouceTiles should be defined on the first map form. Any other map from will use the same settings.
@@ -370,11 +384,7 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
 
 **Options**
 
-* **repeatable**: [Integer] The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
-
-* **forEach**: [Array] an array of expression that validates to an array. Uses items in the array as formRepeatItem.
-
-* **forEachAnswer**: [String] a question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem.
+* **skipWhen**: [Expression]
 
 * **cacheTiles**: [Boolean] A flag to prompt the use to cache the tiles.
 
@@ -387,6 +397,17 @@ Currently the map form can cache tiles. Tile caching regions and srouceTiles sho
 * **maxZoom** [Integer] The maximum allowed zoom level of the map. Note if this value is larger than maxCacheZoom tiles at the higher zoom levels will not show up when offline.
 
 * **maxCacheZoom** [Integer] The maximum allowed zoom level used for tile caching. This differs from the maxZoom options in that it only effects the max zoom level that the tiles are cached for, the map may have a different max zoom level. Generally maxZoom should match maxCacheZoom. 
+
+* **forEachAnswer**: [String] A question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem. For each map forms have an intro and end page.
+
+* **intro**: [HMTL] An intro page
+ 
+* **end**: [HMTL] An end page.
+
+* **repeatable**: [Integer] **NOT IMPLEMENTED YET.** The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
+
+* **forEach**: [Array] **NOT IMPLEMENTED YET.** An array of expression that validates to an array. Uses items in the array as formRepeatItem.
+
 
 Setting maxCacheZoom = 14, it took 17 minutes to cach 273MB with 36,000 GET requests. 
 
@@ -419,24 +440,24 @@ Setting maxCacheZoom = 14, it took 17 minutes to cach 273MB with 36,000 GET requ
     ```
 
 
-##6. Blocks and Block Types
+## 8. Blocks and Block Options
 
-###6.1 Blocks
+###8.1 Blocks
 
  **Options**
 
 
 * **repeatable**: [Integer] The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
 
-* **forEach**: [Array] an array of expression that validates to an array. Uses items in the array as formRepeatItem.
+* **forEach**: [Array] **NOT IMPLEMENTED YET.** An array of expression that validates to an array. Uses items in the array as formRepeatItem.
 
-* **forEachAnswer**: [String] a question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem.
+* **forEachAnswer**: [String] **NOT IMPLEMENTED YET.** A question slug, should be a multi-select (or a question type who's answer.value is a array.) Uses items in the answer as formRepeatItem.
 
 
 
-##7. Angular Services
+##9. Angular Services
 
-These are located in `services.js`. This file contains to modules: `vpApi.services` and `survey.services`. To load these into your app inject `vpApi.services` and/or `survey.services` into your module. 
+These are located in `dist/services.js`. This file contains to modules: `vpApi.services` and `survey.services`. To load these into your app inject `vpApi.services` and/or `survey.services` into your module. 
 
 
 ###vpApi.services
@@ -476,7 +497,7 @@ This is a singalton that contains logic that should be share across the Form and
 
 ---
 
-##6. Linear Form and Block Controllers
+##10. Linear Form and Block Controllers
 
 The app URI structure should be as follows
 
@@ -495,13 +516,13 @@ Examples
 
 ```
 
-###6.1 LinearFormCtrl
+###10.1 LinearFormCtrl
 This controller handles the loading of a **Formstack Response**, **Form**, **Form Response**, **Block**, **Block Response** and sets these varaibles on $scope.current (which is acessable in LinearBlockCtrl). It also broadcasts a 'saveBlock' event when the navigation buttons are pressed. 
 
 #### Options
 
 
-###6.3 LinearBlockCtrl
+###10.3 LinearBlockCtrl
 
 The BlockCtrl handles the loading a block and it's answers, saving of a block, and determines the state change when a 'saveBlock' event is recieved. This controller inherits it's scope from `LinearFormCtrl`, so anything defined on LinearFormCtrl.$scope is available here. 
 
@@ -513,14 +534,10 @@ A block or form can be skipped with logic based on answers from a previous quest
     * "{{getAnswerTo('age')}} > 18"
     * "{{getAnswers('activites').length}}" > 0
 
-  * **repeat** An expression that defines how to repeat the question block. If < 0, is will repeat an unlimited numer of times. If == 0, it will not repeat, and if > 0 it will repeat as many times as specified.
-    * "{{getAnswers('activites').length}}"
-
-  * **repeat_based_on_previous_answer**: [String] Slug of previous question. Repeats the block based on the length of the array of a previous answer (note this only works on previous questions that are multi-select). The block will is aware of the previous answer it is looping over. This value will be recorded in the answer object for each question under the keyword "previous_answer_value".
 
 ---
 
-## 7. For Developers
+## 11. For Developers
 
 ### Getting started
 This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
@@ -536,7 +553,7 @@ This assumes you have Node and NPM installed. See their pages on how to install.
 
 4. See [The Example App](#the-example-app) to get the example app up and running.
 
-### 7.1 Making Question Type Components
+### 11.1 Making Question Type Components
 
 There are several steps required to make a new question type directive but here is a breif outline.
 
@@ -575,7 +592,7 @@ src/
 Where `<QUESTION-TYPE>` is the slug of the question type.
 
 ---
-### 7.2 Question Type Directives
+### 11.2 Question Type Directives
 
 All question type directives must accept `question` ,  `value`, and `form`  (this was previously named control) on their scopes. These varaibles will then be shared  between the parent controller's scope and the directive's scope.  Options for the questions will be defined. 
 in `question.options`.
@@ -602,7 +619,7 @@ The scope takes three objects.
  * **form** - A handle to attach methods to you want exposed in the parent controller.
  
 
-### 7.3 Question Methods
+### 11.3 Question Methods
 Each question type directive will have the following methods available. These are attached to the `form` object passed into the directive and are then available to the parent controller.
 
 ```javascript
@@ -634,7 +651,7 @@ Use this method to do any sort of pre-processing of data before passing it on to
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
 
-###7.4  Question Type Templates
+###11.4  Question Type Templates
 Templates are grouped by themes. Themes usually depend on the front-end framework being used (e.g. Boostrap, Ionic, or Foundation) or platform being used, desktop vs. phonegap. 
 
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
@@ -689,7 +706,7 @@ angular.module('p97.questionTypes')
 
 ----
 
-## 8. The Build Process
+## 12. The Build Process
 The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
 
 The build process is defined in `/gulpfile.js` and can be configured there. 
@@ -699,7 +716,7 @@ To build the dist folder run
 gulp
 ```
 
-### 8.1 Distribution Directory Structure
+### 12.1 Distribution Directory Structure
 
 ```
 dist/
@@ -732,7 +749,7 @@ bower install p97-components
 
 
 ----
-## 9. Testing
+## 13. Testing
 
 Test are ran through the example app. 
 
