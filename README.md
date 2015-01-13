@@ -360,6 +360,7 @@ The are two form types, the default, and a map form.
 
 ###7.1 Default Form
 
+#### Options
 * **skipWhen**: [Expression] A javascript expression that will be evaluted in the current $scope on the client. Exposes the following functions `getAnswer(SLUG)`.
   * Examples
       * "getAnswer('age').value > 18"
@@ -375,14 +376,28 @@ A map form consists of a map and a side panel. The side panel contains the quest
 
 Currently the map form can cache tiles. Tile caching regions and srouceTiles should be defined on the first map form. Any other map from will use the same settings.
 
+###7.3 Foreach Forms
+Forms that have `options.forEach` or `options.forEachAnswer` are considered foreach forms. When a forEach form is first encountered in the survey, the app will automatically create formResp's for all forEach items. If there are existing forEach form responses for items not in the forEach list, these form responses will be deleted.
 
-```
-    app/map-form/<fsRespId>/</formId>#<formRespId>/<blockRespId>/<qIndex>
-    app/map-form-foreach/<fsRespId>/</formId>#<formRespId>/<blockRespId>/<qIndex>
+Foreach forms have a `intro` page and and `end` page to help with navigating the multiple responses.
 
-```
+ **URLS** 
+ 
+ * /form-foreach/fsSlug/fsRespId/formId/intro
+  This view displays the initial form loading page. Its displays the HTML from `options.intro`.  The intro page is sued to dispaly a navigation menu for formResps
 
-**Options**
+ * /form-foreach/fsSlug/fsRespId/formId/end
+   This page displays `options.end` HTML and FORWARD, BACK, REPEAT FORM, REPEAT BLOCK buttons.
+
+* /form-foreach/fsSlug/fsRespId/formRespId/new-blockId
+  This is a new block response to an existing forEach form response.
+
+* /form-foreach/fsSlug/fsRespId/formRespId/blockRespId/
+ This is editing an existing block response to a forEach form response
+
+
+
+####Options
 
 * **skipWhen**: [Expression]
 
