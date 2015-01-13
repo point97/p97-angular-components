@@ -86,17 +86,6 @@ angular.module('p97.questionTypes')
                 //nothing to see here
             }
 
-            scope.buildOtherChoices = function() {
-                //append previously saved 'Other' answer to question.choices
-                choiceValues = _.pluck(scope.localChoices, "value");
-
-                if (choiceValues.indexOf(scope.value) > -1) {
-                    var addOther = { 'verbose': 'User Entered', 'value': scope.value }
-                    scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
-                }
-                return scope.localChoices
-            }
-
             //show Other Input in Modal on click
             scope.otherInputModal = function() {
                 var otherInputPopup = $ionicPopup.show({
