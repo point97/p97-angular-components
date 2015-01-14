@@ -595,7 +595,8 @@ angular.module('vpApi.services', [])
         var options = { 
             map: map,
             maxZoom: obj.getMaxCacheZoom(), 
-            attribution: tileSource.attrib, 
+            attribution: tileSource.attrib,
+            subdomains: tileSource.subdomain, 
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
             onError: function(){console.log("onError for what?")},  // Not sure what this does
