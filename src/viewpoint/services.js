@@ -1,3 +1,9 @@
+/*
+Github Repo: https://github.com/point97/p97-angular-components.git
+Version: 01-15-15a
+
+*/
+
 angular.module('vpApi.services', [])
 
 .service( '$vpApi', ['$rootScope', '$http', 'config', function($rootScope, $http, config) {
@@ -139,7 +145,17 @@ angular.module('vpApi.services', [])
         });
     }
 
+
+    this.showCollection = function(collectionName){
+        console.log("SHOW TABLE: " + collectionName);
+        console.table(data.db.getCollection(collectionName).data);
+    }
+
     this.dbinit();
+
+
+
+
 }])
 
 
@@ -282,6 +298,39 @@ angular.module('vpApi.services', [])
         );
     };
 
+    this.getQuestionBySlug = function(slug) {
+        var fs = $vpApi.db.getCollection('formstack').data[0];
+        var out;
+        _.find(fs.forms, function(form){
+            blockRes = _.find(form.blocks, function(block){
+                qRes = _.find(block.questions, function(q){
+                    if (q.slug === slug){
+                        out = q;
+                        return true;
+                    }
+                });
+                return qRes;
+            });
+            return blockRes;
+        });
+        return out;
+    };
+
+
+    this.getChoice = function(qSlug, value){
+        /*
+            Get's a questions choice by question slug and value.
+            Handles the 'other' answer case
+        */
+        var choice;
+        var question = obj.getQuestionBySlug(qSlug);
+        choice = _.find(question.choices, function(item){return(item.value === value);});
+        if (!choice) {
+            choice = {'verbose': 'User Enter: ' + value, 'value': value };
+        }
+        return choice;
+    };
+
 }])
 
 
@@ -347,8 +396,28 @@ angular.module('vpApi.services', [])
 
     //this.objects = $vpApi.db.getCollection('formResp');
 
-
-    
+    this.delete = function(formRespId){
+        
+        var formResp = $vpApi.db.getCollection('formResp').get(formRespId);
+        if (formResp) {
+            var blockResps = $vpApi.db.getCollection('blockResp').find({'formRespId': formRespId});
+            var answers = $vpApi.db.getCollection('answer').find({'formRespId': formRespId});
+        } else {
+            console.warn("Form Response does not exist: " + formRespId);
+            return;
+        }
+           
+        // Remove the responses
+        $vpApi.db.getCollection('formResp').remove(formResp);
+        _.each(blockResps, function(resp){
+            $vpApi.db.getCollection('blockResp').remove(resp);
+        });
+        
+        _.each(answers, function(resp){
+            $vpApi.db.getCollection('answer').remove(resp);
+        });
+        $vpApi.db.save();
+    }
 }])
 
 .service('$blockResponse', ['$formstack', '$block', '$rootScope', '$answers', '$formResponse', function($formstack, $block, $rootScope, $answers, $formResponse){
@@ -595,8 +664,7 @@ angular.module('vpApi.services', [])
         var options = { 
             map: map,
             maxZoom: obj.getMaxCacheZoom(), 
-            attribution: tileSource.attrib,
-            subdomains: tileSource.subdomain, 
+            attribution: tileSource.attrib, 
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
             onError: function(){console.log("onError for what?")},  // Not sure what this does
@@ -625,7 +693,7 @@ angular.module('vpApi.services', [])
     }
 
 
-    this.clearTilesDb = function(){
+    this.clearTilesDb = function(callback){
         /*
         Use this to clear the tiles database from indexedDB
         */
@@ -652,6 +720,7 @@ angular.module('vpApi.services', [])
              store.clear().onsuccess = function (event) {
                 localStorage.removeItem("tilesCached");
                 console.log('Finished clearing records');
+                callback(event);
             };
         };
     };

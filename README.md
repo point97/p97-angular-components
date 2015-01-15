@@ -454,6 +454,49 @@ Setting maxCacheZoom = 14, it took 17 minutes to cach 273MB with 36,000 GET requ
     ]
     ```
 
+### 7.4 Summary Form
+
+Options
+name: ""
+slug: ""
+
+type: ['table']
+
+7.4.1 Blocks
+
+Options
+* **type**: [String] table, linear
+
+Summary Example
+block1 = [
+  {'type':'header, 'verbose':'My header'},
+  {'type':'col2', ["date(getAnswer('q1-slug').value, "dd-mm-yy")", "date(getAnswer('q1-slug').value, "hh:mm")""},
+  {'type':'header, 'verbose':'My header 2'},
+  {"type": "col2", [,]},
+    {"type": "col2", [,]}
+]
+
+block2  = 
+[
+  {"type":"table", 
+    "options" : {
+      "title": "My table",
+      "rows" : [Something that returns a list]
+  }
+]
+
+block3 = {
+   "type": "resp-menu",
+   "header": "My Header",
+   "targetSlug":'some-slug', 
+   "type": "form" or "block",
+   "filter": ???, 
+   "row": {""}
+}
+
+Loop over all (some form with hidden questions whose answers are LOT ID.
+
+ 
 
 ## 8. Blocks and Block Options
 
@@ -778,6 +821,5 @@ I am following https://github.com/karma-runner/karma-ng-html2js-preprocessor
 
 And here
 http://angular-tips.com/blog/2014/06/introduction-to-unit-test-directives/
-
 
 
