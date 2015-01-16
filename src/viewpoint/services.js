@@ -57,17 +57,29 @@ angular.module('vpApi.services', [])
         });
     }
 
-
-    this.getFormstack = function(){
-        var out = null;
-        try {
-            out = obj.db.getCollection('formstack').find({'slug':obj.user.profile.allowed_formstacks[0]})[0];
-        } catch(e) {
-            console.error('[$vpApi.getFormstack()] Could not find formstack');
-            console.log(e);
+    this.getApp = function(slug){
+        var apps = $vpApi.db.getCollection('app');
+        var app = apps.find({'slug':slug})[0];
+        if (app.length > 0){
+            return app;
+        }else{
+            console.log("eror getting app.")
         }
-        return out;
+    }
 
+    this.getFormstack = function(slug){
+        console.log(slug)
+        var out = null;
+        var formstacks = obj.db.getCollection('formstack')
+        if(slug == undefined || slug == null){
+            out = formstacks.find()[0];
+        }else{
+            out = formstacks.find({'slug':slug})[0]
+        }
+        if(!out)
+            console.error('[$vpApi.getFormstack()] Could not find formstack');
+
+        return out;
     }
 
     this.getTimestamp = function(){
@@ -83,14 +95,14 @@ angular.module('vpApi.services', [])
         return str.join("&");
     }
 
-    this.authenticate = function(data, success_callback, error_callback) { 
+    this.authenticate = function(data, success_callback, error_callback) {
         /*
         Inputs:
             data : object with keywords username, password, stayLoginIn
         */
         var url = apiBase + 'authenticate/';
 
-        var headers = {}// {'Authorization':'Token ' + this.user.token};  
+        var headers = {}// {'Authorization':'Token ' + this.user.token};
         $http.post(url, data, headers)
             .success(function(res, status){
                 var users = obj.users.find({'username': data.username});
@@ -103,16 +115,15 @@ angular.module('vpApi.services', [])
                     obj.users.update(user);
                 }
                 obj.user = user;
-                
-                obj.db.save();
-                localStorage.setItem('user', JSON.stringify(obj.user));                
-                $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
-        })
-            .error(function(data, status){
-            error_callback(data, status)
-        });
-    }
 
+                obj.db.save();
+                localStorage.setItem('user', JSON.stringify(obj.user));
+                $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
+            })
+            .error(function(data, status){
+                error_callback(data, status)
+            });
+    }
 
     this.fetch  = function(resource, data, success, fail){
 
@@ -121,7 +132,7 @@ angular.module('vpApi.services', [])
         url += "?" + qs;
 
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
-        
+
         $http.get(url, config).success(function(data, status){
           success(data, status);
         })
@@ -145,7 +156,6 @@ angular.module('vpApi.services', [])
         });
     }
 
-
     this.showCollection = function(collectionName){
         console.log("SHOW TABLE: " + collectionName);
         console.table(data.db.getCollection(collectionName).data);
@@ -153,54 +163,64 @@ angular.module('vpApi.services', [])
 
     this.dbinit();
 
-
-
-
 }])
 
-
-.service('$user', ['$rootScope', '$vpApi', '$formstack', '$profile', function($rootScope, $vpApi, $formstack, $profile){
+.service('$user', ['$rootScope', '$vpApi', '$app', '$formstack', '$profile', function($rootScope, $vpApi, $app, $formstack, $profile){
     var obj = this;
 
     $rootScope.$on('authenticated', function(event, args){
         $profile.fetch(function(){
             $vpApi.db.save(); // This is to save the profile to indexedDB.
-            
-            allowedFormstacks = $vpApi.user.profile.allowed_formstacks;
-            if (allowedFormstacks.length > 0) {
-                formstackSlug = allowedFormstacks[0];
+
+            allowedApps = $vpApi.user.profile.allowed_apps;
+            if (allowedApps.length > 0) {
+                appSlug = allowedApps[0];
             } else {
-                console.error("There are no allowed formstacks for this user.");
+                console.error("There are no allowed Apps for this user.");
                 // TODO Handle the no formstack case.
             }
-            
 
-            // Now use the allowed_formstacks to get first formstack.
-            $formstack.fetchBySlug(formstackSlug, function(data, status){
-                $vpApi.db.save();
-                args.onSuccess();
-            },
-            function(data, status){
-                console.log('[$user] failed to fetch formstack');
-                console.log(data);
-            })
-        }, 
+            // Now use the allowed_apps to get first app.
+            $app.fetchBySlug(appSlug,
+                function(data, status){
+                    formstacks = data["formstacks"];
+                    //Clear data
+                    oldStacks = $vpApi.db.getCollection('formstack').find();
+                    _.each(oldStacks, function(old){
+                        $vpApi.db.getCollection('formstack').remove(old);
+                    });
+                    // Insert Most recent Fromstack data
+                    _.each(formstacks, function(formstack){
+                        formstack.appId = data.id;
+                        formstack.appSlug = data.slug;
+                        $vpApi.db.getCollection('formstack').insert(formstack);
+                    });
+
+                    // Save the changes
+                    $vpApi.db.save();
+                    $rootScope.$broadcast('apploaded');
+                    args.onSuccess();
+                },
+                function(data, status){
+                    console.log('[$user] failed to fetch formstack');
+                    console.log(data);
+                }
+            );
+        },
         function(data, status){
             console.log('Error fetching profile.');
         });
     })
-    
 }])
 
 .service( '$profile', ['$http', '$vpApi', 'config', function($http, $vpApi, config){
     var obj = this;
     var apiBase = config.apiBaseUri;
 
-    
     this.fetch = function(successCallback, errorCallback){
         /*
         Fetches profile and updates the obj.db. DOSE NOT save to localStorage
-        */ 
+        */
         var url = apiBase +'account/info/?user__username=';
         var token = $vpApi.user.token;
 
@@ -213,6 +233,86 @@ angular.module('vpApi.services', [])
             }).error(function(data, status){
                 errorCallback()
             });
+    };
+
+}])
+
+.service('$app', ['$vpApi', function($vpApi) {
+    var obj = this;
+    this.resource_name = 'pforms/get/app';
+
+    this._fetchSuccess = function(data, status){
+        obj.objects = data;
+        var apps = $vpApi.db.getCollection('app');
+        var app = apps.find({'slug':data[0].slug});
+        if (app.length > 0){
+            apps.remove(app);
+        }
+        apps.insert(data[0]);
+    };
+
+    this._fetchFail = function(data, status){
+        console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
+        console.log(data);
+    }
+
+    this.fetchBySlug = function(slug, successCallback, errorCallback){
+        /*
+        Get the formstack from the VP2 server. 
+        */
+
+        if(HAS_CONNECTION){
+          $vpApi.fetch(
+            this.resource_name, 
+            {'slug':slug}, 
+            function(data, status){
+                obj.objects = data;
+
+                var apps = $vpApi.db.getCollection('app');
+                var app = apps.find({'slug':slug});
+                if (app.length > 0){
+                    apps.remove(app);
+                }
+                apps.insert(data[0]);
+                successCallback(data[0], status);
+            },
+            function(data, status){
+                console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
+                console.log(data);
+                errorCallback(data, status)
+            }
+          );
+
+        }else{
+            debugger
+        }
+
+    }; // fetchBySlug
+
+    this.updateBySlug = function(slug, success, error) {
+        /*
+        Inputs:
+            slug - [String]
+
+            success - [Function] the success callback. This will called with arguements 
+                        formstack, status from the $http.get. 
+            
+            error -  [Fucntion] the error callback. This will be called with arguments 
+                         data, status from the $http.get
+        */
+
+        var data = {'slug':slug};
+        
+        $vpApi.fetch(this.resource_name, data, 
+            function(data, status){
+                obj._fetchSuccess(data, status);
+                success(data[0]);
+            },
+            function(data, status){
+                obj._fetchFail(data, status);
+                error(data, status);
+            }
+        );
     };
 
 }])
@@ -277,16 +377,16 @@ angular.module('vpApi.services', [])
         Inputs:
             slug - [String]
 
-            success - [Function] the success callback. This will called with arguements 
-                        formstack, status from the $http.get. 
-            
-            error -  [Fucntion] the error callback. This will be called with arguments 
+            success - [Function] the success callback. This will called with arguements
+                        formstack, status from the $http.get.
+
+            error -  [Fucntion] the error callback. This will be called with arguments
                          data, status from the $http.get
         */
 
         var data = {'slug':slug};
-        
-        $vpApi.fetch(this.resource_name, data, 
+
+        $vpApi.fetch(this.resource_name, data,
             function(data, status){
                 obj._fetchSuccess(data, status);
                 success(data[0]);
@@ -316,7 +416,6 @@ angular.module('vpApi.services', [])
         return out;
     };
 
-
     this.getChoice = function(qSlug, value){
         /*
             Get's a questions choice by question slug and value.
@@ -333,15 +432,14 @@ angular.module('vpApi.services', [])
 
 }])
 
-
 .service('$fsResp', ['$vpApi', '$rootScope', function($vpApi, $rootScope){
     /*
         A form response is of the form
         {
-            id: 
+            id:
             fsSlug:
         }
-    */ 
+    */
 
     var obj = this;
     this.resource_name = 'pforms/formstack-response';
@@ -349,11 +447,9 @@ angular.module('vpApi.services', [])
     $rootScope.$on('db_loaded', function(e){
         this.objects = $vpApi.db.getCollection('fsResp');
     })
-    
-
 
     this.delete = function(fsRespId){
-        
+
         var fsResp = obj.objects.get(fsRespId);
         obj.objects.remove(fsResp);
 
@@ -370,26 +466,24 @@ angular.module('vpApi.services', [])
         _.each(blockResps, function(resp){
             $vpApi.db.getCollection('blockResp').remove(resp);
         });
-        
+
         _.each(answers, function(resp){
             $vpApi.db.getCollection('answer').remove(resp);
         });
 
         $vpApi.db.save();
     }
-
 }])
-
 
 .service('$formResp', ['$vpApi', function($vpApi){
     /*
         A form response is of the form
         {
-            id: 
+            id:
             fsRespId:
             fsSlug:
         }
-    */ 
+    */
 
     var obj = this;
     this.resource_name = 'pforms/form-response';
@@ -397,7 +491,7 @@ angular.module('vpApi.services', [])
     //this.objects = $vpApi.db.getCollection('formResp');
 
     this.delete = function(formRespId){
-        
+
         var formResp = $vpApi.db.getCollection('formResp').get(formRespId);
         if (formResp) {
             var blockResps = $vpApi.db.getCollection('blockResp').find({'formRespId': formRespId});
@@ -406,13 +500,13 @@ angular.module('vpApi.services', [])
             console.warn("Form Response does not exist: " + formRespId);
             return;
         }
-           
+
         // Remove the responses
         $vpApi.db.getCollection('formResp').remove(formResp);
         _.each(blockResps, function(resp){
             $vpApi.db.getCollection('blockResp').remove(resp);
         });
-        
+
         _.each(answers, function(resp){
             $vpApi.db.getCollection('answer').remove(resp);
         });
@@ -440,8 +534,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-
-.service( '$answers', ['$form', '$rootScope', '$filter', '$vpApi', 'config',  
+.service( '$answers', ['$form', '$rootScope', '$filter', '$vpApi', 'config',
                function($form, $rootScope, $filter, $vpApi, config) {
   /*
     An answer will be of the form
@@ -465,26 +558,23 @@ angular.module('vpApi.services', [])
 
 }])
 
-
 .service('$mediacache', ['$vpApi', '$formstack', '$http', function($vpApi, $formstack, $http){
     var obj = this;
     obj.isCached = false;
-    
 
     this.run = function(){
-        /* 
-        This should run when the app first loads. 
+        /*
+        This should run when the app first loads.
 
         It uses getFileNames to return  alist of file names to
         request from the server and caches them in a Colleciton named
         'media' with a keywords 'filename' and 'data'
-        
 
-        */ 
+        */
         var fnames = obj.getFilenames();
         // Cache all geojsonChoices
         _.each(fnames, function(fname){
-            $http({ 
+            $http({
                 method: 'GET',
                 withCredentials: true,
                 url: fname
@@ -537,7 +627,6 @@ angular.module('vpApi.services', [])
     /*
     Handles tiles caching.
     */
-
     var obj = this;
     this.regions = [];
     this.cacheTimer = {'start':null, 'stop':null, 'elasped':null};
@@ -552,7 +641,7 @@ angular.module('vpApi.services', [])
     this.getMaxCacheZoom = function(){
         /*
         returns the options.maxCacheZoom from the first map-form it finds in forms.
-        */ 
+        */
         var out;
         var fs = $vpApi.getFormstack();
         var mapForm = _.find(fs.forms, function(form){
@@ -568,14 +657,13 @@ angular.module('vpApi.services', [])
     }
 
     this.getRegions = function(){
-        /* 
-        Look for forms with Regions. 
+        /*
+        Look for forms with Regions.
         Returns the list of regions or an empty list.
         */
-        
         var out = [];
         var fs = $vpApi.getFormstack();
-        
+
         _.each(fs.forms, function(form){
             if (form.type === 'map-form' && form.options.regions) {
                 out = _.uniq( out.concat(form.options.regions) );
@@ -586,14 +674,14 @@ angular.module('vpApi.services', [])
     }
 
     this.getTileSources = function(){
-        /* 
-        Look for forms with regions. 
+        /*
+        Look for forms with regions.
         Returns the list of regions or an empty list.
         */
-        
+
         var out = [];
         var fs = $vpApi.getFormstack();
-        
+
         _.each(fs.forms, function(form){
             if (form.type === 'map-form' && form.options.tileSources) {
                 out = _.uniq( out.concat(form.options.tileSources) );
@@ -602,7 +690,6 @@ angular.module('vpApi.services', [])
         obj.tileSources = out;
         return out;
     }
-
 
     this.loadRegions = function(onSuccess, onError){
         if (obj.regions.length === 0) {
@@ -617,7 +704,6 @@ angular.module('vpApi.services', [])
         obj.offlineLayer.saveRegions(obj.regions, maxZoom, 
           function(){
             console.log('[saveRegions] onStarted');
-
           },
           function(){
             console.log('[saveRegions] onSuccess');
@@ -634,7 +720,6 @@ angular.module('vpApi.services', [])
             onError();
           })
 
-
     } // end loadRegions.
 
     this.run = function(success, error){
@@ -643,8 +728,7 @@ angular.module('vpApi.services', [])
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        
-        
+
         var tileSource = obj.getTileSources()[0];
         onError = function(errorType, errorData1, errorData2){
             /*
@@ -658,24 +742,23 @@ angular.module('vpApi.services', [])
             error();
         }
 
-
         // Initalize a map
         var map = L.map('cache-map').setView([-2.9, -79], 13);
-        var options = { 
+        var options = {
             map: map,
-            maxZoom: obj.getMaxCacheZoom(), 
-            attribution: tileSource.attrib, 
+            maxZoom: obj.getMaxCacheZoom(),
+            attribution: tileSource.attrib,
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
             onError: function(){console.log("onError for what?")},  // Not sure what this does
-            storeName:tileSource.storeName,  // this is the objectStore name. 
+            storeName:tileSource.storeName,  // this is the objectStore name.
             dbOption:"IndexedDB" // "WebSQL"
         }
         obj.offlineLayer = new OfflineLayer(tileSource.url, options);
         $timeout(function(){
             obj.loadRegions(success, error);
         }, 1000);
-        
+
     };
 
     this.clearTiles = function(){
@@ -692,7 +775,6 @@ angular.module('vpApi.services', [])
         );
     }
 
-
     this.clearTilesDb = function(callback){
         /*
         Use this to clear the tiles database from indexedDB
@@ -700,24 +782,22 @@ angular.module('vpApi.services', [])
 
         tilesSources = obj.getTileSources();
 
-
         osTableName = tilesSources[0].storeName;
         dbName = "IDBWrapper-" + osTableName;
-        
 
         var openRequest = window.indexedDB.open(dbName, 1); //version used
         openRequest.onerror = function (e) {
             console.log("[openTilesDb] Database error: " + e.target.errorCode);
         };
         openRequest.onsuccess = function (event) {
-            
+
             window.db = openRequest.result;
             console.log("[openTilesDb] Opened "+dbName+" with dataStores");
             console.log(window.db.objectStoreNames);
 
             var store = window.db.transaction(osTableName, "readwrite").objectStore(osTableName);
-                      
-             store.clear().onsuccess = function (event) {
+
+            store.clear().onsuccess = function (event) {
                 localStorage.removeItem("tilesCached");
                 console.log('Finished clearing records');
                 callback(event);
