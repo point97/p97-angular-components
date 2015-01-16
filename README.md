@@ -15,9 +15,10 @@ A collection of angular component to be used with Viewpoint 2.
 * [8. Blocks and Block Options](#8-blocks-and-block-options)
 * [9. Angular Services](#9-angular-services)
 * [10. Linear Form and Block Controllers](#10-linear-form-and-block-controllers)
-* [11. For Developers](#11-for-developers)
-* [12. The Build Process](#12-the-build-process)
-* [13. Testing](#13-testing)
+* [11. Viewpoint API Syncing](#11-viewpoint-api-syncing)
+* [12. For Developers](#11-for-developers)
+* [13. The Build Process](#12-the-build-process)
+* [14. Testing](#13-testing)
 
 
 ##1. Usage
@@ -595,7 +596,49 @@ A block or form can be skipped with logic based on answers from a previous quest
 
 ---
 
-## 11. For Developers
+## 11. Viewpoint API Syncing
+
+### 11.1 The Algorithm
+The syncing algorithm will run a on timer every N seconds, with exponential bak off if offline. The algorithm performs the following steps:
+
+1. Check for network connectivity
+
+2. Check for any pending or expired resources
+  * Get a list of pending resources. Pending resources are tickets that have been modifed since last sync.
+  * Expire resources that are older than `expireTime `. This means delete completed resources that are older enought to remove.
+
+3. Sync the resources
+  * Loop over all the entries in the Resourde status table
+  * If method is blank, do nothing.
+  * Set status to `pending`, increase attempts, and update lastAttempt timestamp
+  * Add in any extra data
+  * Sync the formstack
+    * Clean the formstack (add remove any data feilds)
+    * POST the formstack
+    * if sucess update method to ''
+
+
+5. Update Read Only resrouces.
+
+4. Update last updated timestamp
+
+6. Broascast a 'sync-complete' event.
+
+
+### 11.2 Status Table
+
+Fields
+* method: [String] 'GET", POST', 'PUT', 'DELETE', ''
+* lastAttempt: [DateTime] Last syncing attempt timestamp
+* attempts: [Integer] The number of times the resource has attempted to sync
+* status: [String] 'pending'
+* resourceId: [Integer] Client ID of the resource
+
+
+---
+
+
+## 12. For Developers
 
 ### Getting started
 This assumes you have Node and NPM installed. See their pages on how to install. It is recommended to use Homebrew if you are using a Mac
@@ -611,7 +654,7 @@ This assumes you have Node and NPM installed. See their pages on how to install.
 
 4. See [The Example App](#the-example-app) to get the example app up and running.
 
-### 11.1 Making Question Type Components
+### 12.1 Making Question Type Components
 
 There are several steps required to make a new question type directive but here is a breif outline.
 
@@ -650,7 +693,7 @@ src/
 Where `<QUESTION-TYPE>` is the slug of the question type.
 
 ---
-### 11.2 Question Type Directives
+### 12.2 Question Type Directives
 
 All question type directives must accept `question` ,  `value`, and `form`  (this was previously named control) on their scopes. These varaibles will then be shared  between the parent controller's scope and the directive's scope.  Options for the questions will be defined. 
 in `question.options`.
@@ -677,7 +720,7 @@ The scope takes three objects.
  * **form** - A handle to attach methods to you want exposed in the parent controller.
  
 
-### 11.3 Question Methods
+### 12.3 Question Methods
 Each question type directive will have the following methods available. These are attached to the `form` object passed into the directive and are then available to the parent controller.
 
 ```javascript
@@ -709,7 +752,7 @@ Use this method to do any sort of pre-processing of data before passing it on to
   Returns: BOOLEAN
   This method takes the output of `clean_data()` and validates against the question options requirements. It returns the data is true, else it returns a list of validation errors to display on the UI. 
 
-###11.4  Question Type Templates
+###12.4  Question Type Templates
 Templates are grouped by themes. Themes usually depend on the front-end framework being used (e.g. Boostrap, Ionic, or Foundation) or platform being used, desktop vs. phonegap. 
 
 Each directive must have a template name using the question type's slug. Templates should handle the displaying of all error messages. 
@@ -764,7 +807,7 @@ angular.module('p97.questionTypes')
 
 ----
 
-## 12. The Build Process
+## 13. The Build Process
 The process compiles all the ccs, js, and html templates needed for p97 component from the `src/` directory and puts the output in the `dist/` directory. The dist/ directory has everything needed and is what is installed when a user runs `bower install p97-components`.
 
 The build process is defined in `/gulpfile.js` and can be configured there. 
@@ -774,7 +817,7 @@ To build the dist folder run
 gulp
 ```
 
-### 12.1 Distribution Directory Structure
+### 13.1 Distribution Directory Structure
 
 ```
 dist/
@@ -807,7 +850,7 @@ bower install p97-components
 
 
 ----
-## 13. Testing
+## 14. Testing
 
 Test are ran through the example app. 
 
