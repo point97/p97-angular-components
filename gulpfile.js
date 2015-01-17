@@ -5,6 +5,7 @@ var rename = require('gulp-rename');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var clean = require('gulp-clean');
+var concatUtil = require('gulp-concat-util');
 
 var _ =require('underscore');
 
@@ -12,6 +13,7 @@ var datejs =require('datejs');
 
 var DEST = 'dist/';
 
+var now = new Date();
 var QUESTION_TYPES = [
                       'datetime',
                       'number', 
@@ -45,10 +47,12 @@ gulp.task('question-types', function() {
     console.log(directive_srcs)
     gulp.src(directive_srcs)
         .pipe(concat('question-types.js'))// This will output the non-minified version
+        .pipe(concatUtil.header('// build timestamp: '+now+'\n'))
         .pipe(gulp.dest(DEST + 'viewpoint'))
 
         .pipe(uglify())// This will output the minified version
         .pipe(rename({ extname: '.min.js' }))
+
         .pipe(gulp.dest(DEST + 'viewpoint'));
 
 
@@ -65,17 +69,17 @@ gulp.task('question-types', function() {
 
 gulp.task('viewpoint', function() {
     gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean())
-    
     return gulp.src(['src/viewpoint/*.js'])
    
-    // This will output the non-minified version
-    .pipe(concat('services.js'))
-    .pipe(gulp.dest(DEST + 'viewpoint'))
-    
-    // This will minify and rename to foo.min.js
-    .pipe(uglify())
-    .pipe(rename({ extname: '.min.js' }))
-    .pipe(gulp.dest(DEST + 'viewpoint'));
+      // This will output the non-minified version
+      .pipe(concat('services.js'))
+      .pipe(concatUtil.header('// build timestamp: '+now+'\n'))
+      .pipe(gulp.dest(DEST + 'viewpoint'))
+      
+      // This will minify and rename to foo.min.js
+      .pipe(uglify())
+      .pipe(rename({ extname: '.min.js' }))
+      .pipe(gulp.dest(DEST + 'viewpoint'));
 
 });
 

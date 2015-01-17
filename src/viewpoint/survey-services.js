@@ -1,6 +1,6 @@
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 01-15-15a
+Version: 15.01.16a
 
 */
 angular.module('survey.services', [])
@@ -827,9 +827,3 @@ angular.module('survey.services', [])
         parseHash: parseHash
     };
 }])
-
-
-
-
-
-
