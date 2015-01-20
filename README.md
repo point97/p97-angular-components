@@ -202,6 +202,7 @@ The 'other' options allows for a user to enter a single text answer. Other valid
   * templateUrl
      * "ionic/drop-down-single.html" 
      * "ionic/radio.html"
+     * "ionic/checkbox-single.html" (looks like checkbox.html used for multi-select - however only a single choice can be made)
      * "yeoman/drop-down-single.html"
      * "yeoman/radio.html"
   * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.

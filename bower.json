@@ -1,9 +1,10 @@
 {
   "name": "p97-components",
-  "version": "0.5.13",
+  "version": "0.6.1",
   "homepage": "https://github.com/point97/p97-angular-components",
   "authors": [
-    "Wil Black <wil@pointnineseven.com>"
+    "Wil Black <wil@pointnineseven.com>",
+    "Drew Seminara <drew@pointnineseven.com>"
   ],
   "description": "A collection of Javscript (mostly angular) components to be used with the Viewpoint 2 API",
   "main": "dist/",
