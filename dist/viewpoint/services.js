@@ -1,4 +1,4 @@
-// build timestamp: Tue Jan 20 2015 11:05:25 GMT-0800 (PST)
+// build timestamp: Tue Jan 20 2015 11:46:56 GMT-0800 (PST)
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
 Version: 15.01.16a
@@ -1506,33 +1506,35 @@ angular.module('vpApi.services', [])
 
     this.getTileSources = function(){
         /*
-        Look for forms with regions.
-        Returns the list of regions or an empty list.
+        Look for the first map-form with tile sources
+        and returns those sources in an array of objects
+
+        This means caching will be derived ONLY from the first set of tile sources
+
+        In the future the tile sources should be defined at the formstack level
         */
 
         var out = [];
         var fs = $vpApi.getFormstack();
 
-        _.each(fs.forms, function(form){
-            if (form.type === 'map-form' && form.options.tileSources) {
-                out = _.uniq( out.concat(form.options.tileSources) );
-            }
+        var form = _.find(fs.forms, function(formItem){
+            return (formItem.type === 'map-form' && formItem.options.tileSources)
         });
-        obj.tileSources = out;
-        return out;
+        obj.tileSources = form.options.tileSources;
+        return obj.tileSources;
     }
 
-    this.loadRegions = function(onSuccess, onError){
+    this.loadRegions = function(layer, onSuccess, onError){
         if (obj.regions.length === 0) {
             obj.getRegions();
             if (obj.regions.length === 0);
             return
         }
         var maxZoom = obj.getMaxCacheZoom();
-        var nbTiles = obj.offlineLayer.calculateNbTiles(maxZoom, obj.regions);
+        var nbTiles = layer.calculateNbTiles(maxZoom, obj.regions);
 
         console.log("Will be saving: " + nbTiles + " tiles")
-        obj.offlineLayer.saveRegions(obj.regions, maxZoom, 
+        layer.saveRegions(obj.regions, maxZoom, 
           function(){
             console.log('[saveRegions] onStarted');
           },
@@ -1554,13 +1556,15 @@ angular.module('vpApi.services', [])
     } // end loadRegions.
 
     this.run = function(success, error){
+        obj.offlineLayers = [];
         obj.cacheTimer.start = new Date();
         // These need to be passed in from form.options
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
 
-        var tileSource = obj.getTileSources()[0];
+        var tileSources = obj.getTileSources();
+
         onError = function(errorType, errorData1, errorData2){
             /*
                 Fires when $tilecache errors out during tile caching.
@@ -1575,21 +1579,25 @@ angular.module('vpApi.services', [])
 
         // Initalize a map
         var map = L.map('cache-map').setView([-2.9, -79], 13);
-        var options = {
+
+        _.each(tileSources, function(tileSource) {
+            var options = {
             map: map,
-            maxZoom: obj.getMaxCacheZoom(),
-            attribution: tileSource.attrib,
+            maxZoom: obj.getMaxCacheZoom(), 
+            attribution: tileSource.attrib, 
+            subdomains: tileSource.subdomain,
             dbOnly: true, 
             onReady: function(){console.log("onReady for what?")}, // Not sure what these do
             onError: function(){console.log("onError for what?")},  // Not sure what this does
             storeName:tileSource.storeName,  // this is the objectStore name.
             dbOption:"IndexedDB" // "WebSQL"
-        }
-        obj.offlineLayer = new OfflineLayer(tileSource.url, options);
-        $timeout(function(){
-            obj.loadRegions(success, error);
-        }, 1000);
-
+            }
+            var layer = new OfflineLayer(tileSource.url, options);
+            obj.offlineLayers.push(layer);
+            $timeout(function(){
+                obj.loadRegions(layer, success, error);
+            }, 1000);
+        })
     };
 
     this.clearTiles = function(){
