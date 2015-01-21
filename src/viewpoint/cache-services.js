@@ -1,10 +1,10 @@
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.16a
+Version: 15.01.20a
 
 */
 
-angular.module('vpApi.services', [])
+angular.module('cache.services', [])
 
 .service('$mediacache', ['$vpApi', '$formstack', '$http', function($vpApi, $formstack, $http){
     var obj = this;

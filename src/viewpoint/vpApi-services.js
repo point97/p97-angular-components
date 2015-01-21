@@ -1,6 +1,6 @@
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
-Version: v15.01.16a
+Version: 15.01.20a
 
 */
 
