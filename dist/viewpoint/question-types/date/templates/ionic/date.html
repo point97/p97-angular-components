@@ -4,14 +4,15 @@
     <div class="item item-input-inset" ng-hide="(question.options.hideInput === true)">
         <label class="item-input-wrapper">
             <input type="date"
-                   ng-hide="format === yyyy" 
+                   ng-if="question.options.datejs_format !== 'yyyy'" 
                    placeholder="{{ question.label }}" 
                    ng-model="value"
                    ng-required='question.options.required'
                    />
 
             <input type="tel"
-                   ng-show="format === yyyy" 
+                   ng-if="question.options.datejs_format === 'yyyy'" 
+                   ng-init="value = question.options.initial"
                    placeholder="{{ question.label }}" 
                    ng-model="value"
                    ng-required='question.options.required'
