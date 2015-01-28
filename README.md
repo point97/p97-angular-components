@@ -288,6 +288,8 @@ PASSING TESTS
   * geojsonChoices: [Object]
     * - url: [String] URL to get the geojson Feature Group. Each feature in the group must have an `ID` on it's properites object. 
     * - style: [Object] A leaflet layer style object. See [Leaflet docs](http://leafletjs.com/reference.html).
+  * maxSelectable: [Integer] USe this in conjuection with geojsonChoices. It determines the maximum number of feeatures that can be select. If not present or less then 1, it allows unlimited choices to be selected.
+  * reuseChoice: [Boolean] If not present or true choices can be reused for on a repeating block. If false, the the choices gets disable and is unavailble to select if it has been selected on a previous block response.
   * require_in_bounds: [Boolean]
   * boundary_file: [String] name of boundary GeoJSON file to use (no path required).
   * use_planning_units: [Boolean]
@@ -373,10 +375,28 @@ The are two form types, the default, and a map form.
 
 
 
-###7.2 Map Form
-A map form consists of a map and a side panel. The side panel contains the question and survey naivigation controls. When defined a map form there should only be one block. The first question in the block is the *map question* and is where the map geojson is stored. The remaining questions will be presented to the user one at a time. 
+###7.2 Map Forms
+A map form consists of a map and a side panel. The side panel contains the question and survey naivigation controls. A map form only contains one block. The first question in the block is the *map question* and is where the map geojson is stored. The remaining questions will be presented to the user one at a time. 
 
-Currently the map form can cache tiles. Tile caching regions and srouceTiles should be defined on the first map form. Any other map from will use the same settings.
+Currently the map form can cache tiles. Tile caching regions and souceTiles should be defined on the first map form. Any other map from will use the same settings.
+
+**URLS**
+
+* /map-form/fsSlug/fsResp/formId#intro
+  This view displays the initial form loading page. Its displays the HTML from `options.intro`.  The intro page is used to dispaly a navigation menu for formResps
+
+* /map-form/fsSlug/fsResp/formId#end
+  This page displays `options.end` HTML and as well as any repeat form buttons.
+
+* /map-form/fsSlug/fsResp/formId#formRespId/new-blockId/qIndex
+  This is a new block response to an existing form response.
+
+* /map-form/fsSlug/fsResp/formId#formRespId/blockRespId/qIndex
+  This is editing an existing block response to form response
+
+
+
+
 
 ###7.3 Foreach Forms
 Forms that have `options.forEach` or `options.forEachAnswer` are considered foreach forms. When a forEach form is first encountered in the survey, the app will automatically create formResp's for all forEach items. If there are existing forEach form responses for items not in the forEach list, these form responses will be deleted.
@@ -386,7 +406,7 @@ Foreach forms have a `intro` page and and `end` page to help with navigating the
  **URLS** 
  
  * /form-foreach/fsSlug/fsRespId/formId/intro
-  This view displays the initial form loading page. Its displays the HTML from `options.intro`.  The intro page is sued to dispaly a navigation menu for formResps
+  This view displays the initial form loading page. Its displays the HTML from `options.intro`.  The intro page is used to dispaly a navigation menu for formResps
 
  * /form-foreach/fsSlug/fsRespId/formId/end
    This page displays `options.end` HTML and FORWARD, BACK, REPEAT FORM, REPEAT BLOCK buttons.
@@ -399,7 +419,7 @@ Foreach forms have a `intro` page and and `end` page to help with navigating the
 
 
 
-####Options
+###7.4 All Form Options
 
 * **skipWhen**: [Expression]
 
@@ -421,7 +441,7 @@ Foreach forms have a `intro` page and and `end` page to help with navigating the
  
 * **end**: [HMTL] An end page.
 
-* **repeatable**: [Integer] **NOT IMPLEMENTED YET.** The number of times to display the form repeat. If <= 0 display it as many times as the user wants. USes count as formRepeatItem.
+* **repeatable**: [Integer] The number of times to display the form can be answered. If <= 0 display it as many times as the user wants.
 
 * **forEach**: [Array] **NOT IMPLEMENTED YET.** An array of expression that validates to an array. Uses items in the array as formRepeatItem.
 
@@ -456,49 +476,8 @@ Setting maxCacheZoom = 14, it took 17 minutes to cach 273MB with 36,000 GET requ
     ]
     ```
 
-### 7.4 Summary Form
+###7.4 Repeatable Forms
 
-Options
-name: ""
-slug: ""
-
-type: ['table']
-
-7.4.1 Blocks
-
-Options
-* **type**: [String] table, linear
-
-Summary Example
-block1 = [
-  {'type':'header, 'verbose':'My header'},
-  {'type':'col2', ["date(getAnswer('q1-slug').value, "dd-mm-yy")", "date(getAnswer('q1-slug').value, "hh:mm")""},
-  {'type':'header, 'verbose':'My header 2'},
-  {"type": "col2", [,]},
-    {"type": "col2", [,]}
-]
-
-block2  = 
-[
-  {"type":"table", 
-    "options" : {
-      "title": "My table",
-      "rows" : [Something that returns a list]
-  }
-]
-
-block3 = {
-   "type": "resp-menu",
-   "header": "My Header",
-   "targetSlug":'some-slug', 
-   "type": "form" or "block",
-   "filter": ???, 
-   "row": {""}
-}
-
-Loop over all (some form with hidden questions whose answers are LOT ID.
-
- 
 
 ## 8. Blocks and Block Options
 
@@ -599,31 +578,36 @@ A block or form can be skipped with logic based on answers from a previous quest
 
 ## 11. Viewpoint API Syncing
 
-### 11.1 The Algorithm
+### 11.1 The Algorithm(s)
+
 The syncing algorithm will run a on timer every N seconds, with exponential bak off if offline. The algorithm performs the following steps:
+
+
 
 1. Check for network connectivity
 
-2. Check for any pending or expired resources
-  * Get a list of pending resources. Pending resources are tickets that have been modifed since last sync.
-  * Expire resources that are older than `expireTime `. This means delete completed resources that are older enought to remove.
+2. Check Status table for pending tansactions. 
+  * Transaction come from the $loki changes method.
+  * The app syncs entire form formstacks
 
-3. Sync the resources
-  * Loop over all the entries in the Resourde status table
-  * If method is blank, do nothing.
-  * Set status to `pending`, increase attempts, and update lastAttempt timestamp
-  * Add in any extra data
-  * Sync the formstack
-    * Clean the formstack (add remove any data feilds)
-    * POST the formstack
-    * if sucess update method to ''
+3. Send the list of changes for each formstack to the `/api/v2/pforms/sync/` endpoint.
+  * On the server
+    1. Compare the client changes list to servers changes list.
+    2. Resolve any conflicts. HARD PART
+    3. Merge changes into server
+    4. Return the changes that the client must make
+  * On Client
+    1. Loop over returned changes and apply the changes.
+    2. Updates status table ??? Not sure how to do this.
 
+5. Update Read Only resrouces (.i.e. App, Formstack, mediacache)
+  * Formstack is nested with Forms, Blocks, Questions, QuestionChoices. These will all be updated when the formstack updates
+  * Update mediacache
+  * Update tiles???
 
-5. Update Read Only resrouces.
+6. Update last updated timestamp
 
-4. Update last updated timestamp
-
-6. Broascast a 'sync-complete' event.
+7. Broascast a 'sync-complete' event.
 
 
 ### 11.2 Status Table
@@ -634,6 +618,15 @@ Fields
 * attempts: [Integer] The number of times the resource has attempted to sync
 * status: [String] 'pending'
 * resourceId: [Integer] Client ID of the resource
+
+### 11.3 Changes Object
+  This is base off of the [LokiJs Changes API](https://github.com/techfort/LokiJS/wiki/Changes-API) and needs to be implemented by both the server and the client. *Maybe we should turn the loki `operation` value into an HTTP method and make the  name value into a resource URI to keep the API more general.*
+
+   changes = {
+       'operation': [String] 'I', 'U', or 'R',
+       'name': [String] the name of the Collection,
+       'obj': [Object] The data that has changed. TODO Need to check on this.
+   }
 
 
 ---
