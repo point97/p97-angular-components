@@ -77,7 +77,7 @@ describe('Controller: DateCtrl', function () {
 
     it('does not have to be answered if not required', function(){    
         var isolated = elm2.isolateScope();
-        isolated.value = null;
+        isolated.value = "";
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);

@@ -1,4 +1,4 @@
-// build timestamp: Thu Jan 29 2015 12:38:33 GMT-0800 (PST)
+// build timestamp: Thu Jan 29 2015 14:53:36 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -846,14 +846,14 @@ angular.module('p97.questionTypes')
 
                 if (options && options.required === true) {
                     if (scope.value == null || scope.value == "" || scope.value == undefined) {
-                        scope.errors.push('This field is required')
+                        scope.errors.push('Invalid date format')
                         return false;
                     }
                 }
 
                 if (format !== 'yyyy') {
-                    if (scope.value !== null)  {
-                        if (scope.value == "" || scope.value == undefined) {
+                    if (scope.value !== null || scope.value !== "")  {
+                        if (scope.value == undefined) {
                             scope.errors.push('Invalid date format')
                             return false; 
                         }

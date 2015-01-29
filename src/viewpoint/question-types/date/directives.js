@@ -47,14 +47,14 @@ angular.module('p97.questionTypes')
 
                 if (options && options.required === true) {
                     if (scope.value == null || scope.value == "" || scope.value == undefined) {
-                        scope.errors.push('This field is required')
+                        scope.errors.push('Invalid date format')
                         return false;
                     }
                 }
 
                 if (format !== 'yyyy') {
-                    if (scope.value !== null)  {
-                        if (scope.value == "" || scope.value == undefined) {
+                    if (scope.value !== null || scope.value !== "")  {
+                        if (scope.value == undefined) {
                             scope.errors.push('Invalid date format')
                             return false; 
                         }

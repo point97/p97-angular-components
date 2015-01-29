@@ -103,7 +103,7 @@ angular.module('starter')
             'label': 'yyyy',
             'type': 'date',
             'options': {
-                'required': true,
+                'required': false,
                 'min': '2013-03-28',
                 'max': '2013-04-05'
             }
