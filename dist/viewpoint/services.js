@@ -1,6 +1,4 @@
-
-// build timestamp: Wed Jan 28 2015 15:18:44 GMT-0800 (PST)
-
+// build timestamp: Thu Jan 29 2015 11:05:58 GMT-0800 (PST)
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
 Version: 15.01.20a

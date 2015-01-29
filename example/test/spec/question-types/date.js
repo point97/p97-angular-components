@@ -26,16 +26,17 @@ describe('Controller: DateCtrl', function () {
                 "type": "date",
                 "options": {
                     "required": true,
-                    "datejs_format": "MM/dd/yyyy"
+                    "format": "yyyy",
+                    "min": 2000,
+                    "max": 2002
                 }
             },{
                 "body": "What date was that?",
-                "label": "dd/mm/yyyy",
+                "label": "Dates",
                 "type": "date",
                 "options": {
-                    "datejs_format": "yyyy",
-                    "min": 2000,
-                    "max": 2002 
+                    "min": '2014-04-20',
+                    "max": '2014-05-15' 
                 }
             }]
         };
@@ -82,32 +83,8 @@ describe('Controller: DateCtrl', function () {
         expect(is_valid).toBe(true);
     });
 
-    it('should be in the proper format', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = '07/19/1954';
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(true);
-    });
-
-    it('should follow the proper format when not default', function(){    
-        var isolated = elm2.isolateScope();
-        isolated.value = '08/21/2001';
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
-    });
-
-    it('should follow the rules of actual dates', function(){    
-        var isolated = elm.isolateScope();
-        isolated.value = '18/18/2008';
-
-        var is_valid = isolated.internalControl.validate_answer();
-        expect(is_valid).toBe(false);
-    });
-
     it('should be a realistic year if the format is defined as yyyy', function(){    
-        var isolated = elm2.isolateScope();
+        var isolated = elm.isolateScope();
         isolated.value = '1731';
 
         var is_valid = isolated.internalControl.validate_answer();
@@ -115,7 +92,7 @@ describe('Controller: DateCtrl', function () {
     });
 
     it('should not be lower than the defined min', function(){    
-        var isolated = elm2.isolateScope();
+        var isolated = elm.isolateScope();
         isolated.value = '1999';
 
         var is_valid = isolated.internalControl.validate_answer();
@@ -123,7 +100,7 @@ describe('Controller: DateCtrl', function () {
     });
 
     it('should not be higher than the defined max', function(){    
-        var isolated = elm2.isolateScope();
+        var isolated = elm.isolateScope();
         isolated.value = '2001';
 
         var is_valid = isolated.internalControl.validate_answer();
@@ -131,7 +108,7 @@ describe('Controller: DateCtrl', function () {
     });
 
     it('should be within range', function(){    
-        var isolated = elm2.isolateScope();
+        var isolated = elm.isolateScope();
         isolated.value = '2001';
 
         var is_valid = isolated.internalControl.validate_answer();

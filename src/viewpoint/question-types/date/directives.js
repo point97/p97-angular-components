@@ -39,39 +39,40 @@ angular.module('p97.questionTypes')
                 
                 scope.errors = [];
 
-                var format =  options.datejs_format || 'MM/dd/yyyy';
+                var format =  options.format;
 
                 if (options && options.required === true) {
-                    if (scope.value == null || scope.value == "") {
+                    if (scope.value == null || scope.value == "" || scope.value == undefined) {
                         scope.errors.push('This field is required')
                         return false;
                     }
                 }
 
-                if (scope.value !== null && scope.value !== undefined && scope.value.length > 0) {
-                    // check for a valid date.
-                    var dateObj = Date.parseExact(scope.value, format);
-                    if (dateObj == null || isNaN(dateObj)) {
-                        scope.errors.push('You date is in an invalid format')
+                if (format !== 'yyyy') {
+                    if (scope.value !== null && (scope.value == "" || scope.value == undefined)) {
+                       scope.errors.push('Invalid date format')
+                       return false; 
                     }
-                
-                    if (format && format === 'yyyy') {
-                        if (!regYear.test(scope.value)) {
-                            scope.errors.push('Input must be a valid year')
-                        }
+                }
 
-                        if (options.min && regYear.test(options.min)) {
-                            if (scope.value < options.min){
-                                scope.errors.push('Year must not be lower than ' + options.min);
-                            }
-                        }
+                    
+                else if (scope.value !== null && scope.value !== undefined && scope.value.length > 0) {
 
-                        if (options.max && regYear.test(options.max)) {
-                            if (scope.value > options.max){
-                                scope.errors.push('Year must not be higher than ' + options.max);
-                            }
-                        }    
+                    if (!regYear.test(scope.value)) {
+                        scope.errors.push('Input must be a valid year')
                     }
+
+                    if (options.min && regYear.test(options.min)) {
+                        if (scope.value < options.min){
+                            scope.errors.push('Year must not be lower than ' + options.min);
+                        }
+                    }
+
+                    if (options.max && regYear.test(options.max)) {
+                        if (scope.value > options.max){
+                            scope.errors.push('Year must not be higher than ' + options.max);
+                        }
+                    }    
                 }
 
                 return (scope.errors.length === 0);
