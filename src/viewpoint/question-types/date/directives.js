@@ -41,6 +41,10 @@ angular.module('p97.questionTypes')
 
                 var format =  options.format;
 
+                convertToDate = function (value) {
+                    return new Date(value)
+                };
+
                 if (options && options.required === true) {
                     if (scope.value == null || scope.value == "" || scope.value == undefined) {
                         scope.errors.push('This field is required')
@@ -49,9 +53,23 @@ angular.module('p97.questionTypes')
                 }
 
                 if (format !== 'yyyy') {
-                    if (scope.value !== null && (scope.value == "" || scope.value == undefined)) {
-                       scope.errors.push('Invalid date format')
-                       return false; 
+                    if (scope.value !== null)  {
+                        if (scope.value == "" || scope.value == undefined) {
+                            scope.errors.push('Invalid date format')
+                            return false; 
+                        }
+
+                        if (options.min) {
+                            if (convertToDate(scope.value) < convertToDate(options.min)) {
+                                scope.errors.push('Your selected date is too low')
+                            }
+                        }
+
+                        if (options.max) {
+                            if (convertToDate(scope.value) > convertToDate(options.max)) {
+                                scope.errors.push('Your selected date is too high')
+                            }
+                        }
                     }
                 }
 

@@ -36,7 +36,7 @@ describe('Controller: DateCtrl', function () {
                 "type": "date",
                 "options": {
                     "min": '2014-04-20',
-                    "max": '2014-05-15' 
+                    "max": '2014-07-15' 
                 }
             }]
         };
@@ -110,6 +110,36 @@ describe('Controller: DateCtrl', function () {
     it('should be within range', function(){    
         var isolated = elm.isolateScope();
         isolated.value = '2001';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+    });
+
+    it('should not be lower than defined min on a datepicker', function(){
+        /* on browser this test isn't neccessary, while
+        on mobile, ionic allows users to override min/max */      
+        var isolated = elm2.isolateScope();
+        isolated.value = '2002-03-12';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should not be lower than defined max on a datepicker', function(){
+        /* on browser this test isn't neccessary, while
+        on mobile, ionic allows users to override min/max */      
+        var isolated = elm2.isolateScope();
+        isolated.value = '2022-09-08';
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(false);
+    });
+
+    it('should be in range on a datepicker', function(){
+        /* on browser this test isn't neccessary, while
+        on mobile, ionic allows users to override min/max */   
+        var isolated = elm2.isolateScope();
+        isolated.value = '2014-05-08';
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);
