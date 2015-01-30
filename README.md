@@ -240,13 +240,13 @@ IN PROGRESS but otherwise PASSING TESTS
 
    * templateUrl (yeoman templates currently unavailable): 
       * "ionic/date.html"
-   * initial
-   * min 
-   * max
+   * initial - currently only working when options.format = "yyyy"
+   * min - if options.format is not "yyyy" - years must be input as a string "yyyy-mm-dd" (eg. "2015-04-23")
+   * max - same requirements as min
    * required
    * default  
-    * datejs_format: [String] e.g. 'MM/dd/yyyy'
-     * allows for Years - validates any year between 1900 and 2099
+    * format: "yyyy" or blank (if blank or not "yyyy" - date defaults to using the native datepicker)
+     * if "yyyy" is selected as a format - validates any year between 1900 and 2099
    
 
 * **toggle**
