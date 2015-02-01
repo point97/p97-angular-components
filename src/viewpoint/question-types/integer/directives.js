@@ -38,15 +38,15 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
                 isInteger = function (x) {
                     y = parseInt(x);
-                    return (typeof y === 'number') && (y % 1 === 0);
+                    return (typeof y === 'number') && (x % 1 === 0);
                 }
 
-                if (!isInteger(scope.value) && options.required && options.required === true) {
+                if ((!isInteger(scope.value) || scope.value == null) && options.required && options.required === true) {
                     scope.errors.push('input must be a integer');
                     return false;
                 }
 
-                if (scope.value !== null && scope.value !== undefined && scope.value.length > 0) {
+                if (scope.value !== null && scope.value !== undefined) {
 
                     if (!isInteger(scope.value) && (!options.required || options.required === false)) {
                         scope.errors.push('input must be a integer');

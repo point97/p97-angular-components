@@ -68,7 +68,7 @@ describe('Controller: IntCtrl', function () {
     it('should not allow numbers that are not integers', function(){    
         var isolated = elm.isolateScope();
         isolated.value = 2.34;
-        
+
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
     });
@@ -127,6 +127,15 @@ describe('Controller: IntCtrl', function () {
     it('should be allow null values when not required', function() {
         var isolated = elm2.isolateScope();
         isolated.value = null;
+
+        var is_valid = isolated.internalControl.validate_answer();
+        expect(is_valid).toBe(true);
+
+    });
+
+    it('should allow blank values when not required', function() {
+        var isolated = elm2.isolateScope();
+        isolated.value = "";
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);

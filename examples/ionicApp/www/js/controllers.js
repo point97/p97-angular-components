@@ -100,13 +100,12 @@ angular.module('starter')
             }
         },{
             'body': 'When did that happen?',
-            'label': 'MM/dd/yyyy',
+            'label': 'yyyy',
             'type': 'date',
             'options': {
                 'required': false,
-                'datejs_format': 'yyyy',
-                'min': 1998,
-                'max': 2015
+                'min': '2013-03-28',
+                'max': '2013-04-05'
             }
         },{
             'body': 'How are you feeling?',
