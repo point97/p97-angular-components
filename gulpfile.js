@@ -69,7 +69,7 @@ gulp.task('question-types', function() {
 
 gulp.task('viewpoint', function() {
     gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean())
-    return gulp.src(['src/viewpoint/*.js'])
+    return gulp.src(['src/viewpoint/services/*.js'])
    
       // This will output the non-minified version
       .pipe(concat('services.js'))

@@ -6,7 +6,7 @@
     "Wil Black <wil@pointnineseven.com>",
     "Drew Seminara <drew@pointnineseven.com>"
   ],
-  "description": "A collection of Javscript (mostly angular) components to be used with the Viewpoint 2 API",
+  "description": "A collection of Javascript (mostly angular) components to be used with the Viewpoint 2 API",
   "main": "dist/",
   "keywords": [
     "angular",
