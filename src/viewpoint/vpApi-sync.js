@@ -1,12 +1,22 @@
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: v15.01.15a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
-
 angular.module('vpApi.services')
 
-.service( '$sync', ['$rootScope', '$http', 'config', '$vpApi', function($rootScope, $http, config, $vpApi) {
+.service( '$sync', ['$rootScope', 
+                    '$http', 
+                    'config', 
+                    '$vpApi', 
+                    '$fsResp', 
+                    '$timeout',
+            function($rootScope, 
+                     $http, 
+                     config, 
+                     $vpApi, 
+                     $fsResp,
+                     $timeout
+                     ) {
 
     var obj = this;
     this.collections = ['fsResp', 'formResp', 'blockResp', 'answer'];
@@ -17,26 +27,21 @@ angular.module('vpApi.services')
     }
 
     this.run = function(callback){
+        /*
+        This function can be ran on a periodic timer or called by itself.
+
+        It will look for submitted responses and send them to the server
+
+        */
         var res, fsResps, answers, changes;
         var index = 0;
-        changes = obj.getChanges();
-        if (changes.length === 0) {
-            callback([{'status':'', 'data':'No changes found'}]);
-            return;
-        }
+        var errors = [];
 
-
-        errors = [];
 
         OnSucess = function(data, status) {
             console.log('[$sync.run.OnSucess]');
-            if (index === changes.length-1) {
-                callback(errors);
-            } else {
-                index++;
-                obj.syncResponse(changes[index], OnSucess, OnError);
-            }
             
+            callback(data, status);
             
         };
 
@@ -50,94 +55,61 @@ angular.module('vpApi.services')
                 obj.syncResponse(changes[index], OnSucess, OnError);
             }
         };
-        this.syncResponse(changes[index], OnSucess, OnError);
+
+        var submitted = angular.copy($vpApi.db.getCollection('fsResp').find({'status':'submitted'}));
+        if (submitted.length === 0) OnSucess({}, 'There are no submitted formstack to sync.');
+
+        this.submitFormstacks(submitted, OnSucess, OnError);
 
         
     };
 
-    this.syncResponse = function(resp, onSucess, onError) {
-        var method, reource;
-
-        if (resp.operation === 'I') method = 'POST'
-        if (resp.operation === 'U') method = 'PUT'
-        if (resp.operation === 'D') method = 'DELETE'
-
-        debugger
-        if (resp.name === 'fsResp' || resp.name === 'formResp' || resp.name === 'blockResp') {
-            resource = "pforms/response";
-        } else if (resp.name === 'answer') {
-            resource = 'pforms/answer';
-        } else {
-            console.error("[$sync.syncResponse()] Invalid resource name" + resp.name);
-        }
-        
-        resp.obj.formstack = resp.obj.fsId;
-        resp.obj.reporter = $vpApi.user.profile.user;
-        resp.obj.org = $vpApi.user.profile.orgs[0].id;
-        delete resp.obj.meta;
-        $vpApi.post(resource, resp.obj, onSucess, onError);
-    };
-
-    this.run2 = function(callback){
-        var res, fsResps, answers, changes;
-        
-        changes = obj.getChanges();
-
-        errors = [];
-
-        // Sort into nested structure starting with fsResp --> formResp -->
-
-
-        // First sync fsResp's
-        fsResps = _.find(changes, function(item){return item.name === 'fsResp'});
-        answers = _.find(changes, function(item){return item.name === 'answers'});
-
-        fsOnSucess = function(data, status) {
-            this.syncResponse()
-        };
-
-        fsOnError = function(data, status) {
-            console.log('[fsOnError]')
-        };
-
-        this.syncResponse(fsResps.changes, fsOnSucess, fsOnError);
-
-        callback(res);
-    };
-
-    this.syncResponse2 = function(changes, onSucess, onError) {
-        /*
-            Sync individual resources.
-
-            Params:
-            - resource: [String] the resrouceendpoint, e.g. pforms/response
-            - changes: [Object] The loki changes output
-        */
-        var resource = 'pforms/response';
+    this.submitFormstacks = function(resps, onSucess, onError) {
+        var fsFullResp; // This will be the full nested formstack response.
+        var fsResp;
         var count = 0;
-        _.each(changes, function(resp){
-            if (resp.operation === 'I'){
-                sucess = function(data, status){
-                    onSucess(data, status);
-                    count++;
-                }
+        var failedAttempts = [];
+        var resource;
 
-                fail = function(data, status){
-                    console.error(status);
-                    onError(data, status);
-                    count++;
-                }
+        submitSuccess = function(data, status){
+            console.log('Pretend success callback status ' + status);
+            console.log(data);
+            fsRespId = data.fsRespId;
 
-                resource = "pforms/response";
-                
-                resp.obj.formstack = resp.obj.fsId;
-                resp.obj.reporter = $vpApi.user.profile.user;
-                resp.obj.org = $vpApi.user.profile.orgs[0].id;
-                delete resp.obj.meta;
-                debugger;
-                $vpApi.post(resource, resp.obj, sucess, fail);
+            fsResp = $vpApi.db.getCollection('fsResp').find({"id":fsRespId})[0];
+            fsResp.status = 'synced';
+            $vpApi.db.save();
+            count++
+            if (count === resps.length) {
+                // This is the last response.
+                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
             }
+        }
+
+        submitFail = function(data, status){
+            console.log('I failed ' + status);
+            failedAttempts.push({"data":data, "status":status})
+            count++
+            if (count === resps.length) {
+                // This is the last response.
+                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
+            }
+        }
+
+
+        _.each(resps, function( resp ){
+            fsFullResp = $fsResp.getFullResp(resp.$loki);
+            resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
+            console.log('Pretending to sync ' + resp.$loki);
+
+            // // $vpApi.post(resource, fsFullResp, onSucess, onError);
+            // $timeout(function(){
+            //     submitSucess(resp.$loki);
+            // }, 2000);
+            console.log("About to post to " + resource)
+            $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
         });
+        
     }
 
 

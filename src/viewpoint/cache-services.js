@@ -1,7 +1,6 @@
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.20a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
 
 angular.module('cache.services', [])
@@ -76,16 +75,17 @@ angular.module('cache.services', [])
     Handles tiles caching.
     */
     var obj = this;
+    var cachedArray = [];
     this.regions = [];
     this.cacheTimer = {'start':null, 'stop':null, 'elasped':null};
 
 
-    this.isCached = function(){
-        var rs = localStorage.getItem('tilesCached');
-        var out = (rs === 'true') ? true : false;
-        return out;
+    this.isCached = function(tileSourceCount){
 
+        var rs = parseInt(localStorage.getItem('tilesCount'));
+        return (rs === tileSourceCount);
     }
+
     this.getMaxCacheZoom = function(){
         /*
         returns the options.maxCacheZoom from the first map-form it finds in forms.
@@ -104,14 +104,13 @@ angular.module('cache.services', [])
         return out;
     }
 
-    this.getRegions = function(){
+    this.getRegions = function(fs){
         /*
         Look for forms with Regions.
         Returns the list of regions or an empty list.
         */
         var out = [];
-        var fs = $vpApi.getFormstack();
-
+        
         _.each(fs.forms, function(form){
             if (form.type === 'map-form' && form.options.regions) {
                 out = _.uniq( out.concat(form.options.regions) );
@@ -121,7 +120,7 @@ angular.module('cache.services', [])
         return out;
     }
 
-    this.getTileSources = function(){
+    this.getTileSources = function(fs){
         /*
         Look for the first map-form with tile sources
         and returns those sources in an array of objects
@@ -131,13 +130,15 @@ angular.module('cache.services', [])
         In the future the tile sources should be defined at the formstack level
         */
 
-        var out = [];
-        var fs = $vpApi.getFormstack();
+        obj.tileSources = [];
 
         var form = _.find(fs.forms, function(formItem){
             return (formItem.type === 'map-form' && formItem.options.tileSources)
         });
-        obj.tileSources = form.options.tileSources;
+        if (form) {
+            obj.tileSources = form.options.tileSources;
+        }
+        
         return obj.tileSources;
     }
 
@@ -160,8 +161,8 @@ angular.module('cache.services', [])
             obj.cacheTimer.stop = new Date();
             obj.cacheTimer.elasped = obj.cacheTimer.stop - obj.cacheTimer.start;
             console.log("Cache timer elapsed time (min): " + obj.cacheTimer.elasped/1000/60)
-
-            localStorage.setItem('tilesCached', 'true');
+            var count = parseInt(localStorage.getItem('tilesCount')) || 0;
+            localStorage.setItem('tilesCount', count+1);
             onSuccess();
           },
           function(error){
@@ -187,7 +188,7 @@ angular.module('cache.services', [])
                 Fires when $tilecache errors out during tile caching.
             */
             console.log("[$tilecache.run.onError()] ");
-            localStorage.setItem('tilesCached', 'false');
+            localStorage.setItem('tilesCount', 0);
             console.log(errorType)
             console.log(errorData1)
             console.log(errorData2)
@@ -236,28 +237,35 @@ angular.module('cache.services', [])
         Use this to clear the tiles database from indexedDB
         */
 
-        tilesSources = obj.getTileSources();
+        fs = $vpApi.getCollection('formstack').data[0];
+        tilesSources = obj.getTileSources(fs);
+        osTableNames = [];
 
-        osTableName = tilesSources[0].storeName;
-        dbName = "IDBWrapper-" + osTableName;
+        _.each(tilesSources, function(tileSource, i) {
 
-        var openRequest = window.indexedDB.open(dbName, 1); //version used
-        openRequest.onerror = function (e) {
-            console.log("[openTilesDb] Database error: " + e.target.errorCode);
-        };
-        openRequest.onsuccess = function (event) {
+            osTableNames.push(tileSource.storeName);
+            dbName = "IDBWrapper-" + osTableNames[i];
 
-            window.db = openRequest.result;
-            console.log("[openTilesDb] Opened "+dbName+" with dataStores");
-            console.log(window.db.objectStoreNames);
-
-            var store = window.db.transaction(osTableName, "readwrite").objectStore(osTableName);
-
-            store.clear().onsuccess = function (event) {
-                localStorage.removeItem("tilesCached");
-                console.log('Finished clearing records');
-                callback(event);
+            var openRequest = window.indexedDB.open(dbName, 1); //version used
+            openRequest.onerror = function (e) {
+                console.log("[openTilesDb] Database error: " + e.target.errorCode);
             };
-        };
+            openRequest.onsuccess = function (event) {
+
+                window.db = openRequest.result;
+
+                console.log("[openTilesDb] Opened "+window.db.name+" with dataStores");
+                console.log(window.db.objectStoreNames);
+                var tableName = window.db.name.split('-')[1];
+                var store = window.db.transaction(tableName, "readwrite").objectStore(tableName);
+
+                store.clear().onsuccess = function (event) {
+                    localStorage.removeItem("tilesCount");
+                    console.log('Finished clearing ' + tableName);
+                };
+            };
+        })
+
+        callback(event);
     };
 }])
