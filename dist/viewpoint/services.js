@@ -1,6 +1,6 @@
-// build timestamp: Tue Feb 03 2015 14:11:33 GMT-0800 (PST)
+// build timestamp: Tue Feb 03 2015 15:53:50 GMT-0800 (PST)
 /*
-    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -284,7 +284,7 @@ angular.module('cache.services', [])
     };
 }])
 /*
-    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -428,6 +428,7 @@ angular.module('survey.services', [])
                         'formId': scope.current.form.id,
                         'formIndex': scope.current.formIndex,
                         'formRepeatItem':null,
+                        'ccreated': $vpApi.getTimestamp(),
                         'cupdate': $vpApi.getTimestamp()
                     });
                     $vpApi.db.save()
@@ -1213,7 +1214,7 @@ angular.module('survey.services', [])
 }])
 
 /*
-    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -1884,7 +1885,7 @@ angular.module('vpApi.services', [])
 }])
 
 /*
-    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
     build source: vp-survey
 */
 /*
