@@ -580,7 +580,76 @@ A block or form can be skipped with logic based on answers from a previous quest
 
 ### 11.1 The Algorithm(s)
 
-The syncing algorithm will run a on timer every N seconds, with exponential bak off if offline. The algorithm performs the following steps:
+Endpoint `/api/v2/pforms/formstack/<fsId>/submit`
+
+
+The syncing algorithm will run a on timer every N seconds, with exponential back off if offline. Currenlty "syncing" occurs
+at the Formstack level. That is a formstack is submitted in a nested format. On the client formstacks marked with a 
+status of "submitted" will be synced. Once synced the status will flip to "synced".
+
+
+
+To post to the `/api/v2/pforms/formstack/<fsId>/submit` endpoint the the nested formstack object must look like:
+
+```
+# sample formstack response
+{
+    "id": "716ca92d-bf94-4fb9-99a5-959f5604e5a9"
+    "fsId": "17",
+    "client_created": "2015-02-03T15:27:33.184Z",
+    "client_updated": "2015-02-03T15:27:35.069Z",
+    "formResps": [An Array of formResps objects ]
+}
+
+```
+
+Where each **formResp** object looks like
+
+```
+# sample formResp
+{
+    "id": "16892a10-8005-4bcc-a34e-a7f17ba41fb8",
+    "formId": 225,
+    "formForEachItem": null,  # Not yet implemented
+    "client_created": "2015-02-03T15:27:33.184Z",
+    "client_updated": "2015-02-03T15:27:35.064Z",
+    "blockResps": [An array of blockResp objects]]
+}
+
+```
+
+Where each **blockResp** object looks like
+
+```
+# sample blockResp
+{
+    "id": "41f5f8d0-5050-4613-841d-d5ceef0dd46e",
+    "blockId": 472,
+    "blockForEachItem: null,
+    "client_created": "2015-02-03T15:27:33.184Z",
+    "client_updated": "2015-02-03T15:27:33.184Z",
+    "answers": [An array of answer objects]
+}
+
+```
+
+Where each **answer** object looks like
+
+```
+# sample answer
+{
+    "id: "104bef94-a229-4f04-ae09-794776edbce3"
+    "questionId: 1215
+    "value: The actual answer, could be a number, literal, or JSON object.
+    "client_created: "2015-02-03T15:27:33.184Z"
+    "client_updated: "2015-02-03T15:27:33.184Z"
+}
+
+```
+
+
+
+The algorithm performs the following steps:
 
 
 
@@ -620,13 +689,6 @@ Fields
 * resourceId: [Integer] Client ID of the resource
 
 ### 11.3 Changes Object
-  This is base off of the [LokiJs Changes API](https://github.com/techfort/LokiJS/wiki/Changes-API) and needs to be implemented by both the server and the client. *Maybe we should turn the loki `operation` value into an HTTP method and make the  name value into a resource URI to keep the API more general.*
-
-   changes = {
-       'operation': [String] 'I', 'U', or 'R',
-       'name': [String] the name of the Collection,
-       'obj': [Object] The data that has changed. TODO Need to check on this.
-   }
 
 
 ---
