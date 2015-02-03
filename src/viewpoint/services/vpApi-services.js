@@ -1,7 +1,6 @@
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.20a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
 
 angular.module('vpApi.services', [])
@@ -28,44 +27,61 @@ angular.module('vpApi.services', [])
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
+
+        // Add listeners to generate uuid's 
+        obj.db.getCollection('formResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('fsResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('blockResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('answer').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
         return;
 
-        if (obj.dbLoaded === true) { 
-            initCallback();
-            return;
-        }
-
-        obj.loadHandler = function(){
-            obj.users = obj.db.getCollection('user');
-
-            if (obj.users && obj.users.data.length > 0 && obj.users.data[0].username){
-                obj.user = obj.users.data[0];
-            } else {
-                obj._createDb();
-            }
-            obj.dbLoaded = true;
-            $rootScope.$broadcast('db_loaded');
-            initCallback();
-
-        };
-
-        var idbAdapter = new lokiIndexedAdapter('vpsurvey');
-        obj.db = new loki(config.dbFilename, { 
-            'adapter': idbAdapter,
-            'autoload': true,
-            'autoloadCallback': obj.loadHandler
-        });
     }
+
+
+    this.generateUUID = function() {
+        var d = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (d + Math.random()*16)%16 | 0;
+            d = Math.floor(d/16);
+            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+        });
+        return uuid;
+    };
+
 
     this.getApp = function(slug){
-        var apps = $vpApi.db.getCollection('app');
-        var app = apps.find({'slug':slug})[0];
-        if (app.length > 0){
-            return app;
+        /*
+        If slug is provded, returns that app with that slug. If
+        no slug is provided, it returns the first app it finds. 
+        If no apps are present it will error out.
+        */
+
+        var apps = obj.db.getCollection('app');
+        var app = null;
+        if(slug == undefined || slug == null){
+            app = apps.find()[0];
         }else{
-            console.log("eror getting app.")
+            app = apps.find({'slug':slug})[0];
         }
+        return app;
     }
+
 
     this.getFormstack = function(slug){
         console.log(slug)
@@ -144,10 +160,12 @@ angular.module('vpApi.services', [])
     this.post = function(resource, data, success, fail){
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
-        $http({url:url,
+        $http({
+              url:url,
+              
               method:'POST',
               data: data,
-              headers: {'Authorization':'Token ' + this.user.token}
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
         }).success(function(data, status){
           success(data, status);
         })
@@ -442,7 +460,7 @@ angular.module('vpApi.services', [])
     */
 
     var obj = this;
-    this.resource_name = 'pforms/formstack-response';
+    
 
     $rootScope.$on('db_loaded', function(e){
         this.objects = $vpApi.db.getCollection('fsResp');
@@ -472,6 +490,74 @@ angular.module('vpApi.services', [])
         });
 
         $vpApi.db.save();
+    }
+
+    this.getFullResp = function(fsRespId){
+        /*
+        Returns a full nested formstack response object for syncing.
+        
+        Returns
+        {
+            fsId:
+            fsRespId:
+            formResps: [
+                {
+                    formId:
+                    formRespId:
+                    blockResps: [
+                        blockId:
+                        blockRespId:
+                        answers: [
+                            questionId:
+                            value:
+                        ]
+                    ]
+                },
+                .
+                .
+                .
+                {
+                    formId:
+                    formRespId:
+                    block: []
+                }
+            ]
+
+        }
+        */
+        var blockResps, formResps, answers;
+        out = {};
+
+        // Get fs Info
+        fsResp = angular.copy($vpApi.db.getCollection('fsResp').get(fsRespId));
+
+        out.id = fsResp.id;
+        out.fsId = fsResp.fsId;
+        out.formResps = [];
+
+        // Get the form resps
+        formResps = angular.copy($vpApi.db.getCollection('formResp').find({'fsRespId':fsRespId}));
+        _.each(formResps, function(formResp){
+            blockResps = angular.copy($vpApi.db.getCollection('blockResp').chain()
+                .find({'fsRespId':fsRespId})
+                .find({'formRespId': formResp.$loki})
+                .data());
+            
+            _.each(blockResps, function(blockResp){
+                answers = angular.copy($vpApi.db.getCollection('answer').chain()
+                    .find({'fsRespId':fsRespId})
+                    .find({'formRespId': formResp.$loki})
+                    .find({'blockRespId': blockResp.$loki})
+                    .data());
+                blockResp.answers = answers;
+            })
+            formResp.blockResps = blockResps;
+            formResp.cid = formResp.$loki;
+
+            out.formResps.push(formResp);
+        });
+
+        return out;
     }
 }])
 

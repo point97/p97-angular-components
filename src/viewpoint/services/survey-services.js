@@ -1,8 +1,8 @@
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.21a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
+
 angular.module('survey.services', [])
 
 .factory('$formUtils', ['$vpApi', '$location','$formstack', '$formResp', function($vpApi, $location, $formstack, $formResp) {
@@ -94,6 +94,11 @@ angular.module('survey.services', [])
                 return (form.id === parseInt(stateParams.formId, 10));
             });
             scope.current.block = scope.current.form.blocks[0]; // Map forms only have one block.
+            scope.mapQuestion = scope.current.block.questions[0];
+            scope.mapQuestion.value = ""; // Clear the value of th map question.
+            _.each(scope.current.block.questions, function(q){
+                q.form = {show:false};
+            });
 
             stateParams.qIndex = stateParams.qIndex || 'intro';
 
@@ -108,7 +113,10 @@ angular.module('survey.services', [])
             // Check for forEach options and populate scope.forEach
             if (scope.current.form.options.forEach && scope.current.form.options.forEach.length > 0) {
                 debugger;
+            
+            
             } else if (scope.current.form.options.forEachAnswer && scope.current.form.options.forEachAnswer.length > 0) {
+                /************** FOR EACH AND FOR EACH ANSWER STUFF *******************/
                 var ans = _getAnswer(scope, scope.current.form.options.forEachAnswer, scope.current.fsRespId);
                 var verbose;
                 scope.forEach = [];
@@ -117,17 +125,72 @@ angular.module('survey.services', [])
                     //verbose = _.find(question.choices, function(choice){return(choice.value === val);}) || val;
                     scope.forEach.push({'verbose': val, 'value':val});
                 });
+            
+
+            } else if (scope.current.form.blocks[0].options.repeatable) {
+                /************** REPEATABLE BLOCK STUFF *******************/
+                // get or create formResp
+                var formResps = scope.formResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formId': scope.current.form.id})
+                    .data();
+
+                // A get or create on formResp and set item.formResp 
+                if (formResps.length === 0) {
+                    scope.current.formResp = scope.formResps.insert({
+                        'fsSlug':scope.formstack.slug,
+                        'fsRespId': scope.current.fsResp.$loki,
+                        'formId': scope.current.form.id,
+                        'formIndex': scope.current.formIndex,
+                        'formRepeatItem':null,
+                        'cupdate': $vpApi.getTimestamp()
+                    });
+                    $vpApi.db.save()
+                } else {
+                    scope.current.formResp = formResps[0];
+                }
+
+                scope.current.form.blockResps = scope.blockResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki})
+                    .find({'formId': scope.current.form.id})
+                    .data();
             } else {
-                scope.forEach = [{'verbose':'', 'value':'default'}];
+                //****************** DEFAULT FORM STUFF *************************/
+                // get or create formResp
+                var formResps = scope.formResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formId': scope.current.form.id})
+                    .data();
+
+                // A get or create on formResp and set item.formResp 
+                if (formResps.length === 0) {
+                    scope.current.formResp = scope.formResps.insert({
+                        'fsSlug':scope.formstack.slug,
+                        'fsRespId': scope.current.fsResp.$loki,
+                        'formId': scope.current.form.id,
+                        'formIndex': scope.current.formIndex,
+                        'formRepeatItem':null,
+                        'cupdate': $vpApi.getTimestamp()
+                    });
+                    $vpApi.db.save()
+                } else {
+                    scope.current.formResp = formResps[0];
+                }
+
+                // Look for block Resp
+                var blockResps = scope.blockResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formRespId': scope.current.formResp.$loki})
+                    .find({'blockId': scope.current.block.id})
+                    .data();
+
+                if (blockResps.length > 0){
+                    scope.current.blockResp = blockResps[0];
+                }
+                
             }
 
-            // Use the first question of the block as the map question. This is where the geoJson is
-            // stored for each block.
-            scope.mapQuestion = scope.current.block.questions[0];
 
-            _.each(scope.current.block.questions, function(q){
-                q.form = {show:false};
-            });
 
         } else if (state.current.name === 'app.form-foreach') {
            /*
@@ -233,6 +296,7 @@ angular.module('survey.services', [])
         if (scope.current.form.options.forEach && scope.current.form.options.forEach.length > 0) {
             // TODO This is not yet implemented
             debugger;
+        
         } else if (scope.current.form.options.forEachAnswer && scope.current.form.options.forEachAnswer.length > 0) {
             var ans = _getAnswer(scope, scope.current.form.options.forEachAnswer, scope.current.fsRespId);
             var verbose, question, choice;
@@ -246,7 +310,6 @@ angular.module('survey.services', [])
             // This will populate the forEachItems with formResp and blockResp.
             // It also keeps the formResp in sync with the answers selected
             loadFormForEachItems(scope);
-
         }
 
         if (scope.current.block){
@@ -266,11 +329,13 @@ angular.module('survey.services', [])
             }
         }
 
-        // Set the repeatItem
+        // Set the forEachItem
         if (scope.current.formResp && typeof(scope.current.formResp.formForEachItem) !== 'undefined'){
             choice = $formstack.getChoice(scope.current.formResp.formForEachQuestionSlug, scope.current.formResp.formForEachItem);
             scope.current.form.forEachItem = choice;
         }
+
+        
 
     }; // End setState()
 
@@ -373,7 +438,7 @@ angular.module('survey.services', [])
                     if ($scope.current.form.type === 'map-form'){
                         // Just change the hash, not the URL.
                         var blockRespId = "new-" + $scope.current.block.id; // This is the server Id.
-                        $location.hash([formRespId, blockRespId, 0].join("/"));
+                        $location.hash([$scope.current.formResp.$loki, blockRespId, 0].join("/"));
                         return;
                     } else {
                         formRespId = $scope.current.formResp.$loki
@@ -407,11 +472,48 @@ angular.module('survey.services', [])
             } else {
                 console.log('[LinearBlockCtrl.saveBlock()] No more blocks in this form, so grabbing the first block of the next form');
                 //nextForm = $scope.formstack.forms[$scope.current.formIndex + 1];
-                nextForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
+                var nextFormRespId, nextBlock, nextBlockRespId;
+                var nextForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
                 if (nextForm){
-                    nextBlock = getEligibleBlock('forward', nextForm, -1);
-
                     newState += (nextForm.type) ? nextForm.type : 'form';
+                    
+                    // Send them to the first formResp created if found.
+                    formResps = $scope.formResps.chain()
+                        .find({'fsRespId':$scope.current.fsResp.$loki})
+                        .find({'formId': nextForm.id})
+                        .simplesort('created')
+                        .data();
+
+                    if (formResps.length > 0){
+                        nextFormRespId = formResps[0].$loki;
+
+                    } else {
+                        nextFormRespId = 'new-' + nextForm.id;
+                    }
+
+                    nextBlock = getEligibleBlock('forward', nextForm, -1);
+                    
+                    if(nextBlock.forEach){
+                        // TODO
+                        console.error("Not implemented")
+                        debugger;
+                    } else {
+                        // Send them to the first blockResp created if found.
+                        blockResps = $scope.blockResps.chain()
+                            .find({'fsRespId':$scope.current.fsResp.$loki})
+                            .find({'formRespId': nextFormRespId})
+                            .find({'blockId': nextBlock.id})
+                            .simplesort('$loki',false)
+                            .data();
+
+                        if (blockResps.length > 0){
+                            nextBlockRespId = blockResps[0].$loki;
+                        } else {
+                            nextBlockRespId = 'new-' + nextBlock.id;
+                        }
+                    }
+
+                    
                     if(nextForm.options.forEach || nextForm.options.forEachAnswer){
                         newState += "-foreach";
                         newHash = 'intro'; // This is used be the map-form
@@ -421,8 +523,8 @@ angular.module('survey.services', [])
                         'fsSlug': $scope.formstack.slug,
                         'fsRespId': $scope.current.fsResp.$loki,
                         'formId': nextForm.id,
-                        'formRespId': 'new-' + nextForm.id,
-                        'blockRespId': 'new-' + nextBlock.id,
+                        'formRespId': nextFormRespId,
+                        'blockRespId': nextBlockRespId,
                         'hash': newHash, // This is used by map-form-foreach
                         'page': newHash, // This is used by form-foreach
                         'qIndex': 'intro'
@@ -439,7 +541,7 @@ angular.module('survey.services', [])
                     $vpApi.db.save();
 
                     console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
-                    $state.go('app.complete');  // Use $state.go here instead of $location.path or $location.url
+                    $state.go('app.complete', {'fsRespId':$scope.current.fsResp.$loki});  // Use $state.go here instead of $location.path or $location.url
                     return;
                 }
             }
@@ -656,11 +758,12 @@ angular.module('survey.services', [])
                 .data()
             if (item.blockResps.length > 0) {
                 item.formRespId = item.blockResps[0].formRespId;
-
                 item.blockRespId = item.blockResps[0].$loki;
+                item.isNew = false;
             } else {
                 item.formRespId = "new-" + scope.current.form.id;
                 item.blockRespId = "new-" + scope.current.form.blocks[0].id;
+                item.isNew = true;
             }
 
             item.form = "form"
@@ -810,7 +913,6 @@ angular.module('survey.services', [])
         } else {
             out = raw;
         }
-
         return out;
     };
 

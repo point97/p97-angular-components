@@ -1,4 +1,4 @@
-// build timestamp: Thu Jan 29 2015 14:53:36 GMT-0800 (PST)
+// build timestamp: Mon Feb 02 2015 12:13:46 GMT-0800 (PST)
 /*
 Github Repo: https://github.com/point97/p97-angular-components.git
 Version: 15.01.20a
@@ -77,16 +77,17 @@ angular.module('cache.services', [])
     Handles tiles caching.
     */
     var obj = this;
+    var cachedArray = [];
     this.regions = [];
     this.cacheTimer = {'start':null, 'stop':null, 'elasped':null};
 
 
-    this.isCached = function(){
-        var rs = localStorage.getItem('tilesCached');
-        var out = (rs === 'true') ? true : false;
-        return out;
+    this.isCached = function(tileSourceCount){
 
+        var rs = parseInt(localStorage.getItem('tilesCount'));
+        return (rs === tileSourceCount);
     }
+
     this.getMaxCacheZoom = function(){
         /*
         returns the options.maxCacheZoom from the first map-form it finds in forms.
@@ -105,14 +106,13 @@ angular.module('cache.services', [])
         return out;
     }
 
-    this.getRegions = function(){
+    this.getRegions = function(fs){
         /*
         Look for forms with Regions.
         Returns the list of regions or an empty list.
         */
         var out = [];
-        var fs = $vpApi.getFormstack();
-
+        
         _.each(fs.forms, function(form){
             if (form.type === 'map-form' && form.options.regions) {
                 out = _.uniq( out.concat(form.options.regions) );
@@ -122,7 +122,7 @@ angular.module('cache.services', [])
         return out;
     }
 
-    this.getTileSources = function(){
+    this.getTileSources = function(fs){
         /*
         Look for the first map-form with tile sources
         and returns those sources in an array of objects
@@ -132,13 +132,15 @@ angular.module('cache.services', [])
         In the future the tile sources should be defined at the formstack level
         */
 
-        var out = [];
-        var fs = $vpApi.getFormstack();
+        obj.tileSources = [];
 
         var form = _.find(fs.forms, function(formItem){
             return (formItem.type === 'map-form' && formItem.options.tileSources)
         });
-        obj.tileSources = form.options.tileSources;
+        if (form) {
+            obj.tileSources = form.options.tileSources;
+        }
+        
         return obj.tileSources;
     }
 
@@ -161,8 +163,8 @@ angular.module('cache.services', [])
             obj.cacheTimer.stop = new Date();
             obj.cacheTimer.elasped = obj.cacheTimer.stop - obj.cacheTimer.start;
             console.log("Cache timer elapsed time (min): " + obj.cacheTimer.elasped/1000/60)
-
-            localStorage.setItem('tilesCached', 'true');
+            var count = parseInt(localStorage.getItem('tilesCount')) || 0;
+            localStorage.setItem('tilesCount', count+1);
             onSuccess();
           },
           function(error){
@@ -180,15 +182,20 @@ angular.module('cache.services', [])
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+        
+        var app = $vpApi.getApp();
+        var tilesSources = [];
 
-        var tileSources = obj.getTileSources();
+        _.each(app.formstacks, function(fs) {
+            tileSources = obj.getTileSources(fs);
+        });
 
         onError = function(errorType, errorData1, errorData2){
             /*
                 Fires when $tilecache errors out during tile caching.
             */
             console.log("[$tilecache.run.onError()] ");
-            localStorage.setItem('tilesCached', 'false');
+            localStorage.setItem('tilesCount', 0);
             console.log(errorType)
             console.log(errorData1)
             console.log(errorData2)
@@ -237,36 +244,48 @@ angular.module('cache.services', [])
         Use this to clear the tiles database from indexedDB
         */
 
-        tilesSources = obj.getTileSources();
+        var app = $vpApi.getApp();
+        var tilesSources = [];
 
-        osTableName = tilesSources[0].storeName;
-        dbName = "IDBWrapper-" + osTableName;
+        _.each(app.formstacks, function(fs) {
+            tilesSources = obj.getTileSources(fs);
+        });
 
-        var openRequest = window.indexedDB.open(dbName, 1); //version used
-        openRequest.onerror = function (e) {
-            console.log("[openTilesDb] Database error: " + e.target.errorCode);
-        };
-        openRequest.onsuccess = function (event) {
+        osTableNames = [];
 
-            window.db = openRequest.result;
-            console.log("[openTilesDb] Opened "+dbName+" with dataStores");
-            console.log(window.db.objectStoreNames);
+        _.each(tilesSources, function(tileSource, i) {
 
-            var store = window.db.transaction(osTableName, "readwrite").objectStore(osTableName);
+            osTableNames.push(tileSource.storeName);
+            dbName = "IDBWrapper-" + osTableNames[i];
 
-            store.clear().onsuccess = function (event) {
-                localStorage.removeItem("tilesCached");
-                console.log('Finished clearing records');
-                callback(event);
+            var openRequest = window.indexedDB.open(dbName, 1); //version used
+            openRequest.onerror = function (e) {
+                console.log("[openTilesDb] Database error: " + e.target.errorCode);
             };
-        };
+            openRequest.onsuccess = function (event) {
+
+                window.db = openRequest.result;
+
+                console.log("[openTilesDb] Opened "+window.db.name+" with dataStores");
+                console.log(window.db.objectStoreNames);
+                var tableName = window.db.name.split('-')[1];
+                var store = window.db.transaction(tableName, "readwrite").objectStore(tableName);
+
+                store.clear().onsuccess = function (event) {
+                    localStorage.removeItem("tilesCount");
+                    console.log('Finished clearing ' + tableName);
+                };
+            };
+        })
+
+        callback(event);
     };
 }])
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.21a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
+
 angular.module('survey.services', [])
 
 .factory('$formUtils', ['$vpApi', '$location','$formstack', '$formResp', function($vpApi, $location, $formstack, $formResp) {
@@ -358,6 +377,11 @@ angular.module('survey.services', [])
                 return (form.id === parseInt(stateParams.formId, 10));
             });
             scope.current.block = scope.current.form.blocks[0]; // Map forms only have one block.
+            scope.mapQuestion = scope.current.block.questions[0];
+            scope.mapQuestion.value = ""; // Clear the value of th map question.
+            _.each(scope.current.block.questions, function(q){
+                q.form = {show:false};
+            });
 
             stateParams.qIndex = stateParams.qIndex || 'intro';
 
@@ -372,7 +396,10 @@ angular.module('survey.services', [])
             // Check for forEach options and populate scope.forEach
             if (scope.current.form.options.forEach && scope.current.form.options.forEach.length > 0) {
                 debugger;
+            
+            
             } else if (scope.current.form.options.forEachAnswer && scope.current.form.options.forEachAnswer.length > 0) {
+                /************** FOR EACH AND FOR EACH ANSWER STUFF *******************/
                 var ans = _getAnswer(scope, scope.current.form.options.forEachAnswer, scope.current.fsRespId);
                 var verbose;
                 scope.forEach = [];
@@ -381,17 +408,72 @@ angular.module('survey.services', [])
                     //verbose = _.find(question.choices, function(choice){return(choice.value === val);}) || val;
                     scope.forEach.push({'verbose': val, 'value':val});
                 });
+            
+
+            } else if (scope.current.form.blocks[0].options.repeatable) {
+                /************** REPEATABLE BLOCK STUFF *******************/
+                // get or create formResp
+                var formResps = scope.formResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formId': scope.current.form.id})
+                    .data();
+
+                // A get or create on formResp and set item.formResp 
+                if (formResps.length === 0) {
+                    scope.current.formResp = scope.formResps.insert({
+                        'fsSlug':scope.formstack.slug,
+                        'fsRespId': scope.current.fsResp.$loki,
+                        'formId': scope.current.form.id,
+                        'formIndex': scope.current.formIndex,
+                        'formRepeatItem':null,
+                        'cupdate': $vpApi.getTimestamp()
+                    });
+                    $vpApi.db.save()
+                } else {
+                    scope.current.formResp = formResps[0];
+                }
+
+                scope.current.form.blockResps = scope.blockResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki})
+                    .find({'formId': scope.current.form.id})
+                    .data();
             } else {
-                scope.forEach = [{'verbose':'', 'value':'default'}];
+                //****************** DEFAULT FORM STUFF *************************/
+                // get or create formResp
+                var formResps = scope.formResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formId': scope.current.form.id})
+                    .data();
+
+                // A get or create on formResp and set item.formResp 
+                if (formResps.length === 0) {
+                    scope.current.formResp = scope.formResps.insert({
+                        'fsSlug':scope.formstack.slug,
+                        'fsRespId': scope.current.fsResp.$loki,
+                        'formId': scope.current.form.id,
+                        'formIndex': scope.current.formIndex,
+                        'formRepeatItem':null,
+                        'cupdate': $vpApi.getTimestamp()
+                    });
+                    $vpApi.db.save()
+                } else {
+                    scope.current.formResp = formResps[0];
+                }
+
+                // Look for block Resp
+                var blockResps = scope.blockResps.chain()
+                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'formRespId': scope.current.formResp.$loki})
+                    .find({'blockId': scope.current.block.id})
+                    .data();
+
+                if (blockResps.length > 0){
+                    scope.current.blockResp = blockResps[0];
+                }
+                
             }
 
-            // Use the first question of the block as the map question. This is where the geoJson is
-            // stored for each block.
-            scope.mapQuestion = scope.current.block.questions[0];
 
-            _.each(scope.current.block.questions, function(q){
-                q.form = {show:false};
-            });
 
         } else if (state.current.name === 'app.form-foreach') {
            /*
@@ -497,6 +579,7 @@ angular.module('survey.services', [])
         if (scope.current.form.options.forEach && scope.current.form.options.forEach.length > 0) {
             // TODO This is not yet implemented
             debugger;
+        
         } else if (scope.current.form.options.forEachAnswer && scope.current.form.options.forEachAnswer.length > 0) {
             var ans = _getAnswer(scope, scope.current.form.options.forEachAnswer, scope.current.fsRespId);
             var verbose, question, choice;
@@ -510,7 +593,6 @@ angular.module('survey.services', [])
             // This will populate the forEachItems with formResp and blockResp.
             // It also keeps the formResp in sync with the answers selected
             loadFormForEachItems(scope);
-
         }
 
         if (scope.current.block){
@@ -530,11 +612,13 @@ angular.module('survey.services', [])
             }
         }
 
-        // Set the repeatItem
+        // Set the forEachItem
         if (scope.current.formResp && typeof(scope.current.formResp.formForEachItem) !== 'undefined'){
             choice = $formstack.getChoice(scope.current.formResp.formForEachQuestionSlug, scope.current.formResp.formForEachItem);
             scope.current.form.forEachItem = choice;
         }
+
+        
 
     }; // End setState()
 
@@ -637,7 +721,7 @@ angular.module('survey.services', [])
                     if ($scope.current.form.type === 'map-form'){
                         // Just change the hash, not the URL.
                         var blockRespId = "new-" + $scope.current.block.id; // This is the server Id.
-                        $location.hash([formRespId, blockRespId, 0].join("/"));
+                        $location.hash([$scope.current.formResp.$loki, blockRespId, 0].join("/"));
                         return;
                     } else {
                         formRespId = $scope.current.formResp.$loki
@@ -671,11 +755,48 @@ angular.module('survey.services', [])
             } else {
                 console.log('[LinearBlockCtrl.saveBlock()] No more blocks in this form, so grabbing the first block of the next form');
                 //nextForm = $scope.formstack.forms[$scope.current.formIndex + 1];
-                nextForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
+                var nextFormRespId, nextBlock, nextBlockRespId;
+                var nextForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
                 if (nextForm){
-                    nextBlock = getEligibleBlock('forward', nextForm, -1);
-
                     newState += (nextForm.type) ? nextForm.type : 'form';
+                    
+                    // Send them to the first formResp created if found.
+                    formResps = $scope.formResps.chain()
+                        .find({'fsRespId':$scope.current.fsResp.$loki})
+                        .find({'formId': nextForm.id})
+                        .simplesort('created')
+                        .data();
+
+                    if (formResps.length > 0){
+                        nextFormRespId = formResps[0].$loki;
+
+                    } else {
+                        nextFormRespId = 'new-' + nextForm.id;
+                    }
+
+                    nextBlock = getEligibleBlock('forward', nextForm, -1);
+                    
+                    if(nextBlock.forEach){
+                        // TODO
+                        console.error("Not implemented")
+                        debugger;
+                    } else {
+                        // Send them to the first blockResp created if found.
+                        blockResps = $scope.blockResps.chain()
+                            .find({'fsRespId':$scope.current.fsResp.$loki})
+                            .find({'formRespId': nextFormRespId})
+                            .find({'blockId': nextBlock.id})
+                            .simplesort('$loki',false)
+                            .data();
+
+                        if (blockResps.length > 0){
+                            nextBlockRespId = blockResps[0].$loki;
+                        } else {
+                            nextBlockRespId = 'new-' + nextBlock.id;
+                        }
+                    }
+
+                    
                     if(nextForm.options.forEach || nextForm.options.forEachAnswer){
                         newState += "-foreach";
                         newHash = 'intro'; // This is used be the map-form
@@ -685,8 +806,8 @@ angular.module('survey.services', [])
                         'fsSlug': $scope.formstack.slug,
                         'fsRespId': $scope.current.fsResp.$loki,
                         'formId': nextForm.id,
-                        'formRespId': 'new-' + nextForm.id,
-                        'blockRespId': 'new-' + nextBlock.id,
+                        'formRespId': nextFormRespId,
+                        'blockRespId': nextBlockRespId,
                         'hash': newHash, // This is used by map-form-foreach
                         'page': newHash, // This is used by form-foreach
                         'qIndex': 'intro'
@@ -703,7 +824,7 @@ angular.module('survey.services', [])
                     $vpApi.db.save();
 
                     console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
-                    $state.go('app.complete');  // Use $state.go here instead of $location.path or $location.url
+                    $state.go('app.complete', {'fsRespId':$scope.current.fsResp.$loki});  // Use $state.go here instead of $location.path or $location.url
                     return;
                 }
             }
@@ -920,11 +1041,12 @@ angular.module('survey.services', [])
                 .data()
             if (item.blockResps.length > 0) {
                 item.formRespId = item.blockResps[0].formRespId;
-
                 item.blockRespId = item.blockResps[0].$loki;
+                item.isNew = false;
             } else {
                 item.formRespId = "new-" + scope.current.form.id;
                 item.blockRespId = "new-" + scope.current.form.blocks[0].id;
+                item.isNew = true;
             }
 
             item.form = "form"
@@ -1074,7 +1196,6 @@ angular.module('survey.services', [])
         } else {
             out = raw;
         }
-
         return out;
     };
 
@@ -1090,9 +1211,8 @@ angular.module('survey.services', [])
 }])
 
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.20a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
 
 angular.module('vpApi.services', [])
@@ -1119,44 +1239,61 @@ angular.module('vpApi.services', [])
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
+
+        // Add listeners to generate uuid's 
+        obj.db.getCollection('formResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('fsResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('blockResp').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
+        obj.db.getCollection('answer').on('insert', function(item){
+            item.id = obj.generateUUID();
+            console.log('added uuid '+ item.id)
+        });
+
         return;
 
-        if (obj.dbLoaded === true) { 
-            initCallback();
-            return;
-        }
-
-        obj.loadHandler = function(){
-            obj.users = obj.db.getCollection('user');
-
-            if (obj.users && obj.users.data.length > 0 && obj.users.data[0].username){
-                obj.user = obj.users.data[0];
-            } else {
-                obj._createDb();
-            }
-            obj.dbLoaded = true;
-            $rootScope.$broadcast('db_loaded');
-            initCallback();
-
-        };
-
-        var idbAdapter = new lokiIndexedAdapter('vpsurvey');
-        obj.db = new loki(config.dbFilename, { 
-            'adapter': idbAdapter,
-            'autoload': true,
-            'autoloadCallback': obj.loadHandler
-        });
     }
+
+
+    this.generateUUID = function() {
+        var d = new Date().getTime();
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (d + Math.random()*16)%16 | 0;
+            d = Math.floor(d/16);
+            return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+        });
+        return uuid;
+    };
+
 
     this.getApp = function(slug){
-        var apps = $vpApi.db.getCollection('app');
-        var app = apps.find({'slug':slug})[0];
-        if (app.length > 0){
-            return app;
+        /*
+        If slug is provded, returns that app with that slug. If
+        no slug is provided, it returns the first app it finds. 
+        If no apps are present it will error out.
+        */
+
+        var apps = obj.db.getCollection('app');
+        var app = null;
+        if(slug == undefined || slug == null){
+            app = apps.find()[0];
         }else{
-            console.log("eror getting app.")
+            app = apps.find({'slug':slug})[0];
         }
+        return app;
     }
+
 
     this.getFormstack = function(slug){
         console.log(slug)
@@ -1235,10 +1372,12 @@ angular.module('vpApi.services', [])
     this.post = function(resource, data, success, fail){
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
-        $http({url:url,
+        $http({
+              url:url,
+              
               method:'POST',
               data: data,
-              headers: {'Authorization':'Token ' + this.user.token}
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
         }).success(function(data, status){
           success(data, status);
         })
@@ -1533,7 +1672,7 @@ angular.module('vpApi.services', [])
     */
 
     var obj = this;
-    this.resource_name = 'pforms/formstack-response';
+    
 
     $rootScope.$on('db_loaded', function(e){
         this.objects = $vpApi.db.getCollection('fsResp');
@@ -1563,6 +1702,74 @@ angular.module('vpApi.services', [])
         });
 
         $vpApi.db.save();
+    }
+
+    this.getFullResp = function(fsRespId){
+        /*
+        Returns a full nested formstack response object for syncing.
+        
+        Returns
+        {
+            fsId:
+            fsRespId:
+            formResps: [
+                {
+                    formId:
+                    formRespId:
+                    blockResps: [
+                        blockId:
+                        blockRespId:
+                        answers: [
+                            questionId:
+                            value:
+                        ]
+                    ]
+                },
+                .
+                .
+                .
+                {
+                    formId:
+                    formRespId:
+                    block: []
+                }
+            ]
+
+        }
+        */
+        var blockResps, formResps, answers;
+        out = {};
+
+        // Get fs Info
+        fsResp = angular.copy($vpApi.db.getCollection('fsResp').get(fsRespId));
+
+        out.id = fsResp.id;
+        out.fsId = fsResp.fsId;
+        out.formResps = [];
+
+        // Get the form resps
+        formResps = angular.copy($vpApi.db.getCollection('formResp').find({'fsRespId':fsRespId}));
+        _.each(formResps, function(formResp){
+            blockResps = angular.copy($vpApi.db.getCollection('blockResp').chain()
+                .find({'fsRespId':fsRespId})
+                .find({'formRespId': formResp.$loki})
+                .data());
+            
+            _.each(blockResps, function(blockResp){
+                answers = angular.copy($vpApi.db.getCollection('answer').chain()
+                    .find({'fsRespId':fsRespId})
+                    .find({'formRespId': formResp.$loki})
+                    .find({'blockRespId': blockResp.$loki})
+                    .data());
+                blockResp.answers = answers;
+            })
+            formResp.blockResps = blockResps;
+            formResp.cid = formResp.$loki;
+
+            out.formResps.push(formResp);
+        });
+
+        return out;
     }
 }])
 
@@ -1650,14 +1857,24 @@ angular.module('vpApi.services', [])
 }])
 
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: v15.01.15a
-
+    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build source: vp-survey
 */
-
 angular.module('vpApi.services')
 
-.service( '$sync', ['$rootScope', '$http', 'config', '$vpApi', function($rootScope, $http, config, $vpApi) {
+.service( '$sync', ['$rootScope', 
+                    '$http', 
+                    'config', 
+                    '$vpApi', 
+                    '$fsResp', 
+                    '$timeout',
+            function($rootScope, 
+                     $http, 
+                     config, 
+                     $vpApi, 
+                     $fsResp,
+                     $timeout
+                     ) {
 
     var obj = this;
     this.collections = ['fsResp', 'formResp', 'blockResp', 'answer'];
@@ -1668,26 +1885,21 @@ angular.module('vpApi.services')
     }
 
     this.run = function(callback){
+        /*
+        This function can be ran on a periodic timer or called by itself.
+
+        It will look for submitted responses and send them to the server
+
+        */
         var res, fsResps, answers, changes;
         var index = 0;
-        changes = obj.getChanges();
-        if (changes.length === 0) {
-            callback([{'status':'', 'data':'No changes found'}]);
-            return;
-        }
+        var errors = [];
 
-
-        errors = [];
 
         OnSucess = function(data, status) {
             console.log('[$sync.run.OnSucess]');
-            if (index === changes.length-1) {
-                callback(errors);
-            } else {
-                index++;
-                obj.syncResponse(changes[index], OnSucess, OnError);
-            }
             
+            callback(data, status);
             
         };
 
@@ -1701,94 +1913,61 @@ angular.module('vpApi.services')
                 obj.syncResponse(changes[index], OnSucess, OnError);
             }
         };
-        this.syncResponse(changes[index], OnSucess, OnError);
+
+        var submitted = angular.copy($vpApi.db.getCollection('fsResp').find({'status':'submitted'}));
+        if (submitted.length === 0) OnSucess({}, 'There are no submitted formstack to sync.');
+
+        this.submitFormstacks(submitted, OnSucess, OnError);
 
         
     };
 
-    this.syncResponse = function(resp, onSucess, onError) {
-        var method, reource;
-
-        if (resp.operation === 'I') method = 'POST'
-        if (resp.operation === 'U') method = 'PUT'
-        if (resp.operation === 'D') method = 'DELETE'
-
-        debugger
-        if (resp.name === 'fsResp' || resp.name === 'formResp' || resp.name === 'blockResp') {
-            resource = "pforms/response";
-        } else if (resp.name === 'answer') {
-            resource = 'pforms/answer';
-        } else {
-            console.error("[$sync.syncResponse()] Invalid resource name" + resp.name);
-        }
-        
-        resp.obj.formstack = resp.obj.fsId;
-        resp.obj.reporter = $vpApi.user.profile.user;
-        resp.obj.org = $vpApi.user.profile.orgs[0].id;
-        delete resp.obj.meta;
-        $vpApi.post(resource, resp.obj, onSucess, onError);
-    };
-
-    this.run2 = function(callback){
-        var res, fsResps, answers, changes;
-        
-        changes = obj.getChanges();
-
-        errors = [];
-
-        // Sort into nested structure starting with fsResp --> formResp -->
-
-
-        // First sync fsResp's
-        fsResps = _.find(changes, function(item){return item.name === 'fsResp'});
-        answers = _.find(changes, function(item){return item.name === 'answers'});
-
-        fsOnSucess = function(data, status) {
-            this.syncResponse()
-        };
-
-        fsOnError = function(data, status) {
-            console.log('[fsOnError]')
-        };
-
-        this.syncResponse(fsResps.changes, fsOnSucess, fsOnError);
-
-        callback(res);
-    };
-
-    this.syncResponse2 = function(changes, onSucess, onError) {
-        /*
-            Sync individual resources.
-
-            Params:
-            - resource: [String] the resrouceendpoint, e.g. pforms/response
-            - changes: [Object] The loki changes output
-        */
-        var resource = 'pforms/response';
+    this.submitFormstacks = function(resps, onSucess, onError) {
+        var fsFullResp; // This will be the full nested formstack response.
+        var fsResp;
         var count = 0;
-        _.each(changes, function(resp){
-            if (resp.operation === 'I'){
-                sucess = function(data, status){
-                    onSucess(data, status);
-                    count++;
-                }
+        var failedAttempts = [];
+        var resource;
 
-                fail = function(data, status){
-                    console.error(status);
-                    onError(data, status);
-                    count++;
-                }
+        submitSuccess = function(data, status){
+            console.log('Pretend success callback status ' + status);
+            console.log(data);
+            fsRespId = data.fsRespId;
 
-                resource = "pforms/response";
-                
-                resp.obj.formstack = resp.obj.fsId;
-                resp.obj.reporter = $vpApi.user.profile.user;
-                resp.obj.org = $vpApi.user.profile.orgs[0].id;
-                delete resp.obj.meta;
-                debugger;
-                $vpApi.post(resource, resp.obj, sucess, fail);
+            fsResp = $vpApi.db.getCollection('fsResp').find({"id":fsRespId})[0];
+            fsResp.status = 'synced';
+            $vpApi.db.save();
+            count++
+            if (count === resps.length) {
+                // This is the last response.
+                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
             }
+        }
+
+        submitFail = function(data, status){
+            console.log('I failed ' + status);
+            failedAttempts.push({"data":data, "status":status})
+            count++
+            if (count === resps.length) {
+                // This is the last response.
+                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
+            }
+        }
+
+
+        _.each(resps, function( resp ){
+            fsFullResp = $fsResp.getFullResp(resp.$loki);
+            resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
+            console.log('Pretending to sync ' + resp.$loki);
+
+            // // $vpApi.post(resource, fsFullResp, onSucess, onError);
+            // $timeout(function(){
+            //     submitSucess(resp.$loki);
+            // }, 2000);
+            console.log("About to post to " + resource)
+            $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
         });
+        
     }
 
 
