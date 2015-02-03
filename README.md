@@ -659,17 +659,18 @@ The algorithm performs the following steps:
   * Transaction come from the $loki changes method.
   * The app syncs entire form formstacks
 
-3. Send the list of changes for each formstack to the `/api/v2/pforms/sync/` endpoint.
-  * On the server
-    1. Compare the client changes list to servers changes list.
-    2. Resolve any conflicts. HARD PART
-    3. Merge changes into server
-    4. Return the changes that the client must make
-  * On Client
-    1. Loop over returned changes and apply the changes.
-    2. Updates status table ??? Not sure how to do this.
+3. Create full formstack responses (nested responses)
+  * Data cleaning to fit the VP API standard is also be done here.
 
-5. Update Read Only resrouces (.i.e. App, Formstack, mediacache)
+4. Send the submitted formstacks
+  * On the server
+    1. Perform dry_run for validation. If it fails return with errors
+    2. Perform save.
+ 
+5. Clear out any old responses.
+    
+
+5. Update Read Only resoucres (.i.e. App, Formstack, mediacache)
   * Formstack is nested with Forms, Blocks, Questions, QuestionChoices. These will all be updated when the formstack updates
   * Update mediacache
   * Update tiles???
@@ -686,7 +687,8 @@ Fields
 * lastAttempt: [DateTime] Last syncing attempt timestamp
 * attempts: [Integer] The number of times the resource has attempted to sync
 * status: [String] 'pending'
-* resourceId: [Integer] Client ID of the resource
+* resourceId: [String] The UUID of the resource
+* resourceUri: [String] The resource url
 
 ### 11.3 Changes Object
 

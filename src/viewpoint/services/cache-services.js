@@ -1,7 +1,6 @@
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.20a
-
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build source: vp-survey
 */
 
 angular.module('cache.services', [])
@@ -181,13 +180,14 @@ angular.module('cache.services', [])
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        
+
         var app = $vpApi.getApp();
         var tilesSources = [];
 
         _.each(app.formstacks, function(fs) {
             tileSources = obj.getTileSources(fs);
         });
+
 
         onError = function(errorType, errorData1, errorData2){
             /*
@@ -249,6 +249,8 @@ angular.module('cache.services', [])
         _.each(app.formstacks, function(fs) {
             tilesSources = obj.getTileSources(fs);
         });
+
+
 
         osTableNames = [];
 

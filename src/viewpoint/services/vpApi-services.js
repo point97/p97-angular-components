@@ -1,5 +1,5 @@
 /*
-    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -31,22 +31,22 @@ angular.module('vpApi.services', [])
         // Add listeners to generate uuid's 
         obj.db.getCollection('formResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('fsResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('blockResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('answer').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         return;
@@ -84,7 +84,6 @@ angular.module('vpApi.services', [])
 
 
     this.getFormstack = function(slug){
-        console.log(slug)
         var out = null;
         var formstacks = obj.db.getCollection('formstack')
         if(slug == undefined || slug == null){
@@ -467,7 +466,12 @@ angular.module('vpApi.services', [])
     })
 
     this.delete = function(fsRespId){
+        /*
+        A cascading delete for formResps, this will delete the children of the fsResp.
 
+        */
+
+        obj.objects = $vpApi.db.getCollection('fsResp');
         var fsResp = obj.objects.get(fsRespId);
         obj.objects.remove(fsResp);
 
@@ -533,11 +537,16 @@ angular.module('vpApi.services', [])
 
         out.id = fsResp.id;
         out.fsId = fsResp.fsId;
+        out.client_created = fsResp.ccreated;
+        out.client_updated = fsResp.cupdate;
         out.formResps = [];
+
 
         // Get the form resps
         formResps = angular.copy($vpApi.db.getCollection('formResp').find({'fsRespId':fsRespId}));
         _.each(formResps, function(formResp){
+            formResp.client_created = formResp.ccreated;
+            formResp.client_updated = formResp.cupdate;
             blockResps = angular.copy($vpApi.db.getCollection('blockResp').chain()
                 .find({'fsRespId':fsRespId})
                 .find({'formRespId': formResp.$loki})
@@ -549,7 +558,19 @@ angular.module('vpApi.services', [])
                     .find({'formRespId': formResp.$loki})
                     .find({'blockRespId': blockResp.$loki})
                     .data());
+                _.each(answers, function(ans){
+                    // Clean the answers
+                    if (ans.value === undefined) ans.value = null;
+                });
+
                 blockResp.answers = answers;
+                blockResp.client_created = blockResp.ccreated;
+                blockResp.client_updated = blockResp.cupdate;
+
+                _.each(blockResp.answers, function(ans){
+                    ans.client_created = ans.ccreated;
+                    ans.client_updated = ans.cupdate;
+                })
             })
             formResp.blockResps = blockResps;
             formResp.cid = formResp.$loki;
@@ -577,6 +598,10 @@ angular.module('vpApi.services', [])
     //this.objects = $vpApi.db.getCollection('formResp');
 
     this.delete = function(formRespId){
+        /*
+        A cascading delete for formResps, this will delete the children of the formResp.
+
+        */
 
         var formResp = $vpApi.db.getCollection('formResp').get(formRespId);
         if (formResp) {

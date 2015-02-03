@@ -1,5 +1,5 @@
 /*
-    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -848,7 +848,7 @@ angular.module('survey.services', [])
 
         */
         //$scope.previousAnswers = $answers.getByBlockId($scope.current.block.id, $stateParams.blockResponse); // This returns a list of lists of answers.
-        console.log("[$formUtils.loadAnswers()]")
+
         var isNew = false;
 
         formRespId = formRespId + "";
@@ -876,7 +876,7 @@ angular.module('survey.services', [])
                 return (pans.questionId === q.id);
             });
 
-            console.log("[loadAnswers] Question: " + q.slug )
+
             if (ans) {
                 q.value = ans.value;
                 q.previousValue = ans.value;

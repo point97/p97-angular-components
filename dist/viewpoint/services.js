@@ -1,8 +1,7 @@
-// build timestamp: Mon Feb 02 2015 12:13:46 GMT-0800 (PST)
+// build timestamp: Tue Feb 03 2015 14:11:33 GMT-0800 (PST)
 /*
-Github Repo: https://github.com/point97/p97-angular-components.git
-Version: 15.01.20a
-
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build source: vp-survey
 */
 
 angular.module('cache.services', [])
@@ -182,13 +181,14 @@ angular.module('cache.services', [])
         // var mapquestUrl = 'http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png'
         // var subDomains = ['otile1','otile2','otile3','otile4']
         // var mapquestAttrib = 'Data, imagery and map information provided by <a href="http://open.mapquest.co.uk" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        
+
         var app = $vpApi.getApp();
         var tilesSources = [];
 
         _.each(app.formstacks, function(fs) {
             tileSources = obj.getTileSources(fs);
         });
+
 
         onError = function(errorType, errorData1, errorData2){
             /*
@@ -251,6 +251,8 @@ angular.module('cache.services', [])
             tilesSources = obj.getTileSources(fs);
         });
 
+
+
         osTableNames = [];
 
         _.each(tilesSources, function(tileSource, i) {
@@ -282,7 +284,7 @@ angular.module('cache.services', [])
     };
 }])
 /*
-    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -1131,7 +1133,7 @@ angular.module('survey.services', [])
 
         */
         //$scope.previousAnswers = $answers.getByBlockId($scope.current.block.id, $stateParams.blockResponse); // This returns a list of lists of answers.
-        console.log("[$formUtils.loadAnswers()]")
+
         var isNew = false;
 
         formRespId = formRespId + "";
@@ -1159,7 +1161,7 @@ angular.module('survey.services', [])
                 return (pans.questionId === q.id);
             });
 
-            console.log("[loadAnswers] Question: " + q.slug )
+
             if (ans) {
                 q.value = ans.value;
                 q.previousValue = ans.value;
@@ -1211,7 +1213,7 @@ angular.module('survey.services', [])
 }])
 
 /*
-    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -1243,22 +1245,22 @@ angular.module('vpApi.services', [])
         // Add listeners to generate uuid's 
         obj.db.getCollection('formResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('fsResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('blockResp').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         obj.db.getCollection('answer').on('insert', function(item){
             item.id = obj.generateUUID();
-            console.log('added uuid '+ item.id)
+
         });
 
         return;
@@ -1296,7 +1298,6 @@ angular.module('vpApi.services', [])
 
 
     this.getFormstack = function(slug){
-        console.log(slug)
         var out = null;
         var formstacks = obj.db.getCollection('formstack')
         if(slug == undefined || slug == null){
@@ -1679,7 +1680,12 @@ angular.module('vpApi.services', [])
     })
 
     this.delete = function(fsRespId){
+        /*
+        A cascading delete for formResps, this will delete the children of the fsResp.
 
+        */
+
+        obj.objects = $vpApi.db.getCollection('fsResp');
         var fsResp = obj.objects.get(fsRespId);
         obj.objects.remove(fsResp);
 
@@ -1745,11 +1751,16 @@ angular.module('vpApi.services', [])
 
         out.id = fsResp.id;
         out.fsId = fsResp.fsId;
+        out.client_created = fsResp.ccreated;
+        out.client_updated = fsResp.cupdate;
         out.formResps = [];
+
 
         // Get the form resps
         formResps = angular.copy($vpApi.db.getCollection('formResp').find({'fsRespId':fsRespId}));
         _.each(formResps, function(formResp){
+            formResp.client_created = formResp.ccreated;
+            formResp.client_updated = formResp.cupdate;
             blockResps = angular.copy($vpApi.db.getCollection('blockResp').chain()
                 .find({'fsRespId':fsRespId})
                 .find({'formRespId': formResp.$loki})
@@ -1761,7 +1772,19 @@ angular.module('vpApi.services', [])
                     .find({'formRespId': formResp.$loki})
                     .find({'blockRespId': blockResp.$loki})
                     .data());
+                _.each(answers, function(ans){
+                    // Clean the answers
+                    if (ans.value === undefined) ans.value = null;
+                });
+
                 blockResp.answers = answers;
+                blockResp.client_created = blockResp.ccreated;
+                blockResp.client_updated = blockResp.cupdate;
+
+                _.each(blockResp.answers, function(ans){
+                    ans.client_created = ans.ccreated;
+                    ans.client_updated = ans.cupdate;
+                })
             })
             formResp.blockResps = blockResps;
             formResp.cid = formResp.$loki;
@@ -1789,6 +1812,10 @@ angular.module('vpApi.services', [])
     //this.objects = $vpApi.db.getCollection('formResp');
 
     this.delete = function(formRespId){
+        /*
+        A cascading delete for formResps, this will delete the children of the formResp.
+
+        */
 
         var formResp = $vpApi.db.getCollection('formResp').get(formRespId);
         if (formResp) {
@@ -1857,6 +1884,10 @@ angular.module('vpApi.services', [])
 }])
 
 /*
+    build timestamp: Tue Feb 03 2015 14:09:09 GMT-0800 (PST)
+    build source: vp-survey
+*/
+/*
     build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
     build source: vp-survey
 */
@@ -1866,20 +1897,23 @@ angular.module('vpApi.services')
                     '$http', 
                     'config', 
                     '$vpApi', 
-                    '$fsResp', 
-                    '$timeout',
+                    '$fsResp',
+                    '$ionicLoading',
             function($rootScope, 
                      $http, 
                      config, 
                      $vpApi, 
                      $fsResp,
-                     $timeout
+                     $ionicLoading
                      ) {
 
     var obj = this;
+    this.toasDuration = 3000;
+    this.intervalHandle = null; // A handle for the setInterval that runs the sync.
     this.collections = ['fsResp', 'formResp', 'blockResp', 'answer'];
     this.lastUpdate = localStorage.getItem('lastUpdate');
-    
+    this.statusTable = $vpApi.db.getCollection('statusTable');
+
     if (this.lastUpdate) {
         this.lastUpdate = new Date(this.lastUpdate);
     }
@@ -1887,118 +1921,161 @@ angular.module('vpApi.services')
     this.run = function(callback){
         /*
         This function can be ran on a periodic timer or called by itself.
-
         It will look for submitted responses and send them to the server
 
         */
-        var res, fsResps, answers, changes;
-        var index = 0;
-        var errors = [];
 
+        if (window.HAS_CONNECTION !== true) {
+            console.warn("No network found, sync cancelled.")
+            return;
+        }
 
-        OnSucess = function(data, status) {
+        onSucess = function(data, status) {
             console.log('[$sync.run.OnSucess]');
-            
+            $rootScope.$broadcast('sync-complete', data);
             callback(data, status);
+
+            //if (data.length > 0) {
+            //    $ionicLoading.show({ template: 'All responses successfully synced.',
+            //                     noBackdrop: true,
+            //                     duration: obj.toastDuration
+            //                    });
+            //}
+
             
         };
 
-        OnError = function(data, status) {
+        onError = function(data, status) {
             console.log('[$sync.run.OnError]');
-            if (index === changes.length-1) {
-                callback(errors);
-            } else {
-                index++;
-                errors.push({'status':status, 'data':data});
-                obj.syncResponse(changes[index], OnSucess, OnError);
-            }
+            //$ionicLoading.show({ template: 'There was a problem syncing some responses.', noBackdrop: true, duration: obj.toastDuration });
         };
 
+        // Get formstack responses and then submit them
         var submitted = angular.copy($vpApi.db.getCollection('fsResp').find({'status':'submitted'}));
-        if (submitted.length === 0) OnSucess({}, 'There are no submitted formstack to sync.');
+        if (submitted.length === 0) onSucess([], 'There are no submitted formstack to sync.');
+        this.submitFormstacks(submitted, onSucess, onError);
 
-        this.submitFormstacks(submitted, OnSucess, OnError);
 
-        
+        // Remove any old synced responses
+        obj.clearSyncedFormstacks();
+
+        // Update readonly resources
+        obj.updateReadOnly();
+        $rootScope.$broadcast('sync-complete');
+
     };
 
     this.submitFormstacks = function(resps, onSucess, onError) {
+        /*
+
+        This function POST's the formstack respoinses to the
+        /pforms/formstack/<ID>/submit endpoint.
+
+        */
+
         var fsFullResp; // This will be the full nested formstack response.
         var fsResp;
         var count = 0;
-        var failedAttempts = [];
         var resource;
 
         submitSuccess = function(data, status){
-            console.log('Pretend success callback status ' + status);
+            console.log('Submit successful: ' + data.id);
             console.log(data);
-            fsRespId = data.fsRespId;
 
-            fsResp = $vpApi.db.getCollection('fsResp').find({"id":fsRespId})[0];
+
+            // Update statusTable
+            item = obj.statusTable.find({'resourceId':data.id})[0];
+            item.status = 'success';
+
+            // Update record's status
+            fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
             fsResp.status = 'synced';
+            fsResp.syncedAt = $vpApi.getTimestamp();
+
             $vpApi.db.save();
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
+                onSucess([1,2], 'Finished submitting formstacks. Aren\'t you proud of me?');
             }
         }
 
         submitFail = function(data, status){
             console.log('I failed ' + status);
-            failedAttempts.push({"data":data, "status":status})
+
+            // Update statusTable
+            item = obj.statusTable.find({'resourceId':data.id});
+            item.status = 'fail';
+            $vpApi.db.save();
+
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess({}, 'Yeah I finished Pretending to submit formstacks. Aren\'t you proud of me?');
+                onSucess({}, 'Finished submitting formstacks. Aren\'t you proud of me?');
             }
         }
 
-
         _.each(resps, function( resp ){
             fsFullResp = $fsResp.getFullResp(resp.$loki);
-            resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
-            console.log('Pretending to sync ' + resp.$loki);
 
-            // // $vpApi.post(resource, fsFullResp, onSucess, onError);
-            // $timeout(function(){
-            //     submitSucess(resp.$loki);
-            // }, 2000);
-            console.log("About to post to " + resource)
+            resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
+            console.log("About to post to " + resource);
+
+            // Update status table
+            item = obj.statusTable.find({'resourceId':resp.id});
+
+            if (item.length === 0) {
+                // This must be a new attempt
+                item = {
+                    "status": "pending",
+                    "attempts": 1,
+                    "lastAttempt": $vpApi.getTimestamp(),
+                    "method": "POST",
+                    "resourceUri": resource,
+                    "resourceId": resp.id
+                }
+
+                obj.statusTable.insert(item);
+            } else {
+                item.status = 'pending';
+                item.attempts++;
+                item.lastAttempt = $vpApi.getTimestamp();
+                obj.statusTable.update(item);
+            }
+            $vpApi.db.save();
             $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
         });
         
     }
 
+    this.clearSyncedFormstacks = function(){
+        var dt, syncedAt, item;
+        var now = new Date();
+        var olds = $vpApi.db.getCollection('fsResp').chain()
+            .find({'status':'synced'})
+            .where(function(resp) {
+                syncedAt = new Date(resp.syncedAt);
+                dt = (now - syncedAt)/1000;
+                console.log(dt)
+                return (dt > config.ARCHIVE_DT);
+            })
+            .data();
+        _.each(olds, function(resp){
 
-    this.getChanges = function(){
-        /*
-        Get the items that need to be uploaded to the server.
 
-        Items include fsResp, formResp, blockResp, answer
+            // Remove them from status table as well.
+            item = obj.statusTable.find({'resourceId':resp.id})[0];
+            obj.statusTable.remove(item);
 
-        changes items will have keywords
-        - name
-        - operation: "I", "U", "D"
-        - obj 
-
-        */
-        
-
-
-        var changes;
-        var out = [];
-        changes = $vpApi.db.serializeChanges(obj.collections);
-        return JSON.parse(changes);
-
-        _.each(this.collections, function(colName){
-            changes = $vpApi.db.serializeChanges([colName]);
-            changes = JSON.parse(changes);
-            console.log(colName);
-            console.table(changes);
-            out.push({'name':colName, 'changes':changes});
+            $fsResp.delete(resp.$loki);
         });
-
-        return out;
     };
+
+    this.updateReadOnly = function(){
+        // TODO Make this happen
+        console.log("I NEED TO UPDATE FORMSTACKS AND MEDIA AND TILES???");
+
+    }
+
+
 }]);
