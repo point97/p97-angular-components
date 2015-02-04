@@ -25,7 +25,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/radio.html';
+                    return BASE_URL+'single-select/templates/ionic/checkbox-single.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -40,6 +40,21 @@ angular.module('p97.questionTypes')
                 var otherChoice = { 'verbose': 'Other', 'value': 'other' }
                 scope.localChoices.push(otherChoice);
             }
+
+            //only checks a single choice - will unselect previous
+            scope.changeSelected = function(choice) {
+                _.each(scope.localChoices, function(i) {
+                    if (i !== choice) {
+                        i.checked = false;
+                    } else {
+                        if (i.checked === true) {
+                            scope.inputValue = i.value;
+                        } else {
+                            (scope.inputValue = "")
+                        }
+                    }
+                });
+            };
 
             //if previousAnswer exists - check it upon return to the question
             scope.checkPreviousAnswer = function() {
@@ -97,8 +112,7 @@ angular.module('p97.questionTypes')
                     { 
                       text: 'Cancel',
                       onTap: function(e) {
-                        scope.value = '';
-                        return false;
+                        scope.cancelOther();
                       } 
                     },
                     {
@@ -116,10 +130,10 @@ angular.module('p97.questionTypes')
                                 return scope.localChoices;
                             });
 
-                          var newChoice = { 'verbose': 'User Entered: '+scope.obj.otherValue, 'value': scope.obj.otherValue};
+                          var newChoice = { 'verbose': 'User Entered: '+scope.obj.otherValue, 'value': scope.obj.otherValue, 'checked': true};
                           //inserts newChoice into question.choices in front of 'Other'
                           scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
-
+                          scope.localChoices[scope.localChoices.length - 1].checked = false;
                           scope.inputValue = scope.obj.otherValue; 
                           scope.obj.otherValue = '';
                       }
@@ -158,7 +172,7 @@ angular.module('p97.questionTypes')
                                      :  alert('You have typed a duplicate answer. Please try again.')
                         );
                         scope.obj.otherValue = '';
-                        scope.value = '';
+                        scope.cancelOther();
                         return false;
                     }; //end contains duplicate
 
@@ -169,6 +183,8 @@ angular.module('p97.questionTypes')
                                         }) 
                                      :  alert('You have typed an answer that is too long. Please try again.')
                         );
+                        scope.obj.otherValue = '';
+                        scope.cancelOther();
                         return false;
                     }; //end lengthy input
 
@@ -191,6 +207,14 @@ angular.module('p97.questionTypes')
                     // } //ends else statement
                 }          
             }
+
+            //used multiple times throughout directive - unchecks and removes 'other' value
+            scope.cancelOther = function () {
+                //unchecks 'other' on UI
+                scope.localChoices[scope.localChoices.length - 1].checked = false; 
+                scope.inputValue = '';
+            };
+
             scope.checkPreviousAnswer();
         }
     } // end return 

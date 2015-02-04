@@ -71,7 +71,8 @@ angular.module('starter')
             'options': {
                 'required': false,
                 'allow_other': 1,
-                "other_max_length": 10
+                "other_max_length": 10,
+                "templateUrl": 'ionic/checkbox-single'
             }
         },{
             'body': 'Please choose one of the following',
