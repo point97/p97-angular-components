@@ -1,4 +1,4 @@
-// build timestamp: Tue Feb 03 2015 15:53:50 GMT-0800 (PST)
+// build timestamp: Tue Feb 03 2015 16:58:33 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -714,9 +714,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
             scope.$watch('dummyValue', function(newValue){
-                if (!newValue) return;
                 scope.value = newValue;
-
             });
 
             // Compile the template into the directive's scope.

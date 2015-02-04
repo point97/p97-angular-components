@@ -75,9 +75,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
             scope.$watch('dummyValue', function(newValue){
-                if (!newValue) return;
                 scope.value = newValue;
-
             });
 
             // Compile the template into the directive's scope.
