@@ -1,4 +1,4 @@
-// build timestamp: Wed Feb 04 2015 11:27:09 GMT-0800 (PST)
+// build timestamp: Wed Feb 04 2015 17:45:07 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -1291,7 +1291,7 @@ angular.module('p97.questionTypes')
             if (!scope.question) return;
             var options = scope.question.options;
             scope.errors = [];
-            
+
             // Load intial data
             if (typeof(scope.question.value) !== 'undefined'){
                 scope.localValue = scope.question.value;
@@ -1300,35 +1300,22 @@ angular.module('p97.questionTypes')
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
-                if (scope.value === scope.question.options.positiveValue
-                    || scope.value === scope.question.options.negativeValue) {
+                if (scope.value === options.choices.positiveValue
+                    || scope.value === options.choices.negativeValue) {
                     return true;
                 }
             }
 
             scope.internalControl.clean_answer = function(){
                 // Nothing to see here.
-                if (scope.value === null){
-                    scope.value = false;
-                }
             }
 
-            // scope.showPositiveLabel = function() {
-            //     if (scope.value === scope.question.choices[0].positiveValue){ 
-            //         return true;
-            //     } else`uu {
-            //         return false;
-            //     };
-            // };
-
             scope.$watch('localValue', function(newValue){
-                if (typeof(newValue) === 'undefined') return;
                 if (newValue === true){
-                    scope.value = scope.question.options.positiveValue || true;
+                    scope.value = options.choices.positiveValue || true;
                 } else {
-                    scope.value = scope.question.options.negativeValue || false;
+                    scope.value = options.choices.negativeValue || false;
                 }
-                console.log(scope.value)
             })
 
             // Compile the template into the directive's scope.

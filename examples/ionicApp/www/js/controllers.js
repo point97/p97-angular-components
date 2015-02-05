@@ -40,14 +40,19 @@ angular.module('starter')
                 'datejs_format': 'MM/dd/yyyy HH:mm:ss'
             }
         },{
-            'body': 'Do you agree?',
-            'label': 'Do you agree',
-            'type': 'toggle',
-            'choices': [
-                    {'positive_label': 'yes', 'positive_value': '10'},
-                    {'negative_label': 'no', 'negative_value': '5'}
-            ],
-            'options': {'required': true}
+            "body": "Payment delivered",
+            "label": "payment delivered",
+            "slug": "payment-delivered",
+            "order": 1,
+            "type": "toggle",
+            "options": {
+                "choices": {
+                    "positiveLabel": "Yes",
+                    "positiveValue": "1",
+                    "negativeLabel": "No",
+                    "negativeValue": "0"
+                    }
+                }
         },{
             'body': 'Enter your age. This will skip the next for if you are under 18."',
             'label': 'your age',
