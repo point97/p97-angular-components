@@ -200,9 +200,9 @@ The 'other' options allows for a user to enter a single text answer. Other valid
   `options`
   
   * templateUrl
+     * "ionic/checkbox-single.html" (looks like checkbox.html used for multi-select - however only a single choice can be made -- DEFAULT)
      * "ionic/drop-down-single.html" 
      * "ionic/radio.html"
-     * "ionic/checkbox-single.html" (looks like checkbox.html used for multi-select - however only a single choice can be made)
      * "yeoman/drop-down-single.html"
      * "yeoman/radio.html"
   * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
@@ -255,11 +255,11 @@ PASSING TESTS
 
   `options`
   
-  * positiveValue - [String]
-  * positiveLabel - [String]
-  * negativeValue - [String]
-  * negativeLabel - [String] Not used.
-  * default - [String]
+  * choices.positiveValue - [String]
+  * choices.positiveLabel - [String]
+  * choices.negativeValue - [String]
+  * choices.negativeLabel - [String] 
+  * default - [String] - currently not implemented
   * templateUrl (specific to Ionic): 
       * "ionic/toggle.html"
 
