@@ -1,4 +1,4 @@
-// build timestamp: Wed Feb 04 2015 11:27:09 GMT-0800 (PST)
+// build timestamp: Wed Feb 04 2015 16:21:18 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -1047,14 +1047,30 @@ angular.module('p97.questionTypes')
         },
         link: function(scope, element, attrs) {
 
-            options = scope.question.options;
-            reg = /^[A-Za-z\d() _.,-]*$/;
-            scope.showOtherInput = false;
-            scope.choicesSelected = 0;
-            scope.errors = [];
-            scope.valueArray = [];
-            scope.obj = {'otherValue': null}
-            scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+            if (!scope.question) return;
+
+            var options = scope.question.options;
+            var reg = /^[A-Za-z\d() _.,-]*$/;
+            
+            scope.setBlock = function(){
+                scope.showOtherInput = false;
+                scope.choicesSelected = 0;
+                scope.errors = [];
+                scope.valueArray = [];
+                scope.obj = {'otherValue': null}
+                scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+
+                // auto selects if only one choice exists
+                if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+
+                if (options.allow_other > 0) {
+                    var otherChoice = { 'verbose': 'Other', 'value': 'other' }
+                    scope.localChoices.push(otherChoice);
+                }
+            }
+            scope.setBlock();
+
+            
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
@@ -1067,17 +1083,23 @@ angular.module('p97.questionTypes')
                 return $sce.trustAsHtml(htmlCode);
             };
 
-            if (!scope.question) return;
+            
 
-            //auto selects if only one choice exists
-            if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+            // //auto selects if only one choice exists
+            // if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
 
-            if (options.allow_other > 0) {
-                var otherChoice = { 'verbose': 'Other', 'value': 'other' }
-                scope.localChoices.push(otherChoice);
-            }
+            // if (options.allow_other > 0) {
+            //     var otherChoice = { 'verbose': 'Other', 'value': 'other' }
+            //     scope.localChoices.push(otherChoice);
+            // }
 
             // This is availible in the main controller.
+            scope.resetBlock = function(){
+                scope.setBlock();
+                scope.value = scope.question.value; 
+                scope.togglePrevAnswers();
+            } 
+
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
                 scope.errors = [];
@@ -1213,11 +1235,7 @@ angular.module('p97.questionTypes')
                 } 
             }, true);
 
-            // Compile the template into the directive's scope.
-            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
-                var contents = element.html(response).contents();
-                $compile(contents)(scope);
-            });
+            
 
             //toggles and checks UI on localChoices for previousAnswers - will only run at start
             scope.togglePrevAnswers = function () {
@@ -1254,12 +1272,26 @@ angular.module('p97.questionTypes')
             };
 
             scope.togglePrevAnswers();
+
+            scope.$on('reset-block', function(event){
+                /*
+                Listens for the reset-block event fired by the map-form whenever the user 
+                gets to the intro or end page of the map-form. 
+                This is necessary becuase the map-form do not reloead that Controller
+                and qt-loader.
+                */
+                console.log('[multi-select] reset-block');
+                scope.resetBlock();
+            });
+
+            // Compile the template into the directive's scope.
+            $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
+                var contents = element.html(response).contents();
+                $compile(contents)(scope);
+            });
         }
     } // end return 
 }])
-
-
-
 
 angular.module('p97.questionTypes')  
 .directive('toggle', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  
