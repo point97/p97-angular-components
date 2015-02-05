@@ -1,5 +1,5 @@
 /*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
+    build timestamp: Wed Feb 04 2015 16:13:39 GMT-0800 (PST)
     build source: vp-survey
 */
 
@@ -46,7 +46,6 @@ angular.module('vpApi.services', [])
 
         obj.db.getCollection('answer').on('insert', function(item){
             item.id = obj.generateUUID();
-
         });
 
         return;
@@ -484,7 +483,6 @@ angular.module('vpApi.services', [])
         _.each(formResps, function(resp){
             $vpApi.db.getCollection('formResp').remove(resp);
         });
-
         _.each(blockResps, function(resp){
             $vpApi.db.getCollection('blockResp').remove(resp);
         });
@@ -494,6 +492,8 @@ angular.module('vpApi.services', [])
         });
 
         $vpApi.db.save();
+        console.log("[$fsResp.delete()] Deleted all responses. About to broadcast fsResp-deleted for " + fsRespId);
+        $rootScope.$broadcast('fsResp-deleted', {fsRespId: fsRespId});
     }
 
     this.getFullResp = function(fsRespId){
