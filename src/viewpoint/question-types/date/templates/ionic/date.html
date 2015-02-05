@@ -13,15 +13,14 @@
                    />
 
             <input type="tel"
-                   ng-if="question.options.format === 'yyyy'" 
-                   ng-init="value = question.options.initial"
-                   placeholder="{{ question.label }}" 
-                   ng-model="value"
+                   ng-if="question.options.format === 'yyyy'"
+                   placeholder="{{ question.label }}"
+                   ng-model="$parent.value"
                    ng-required='question.options.required'
                    />
         </label>
     </div>
-      <div class="item item-divider" ng-show="errors.length>0"> 
+      <div class="item item-divider" ng-show="errors.length>0">
         <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
       </div>
   </div>
