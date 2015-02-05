@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 05 2015 10:59:41 GMT-0800 (PST)
+// build timestamp: Thu Feb 05 2015 14:12:20 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -406,6 +406,10 @@ angular.module('p97.questionTypes')
                         scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                     }
                     scope.inputValue = scope.value;
+                    
+                    //find value and toggle choice as checked
+                    var choice = _.find(scope.localChoices, {value: scope.inputValue});
+                    choice.checked = true;
                 }
             };
             

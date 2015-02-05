@@ -69,6 +69,10 @@ angular.module('p97.questionTypes')
                         scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                     }
                     scope.inputValue = scope.value;
+                    
+                    //find value and toggle choice as checked
+                    var choice = _.find(scope.localChoices, {value: scope.inputValue});
+                    choice.checked = true;
                 }
             };
             
