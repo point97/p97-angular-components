@@ -36,14 +36,17 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                if ((typeof scope.value !== 'number' || isNaN(scope.value)) && options.required && options.required === true) {
-                    scope.errors.push('input must be a number');
-                    return false;
-                }
+                if (typeof scope.value !== 'number' || isNaN(scope.value)) {
+                    if (options.required && options.required === true) {
+                        scope.errors.push('input must be an number');
+                        return false;
+                    }
 
-                if (typeof scope.value !== 'number' && (!options.required || options.required === false)) {
-                    scope.errors.push('input must be a number');
-                    return false;
+                    if (scope.value !== "" && (!options.required || options.required === false)) {
+                        scope.errors.push('input must be a number');
+                        return false;
+                    }
+
                 }
 
                 if (options.min && (typeof options.min === 'number')) {
@@ -61,9 +64,28 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return (scope.errors.length === 0);
             };
 
+            scope.showDummyValue = function() {
+                /*
+                in ionic, number qType uses a hidden input to save responses. 
+                From a purely UI standpoint - the shown input is a num/tel to display an appropriate keyboard.
+                As a result, to display the previousValue - that value must be set to the dummy input
+                */
+                if ((scope.value) && scope.value !== "") {
+                    scope.dummyValue = scope.value.toString();
+                }
+            };
+
             scope.internalControl.clean_answer = function(){
                 scope.value = parseFloat(scope.value, 10);
             };
+
+            scope.$watch('dummyValue', function(newValue){
+                if (isInteger(newValue)) {
+                    scope.value = parseInt(newValue);
+                } else {
+                scope.value =  "";
+                }
+            });
 
             // Compile the template into the directive's scope.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {

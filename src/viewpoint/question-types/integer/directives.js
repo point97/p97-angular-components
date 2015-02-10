@@ -14,6 +14,15 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
 
+            isInteger = function (x) {
+                if (x === "") {
+                    return false;
+                };
+                
+                y = parseInt(x, 10);
+                return (typeof y === 'number') && (x % 1 === 0);
+            }
+
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -36,11 +45,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                isInteger = function (x) {
-                    y = parseInt(x);
-                    return (typeof y === 'number') && (x % 1 === 0);
-                }
-
+            
                 if ((!isInteger(scope.value) || scope.value == null) && options.required && options.required === true) {
                     scope.errors.push('input must be a integer');
                     return false;
@@ -48,7 +53,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
                 if (scope.value !== null && scope.value !== undefined) {
 
-                    if (!isInteger(scope.value) && (!options.required || options.required === false)) {
+                    if (scope.value !== "" && !isInteger(scope.value) && (!options.required || options.required === false)) {
                         scope.errors.push('input must be a integer');
                         return false;
                     }
@@ -70,12 +75,23 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-
+                /*
+                in ionic, integer qType uses a hidden input to save responses. 
+                From a purely UI standpoint - the fake input is used to display an appropriate keyboard.
+                As a result, to display the previousValue - that value must be set to the dummy input
+                */
+                if (isInteger(scope.value) && scope.value !== "") {
+                    scope.dummyValue = scope.value.toString();
+                }
             };
 
 
             scope.$watch('dummyValue', function(newValue){
-                scope.value = newValue;
+                if (isInteger(newValue)) {
+                    scope.value = parseInt(newValue);
+                } else {
+                scope.value =  "";
+                }
             });
 
             // Compile the template into the directive's scope.

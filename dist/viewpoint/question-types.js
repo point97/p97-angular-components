@@ -1,5 +1,4 @@
-// build timestamp: Fri Feb 06 2015 12:11:55 GMT-0800 (PST)
-
+// build timestamp: Mon Feb 09 2015 17:16:30 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -139,14 +138,17 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                if ((typeof scope.value !== 'number' || isNaN(scope.value)) && options.required && options.required === true) {
-                    scope.errors.push('input must be a number');
-                    return false;
-                }
+                if (typeof scope.value !== 'number' || isNaN(scope.value)) {
+                    if (options.required && options.required === true) {
+                        scope.errors.push('input must be an number');
+                        return false;
+                    }
 
-                if (typeof scope.value !== 'number' && (!options.required || options.required === false)) {
-                    scope.errors.push('input must be a number');
-                    return false;
+                    if (scope.value !== "" && (!options.required || options.required === false)) {
+                        scope.errors.push('input must be a number');
+                        return false;
+                    }
+
                 }
 
                 if (options.min && (typeof options.min === 'number')) {
@@ -164,9 +166,28 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return (scope.errors.length === 0);
             };
 
+            scope.showDummyValue = function() {
+                /*
+                in ionic, number qType uses a hidden input to save responses. 
+                From a purely UI standpoint - the shown input is a num/tel to display an appropriate keyboard.
+                As a result, to display the previousValue - that value must be set to the dummy input
+                */
+                if ((scope.value) && scope.value !== "") {
+                    scope.dummyValue = scope.value.toString();
+                }
+            };
+
             scope.internalControl.clean_answer = function(){
                 scope.value = parseFloat(scope.value, 10);
             };
+
+            scope.$watch('dummyValue', function(newValue){
+                if (isInteger(newValue)) {
+                    scope.value = parseInt(newValue);
+                } else {
+                scope.value =  "";
+                }
+            });
 
             // Compile the template into the directive's scope.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
@@ -407,7 +428,7 @@ angular.module('p97.questionTypes')
                         scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                     }
                     scope.inputValue = scope.value;
-
+                    
                     //find value and toggle choice as checked
                     var choice = _.find(scope.localChoices, {value: scope.inputValue});
                     choice.checked = true;
@@ -682,6 +703,15 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         },
         link: function(scope, element, attrs) {
 
+            isInteger = function (x) {
+                if (x === "") {
+                    return false;
+                };
+                
+                y = parseInt(x, 10);
+                return (typeof y === 'number') && (x % 1 === 0);
+            }
+
             if (!scope.question) return;
             var options = scope.question.options;
             
@@ -704,11 +734,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                isInteger = function (x) {
-                    y = parseInt(x);
-                    return (typeof y === 'number') && (x % 1 === 0);
-                }
-
+            
                 if ((!isInteger(scope.value) || scope.value == null) && options.required && options.required === true) {
                     scope.errors.push('input must be a integer');
                     return false;
@@ -716,7 +742,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
                 if (scope.value !== null && scope.value !== undefined) {
 
-                    if (!isInteger(scope.value) && (!options.required || options.required === false)) {
+                    if (scope.value !== "" && !isInteger(scope.value) && (!options.required || options.required === false)) {
                         scope.errors.push('input must be a integer');
                         return false;
                     }
@@ -738,12 +764,23 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-
+                /*
+                in ionic, integer qType uses a hidden input to save responses. 
+                From a purely UI standpoint - the fake input is used to display an appropriate keyboard.
+                As a result, to display the previousValue - that value must be set to the dummy input
+                */
+                if (isInteger(scope.value) && scope.value !== "") {
+                    scope.dummyValue = scope.value.toString();
+                }
             };
 
 
             scope.$watch('dummyValue', function(newValue){
-                scope.value = newValue;
+                if (isInteger(newValue)) {
+                    scope.value = parseInt(newValue);
+                } else {
+                scope.value =  "";
+                }
             });
 
             // Compile the template into the directive's scope.

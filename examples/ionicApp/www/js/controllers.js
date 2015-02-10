@@ -59,7 +59,7 @@ angular.module('starter')
             'type': 'number',
             'slug': 'age',
             'options': {
-                'required': true,
+                'required': false,
                 'min': 1,
                 'max': 150
             }
@@ -100,7 +100,7 @@ angular.module('starter')
             'label': 'enter an integer',
             'type': 'integer',
             'options': {
-                'required': true,
+                'required': false,
                 'min': -5,
                 'max': 25
             }
