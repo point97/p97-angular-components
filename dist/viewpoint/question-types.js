@@ -1,4 +1,4 @@
-// build timestamp: Mon Feb 09 2015 17:16:30 GMT-0800 (PST)
+// build timestamp: Thu Feb 12 2015 14:49:46 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -373,12 +373,24 @@ angular.module('p97.questionTypes')
             control: '='
         },
         link: function(scope, element, attrs) {
+            if (!scope.question) return;
 
             var reg = /^[A-Za-z\d() _.,-]*$/;
             var options = scope.question.options;
-            scope.errors = [];
-            scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
-            scope.obj = {'otherValue': null}
+
+            scope.setBlock = function(){
+                scope.errors = [];
+                scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+                scope.obj = {'otherValue': null}
+
+                if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
+
+                if (options.allow_other > 0) {
+                    var otherChoice = { 'verbose': 'Other', 'value': 'other' }
+                    scope.localChoices.push(otherChoice);
+                }
+            };
+            scope.setBlock();
 
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
@@ -390,15 +402,6 @@ angular.module('p97.questionTypes')
             scope.renderHtml = function(htmlCode) {
                 return $sce.trustAsHtml(htmlCode);
             };
-
-            if (!scope.question) return;
-
-            if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
-
-            if (options.allow_other > 0) {
-                var otherChoice = { 'verbose': 'Other', 'value': 'other' }
-                scope.localChoices.push(otherChoice);
-            }
 
             //only checks a single choice - will unselect previous
             scope.changeSelected = function(choice) {
@@ -550,24 +553,6 @@ angular.module('p97.questionTypes')
                         scope.cancelOther();
                         return false;
                     }; //end lengthy input
-
-                    // if ($ionicPopup) {
-                    //    var confirmPopup = $ionicPopup.confirm({
-                    //         title: 'Are You Sure',
-                    //         template: 'Are you sure you want this selection?'
-                    //       });
-                    //    confirmPopup.then(function(res) {
-                    //        if (res) {
-                    //           setValue();
-                    //        } 
-                    //    }); //end confirmPopup.then
-                       
-                    // } else {
-                    //     var option = window.confirm("Are You Sure", "Are you sure you want this selection");
-                    //     if (option == true) {
-                    //         setValue();
-                    //     }
-                    // } //ends else statement
                 }          
             }
 
@@ -579,6 +564,19 @@ angular.module('p97.questionTypes')
             };
 
             scope.checkPreviousAnswer();
+
+            scope.$on('reset-block', function(event){
+                /*
+                Listens for the reset-block event fired by the map-form whenever the user 
+                gets to the intro or end page of the map-form. 
+                This is necessary becuase the map-form do not reloead that Controller
+                and qt-loader.
+                */
+                console.log('[single-select] reset-block');
+                scope.setBlock();
+                scope.value = scope.question.value; 
+                scope.checkPreviousAnswer();
+            });
         }
     } // end return 
 }])
