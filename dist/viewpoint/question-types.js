@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 12 2015 14:49:46 GMT-0800 (PST)
+// build timestamp: Fri Feb 13 2015 10:51:52 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic']);
 
@@ -700,6 +700,8 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
+            if (!scope.question) return;
+            var options;
 
             isInteger = function (x) {
                 if (x === "") {
@@ -710,10 +712,13 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return (typeof y === 'number') && (x % 1 === 0);
             }
 
-            if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
+            scope.setBlock = function(){
+                options = scope.question.options;
+                scope.errors = [];
+                scope.value = scope.question.value
+                scope.dummyValue = scope.value;
+            }
+            scope.setBlock();
             
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
@@ -762,14 +767,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-                /*
-                in ionic, integer qType uses a hidden input to save responses. 
-                From a purely UI standpoint - the fake input is used to display an appropriate keyboard.
-                As a result, to display the previousValue - that value must be set to the dummy input
-                */
-                if (isInteger(scope.value) && scope.value !== "") {
-                    scope.dummyValue = scope.value.toString();
-                }
+                
             };
 
 
@@ -785,6 +783,17 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
                 var contents = element.html(response).contents();
                 $compile(contents)(scope);
+            });
+
+            scope.$on('reset-block', function(event){
+                /*
+                Listens for the reset-block event fired by the map-form whenever the user 
+                gets to the intro or end page of the map-form. 
+                This is necessary becuase the map-form do not reloead that Controller
+                and qt-loader.
+                */
+                console.log('[integer] reset-block');
+                scope.setBlock();
             });
 
         }
