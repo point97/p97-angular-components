@@ -9,6 +9,7 @@
     <!-- compiled css output -->
     <link href="css/ionic.app.css" rel="stylesheet">
     <link href="js/p97-components/src/viewpoint/question-types/ionic-styles.css" rel="stylesheet">
+    <link href="lib/google-places-autocomplete/autocomplete.css" rel="stylesheet">
 
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
@@ -16,15 +17,19 @@
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
 
+    <!-- google places api -->
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+
     <script src="lib/underscore/underscore-min.js"></script>
 
     <script src="lib/datejs/build/production/date.min.js"></script>
 
     <script src="lib/angular-elastic/elastic.js"></script>
 
+    <script src="lib/google-places-autocomplete/autocomplete.js"></script>
+
     <!-- Question Types. Order matter here -->
     <script src="js/p97-components/src/viewpoint/question-types/qt-loader.js"></script>
-
 
     <script src="js/p97-components/src/viewpoint/question-types/textarea/directives.js"></script>
 
@@ -47,6 +52,8 @@
     <script src="js/p97-components/src/viewpoint/question-types/phonenumber/directives.js"></script>
 
     <script src="js/p97-components/src/viewpoint/question-types/multi-select/directives.js"></script>
+
+    <script src="js/p97-components/src/viewpoint/question-types/google-search/directives.js"></script>
     <!-- End Question Types -->
 
     <!-- your app's js -->

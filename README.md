@@ -295,15 +295,23 @@ PASSING TESTS
   * use_planning_units: [Boolean]
   * planning_unit_file: [String] name of boundary GeoJSON file to use. (no path required)
 
+* **google-search** (avaiable in v0.7) - allows users to use google places API to do autocomplete searching in conjunction with [angular-google-places-autocomplete](https://github.com/kuhnza/angular-google-places-autocomplete/) 
 
-### Available in version v0.6
+  `options`
+  * stateRestrict - an array of state abbreviations (ex. ['NY', 'MA', 'CT'])
+  * countryRestrict - string abbreviations using ISO 2-letter codes (ex. 'us') (defaults to 'us' if nothing is defined)
+  * templateUrl : 
+    * "ionic/autocomplete.html"
+    * "yeoman/autocomplete.html"
+
+
+### Available in version v0.8
 * **email**
   PASSING TESTS - 
   `options`
 
   * required
   * default
-
 
 
 * **time** 
@@ -321,12 +329,6 @@ PASSING TESTS
   * datejs_format: [String] e.g. 'HH:mm:ss'
   * required
   * default
-
-* **checkbox**
-  A single check box. 
-  `options`
-  * default: [String] 'checked', 'unchecked'
-  * required
 
 * **currency**
  

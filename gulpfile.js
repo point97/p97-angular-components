@@ -26,7 +26,8 @@ var QUESTION_TYPES = [
                       'date',
                       'phonenumber',
                       'multi-select',
-                      'toggle'
+                      'toggle',
+                      'google-search'
                      ]
 
 

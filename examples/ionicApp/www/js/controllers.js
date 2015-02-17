@@ -181,6 +181,13 @@ angular.module('starter')
                 "other_max_length": 25,
                 'templateUrl': 'ionic/checkbox'
             }
+        },{
+            'body': 'Search',
+            'label': 'Search...',
+            'type': 'google-search',
+            'options': {
+                stateRestrict: ['NY', 'MA', 'CT']
+            }
         }]
     };
 
