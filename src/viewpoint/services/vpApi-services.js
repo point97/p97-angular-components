@@ -1,7 +1,3 @@
-/*
-    build timestamp: Wed Feb 04 2015 16:13:39 GMT-0800 (PST)
-    build source: vp-survey
-*/
 
 angular.module('vpApi.services', [])
 

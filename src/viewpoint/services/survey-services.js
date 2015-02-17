@@ -1,7 +1,3 @@
-/*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
 
 angular.module('survey.services', [])
 
@@ -742,6 +738,7 @@ angular.module('survey.services', [])
                     'formRepeatItem':item.value,
                     'formForEachItem':item.value,
                     'formForEachQuestionSlug': scope.current.form.options.forEachAnswer,
+                    'ccreated': $vpApi.getTimestamp(),
                     'cupdate': $vpApi.getTimestamp()
                 });
                 $vpApi.db.save()

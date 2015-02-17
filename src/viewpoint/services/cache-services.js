@@ -1,7 +1,3 @@
-/*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
 
 angular.module('cache.services', [])
 

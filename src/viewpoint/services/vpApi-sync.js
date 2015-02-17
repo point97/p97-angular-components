@@ -1,8 +1,4 @@
 /*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
-/*
     build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
     build source: vp-survey
 */
@@ -111,7 +107,7 @@ angular.module('vpApi.services')
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess([1,2], 'Finished submitting formstacks. Aren\'t you proud of me?');
+                onSucess([1,2], 'Finished submitting formstacks.');
             }
         }
 
@@ -126,7 +122,7 @@ angular.module('vpApi.services')
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess({}, 'Finished submitting formstacks. Aren\'t you proud of me?');
+                onSucess({}, 'Finished submitting formstacks.');
             }
         }
 
