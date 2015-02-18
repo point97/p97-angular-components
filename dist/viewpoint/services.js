@@ -1,8 +1,4 @@
-// build timestamp: Tue Feb 17 2015 13:26:28 GMT-0800 (PST)
-/*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
+// build timestamp: Wed Feb 18 2015 15:31:59 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -283,10 +279,6 @@ angular.module('cache.services', [])
         callback(event);
     };
 }])
-/*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
 
 angular.module('survey.services', [])
 
@@ -1027,6 +1019,7 @@ angular.module('survey.services', [])
                     'formRepeatItem':item.value,
                     'formForEachItem':item.value,
                     'formForEachQuestionSlug': scope.current.form.options.forEachAnswer,
+                    'ccreated': $vpApi.getTimestamp(),
                     'cupdate': $vpApi.getTimestamp()
                 });
                 $vpApi.db.save()
@@ -1213,10 +1206,6 @@ angular.module('survey.services', [])
     };
 }])
 
-/*
-    build timestamp: Wed Feb 04 2015 16:13:39 GMT-0800 (PST)
-    build source: vp-survey
-*/
 
 angular.module('vpApi.services', [])
 
@@ -1885,10 +1874,6 @@ angular.module('vpApi.services', [])
 }])
 
 /*
-    build timestamp: Tue Feb 03 2015 15:52:42 GMT-0800 (PST)
-    build source: vp-survey
-*/
-/*
     build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
     build source: vp-survey
 */
@@ -1997,7 +1982,7 @@ angular.module('vpApi.services')
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess([1,2], 'Finished submitting formstacks. Aren\'t you proud of me?');
+                onSucess([1,2], 'Finished submitting formstacks.');
             }
         }
 
@@ -2012,7 +1997,7 @@ angular.module('vpApi.services')
             count++
             if (count === resps.length) {
                 // This is the last response.
-                onSucess({}, 'Finished submitting formstacks. Aren\'t you proud of me?');
+                onSucess({}, 'Finished submitting formstacks.');
             }
         }
 
