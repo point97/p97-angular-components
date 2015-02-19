@@ -186,8 +186,12 @@ angular.module('starter')
             'label': 'Search...',
             'type': 'google-search',
             'options': {
-                stateRestrict: ['NY', 'MA', 'CT']
+                'stateRestrict': ['NY', 'MA', 'CT']
             }
+        },{
+            'body': '<p>This is an info page that can be a really long body<p> <p>It can also be multiple paragraphs.</p> <p><strong>And have markup</strong></p>',
+            'label': 'Body...',
+            'type': 'info'
         }]
     };
 

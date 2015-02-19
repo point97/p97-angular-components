@@ -27,7 +27,8 @@ var QUESTION_TYPES = [
                       'phonenumber',
                       'multi-select',
                       'toggle',
-                      'google-search'
+                      'google-search',
+                      'info'
                      ]
 
 
