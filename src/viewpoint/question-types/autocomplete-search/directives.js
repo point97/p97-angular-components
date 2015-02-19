@@ -1,5 +1,5 @@
 angular.module('p97.questionTypes')
-  .directive('googleSearch', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
+  .directive('autocompleteSearch', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
     
         return {
             template:'',
@@ -15,9 +15,9 @@ angular.module('p97.questionTypes')
 
                 scope.getContentUrl = function() {
                     if(scope.question.options.templateUrl)
-                        return BASE_URL+'google-search/templates/'+scope.question.options.templateUrl+'.html';
+                        return BASE_URL+'autocomplete-search/templates/'+scope.question.options.templateUrl+'.html';
                     else
-                        return BASE_URL+'google-search/templates/ionic/autocomplete.html';
+                        return BASE_URL+'autocomplete-search/templates/ionic/autocomplete.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {

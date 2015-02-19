@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 19 2015 09:39:01 GMT-0800 (PST)
+// build timestamp: Thu Feb 19 2015 11:55:06 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
 
@@ -1410,7 +1410,7 @@ angular.module('p97.questionTypes')
 
 
 angular.module('p97.questionTypes')
-  .directive('googleSearch', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
+  .directive('autocompleteSearch', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){
     
         return {
             template:'',
@@ -1426,9 +1426,9 @@ angular.module('p97.questionTypes')
 
                 scope.getContentUrl = function() {
                     if(scope.question.options.templateUrl)
-                        return BASE_URL+'google-search/templates/'+scope.question.options.templateUrl+'.html';
+                        return BASE_URL+'autocomplete-search/templates/'+scope.question.options.templateUrl+'.html';
                     else
-                        return BASE_URL+'google-search/templates/ionic/autocomplete.html';
+                        return BASE_URL+'autocomplete-search/templates/ionic/autocomplete.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {

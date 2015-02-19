@@ -184,7 +184,7 @@ angular.module('starter')
         },{
             'body': 'Search',
             'label': 'Search...',
-            'type': 'google-search',
+            'type': 'autocomplete-search',
             'options': {
                 'stateRestrict': ['NY', 'MA', 'CT']
             }
