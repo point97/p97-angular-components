@@ -206,6 +206,16 @@ angular.module('vpApi.services', [])
                         formstack.appId = data.id;
                         formstack.appSlug = data.slug;
                         $vpApi.db.getCollection('formstack').insert(formstack);
+
+                        item = {
+                            "status": "success",
+                            "attempts": 1,
+                            "lastAttempt": $vpApi.getTimestamp(),
+                            "method": "GET",
+                            "resourceUri": "/api/v2/pforms/formstack/" + formstack.id,
+                            "resourceId": formstack.id,
+                        }
+                        $vpApi.db.getCollection('statusTable').insert(item);
                     });
 
                     // Save the changes
@@ -249,7 +259,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$app', ['$vpApi', function($vpApi) {
+.service('$app', ['$vpApi', '$rootScope', function($vpApi, $rootScope) {
     var obj = this;
     this.resource_name = 'pforms/get/app';
 
@@ -300,28 +310,39 @@ angular.module('vpApi.services', [])
         }
 
     }; // fetchBySlug
-
-    this.updateBySlug = function(slug, success, error) {
+    
+    this.updateBySlug = function(slug, lastTimestamp, success, error) {
         /*
         Inputs:
             slug - [String]
-
+            lastTimestamp: [ISO 8601 String] last time the formstack was updated. 
             success - [Function] the success callback. This will called with arguements 
                         formstack, status from the $http.get. 
             
             error -  [Fucntion] the error callback. This will be called with arguments 
                          data, status from the $http.get
         */
-
-        var data = {'slug':slug};
         
-        $vpApi.fetch(this.resource_name, data, 
+        var resource_name = obj.resource_name;
+        var data = {'slug':slug};
+        if (lastTimestamp){
+            data.modified_gte = lastTimestamp;
+            resource_name = "pforms/app";
+        }
+                
+        $vpApi.fetch(resource_name, data, 
             function(data, status){
-                obj._fetchSuccess(data, status);
-                success(data[0]);
+                
+                app = $vpApi.getApp();
+                // Update all fields that are not the formstacks.
+                app = null;
+                if (length.data === 1){
+                    app = data[0];
+                }
+                success(app, status, slug);
             },
             function(data, status){
-                obj._fetchFail(data, status);
+                obj._fetchFail(data, status, slug);
                 error(data, status);
             }
         );
@@ -384,11 +405,11 @@ angular.module('vpApi.services', [])
 
     }; // fetchBySlug
 
-    this.updateBySlug = function(slug, success, error) {
+    this.updateBySlug = function(slug, lastTimestamp, success, error) {
         /*
         Inputs:
             slug - [String]
-
+            lastTimestamp: [ISO 8601 String] last time the formstack was updated. 
             success - [Function] the success callback. This will called with arguements
                         formstack, status from the $http.get.
 
@@ -397,15 +418,22 @@ angular.module('vpApi.services', [])
         */
 
         var data = {'slug':slug};
+        if (lastTimestamp){
+            data.modified_gte = lastTimestamp;
+        }
 
         $vpApi.fetch(this.resource_name, data,
             function(data, status){
-                obj._fetchSuccess(data, status);
-                success(data[0]);
+                var fs = null;
+                if (data.length > 0) {
+                    obj._fetchSuccess(data, status, slug);
+                    fs = data[0]
+                }                 
+                success(fs,status, slug);
             },
             function(data, status){
-                obj._fetchFail(data, status);
-                error(data, status);
+                obj._fetchFail(data, status, slug);
+                error(data, status, slug);
             }
         );
     };
@@ -441,6 +469,16 @@ angular.module('vpApi.services', [])
         }
         return choice;
     };
+
+
+    this.getSlugs = function(){
+        var out = [];
+        formstacks = $vpApi.db.getCollection('formstack').data;
+        out = _.map(formstacks, function(fs){
+            return fs.slug;
+        })
+        return out;
+    }
 
 }])
 

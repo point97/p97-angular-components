@@ -7,13 +7,17 @@ angular.module('vpApi.services')
 .service( '$sync', ['$rootScope', 
                     '$http', 
                     'config', 
-                    '$vpApi', 
+                    '$vpApi',
+                    '$app',
+                    '$formstack',
                     '$fsResp',
                     '$ionicLoading',
             function($rootScope, 
                      $http, 
                      config, 
-                     $vpApi, 
+                     $vpApi,
+                     $app,
+                     $formstack, 
                      $fsResp,
                      $ionicLoading
                      ) {
@@ -24,6 +28,7 @@ angular.module('vpApi.services')
     this.collections = ['fsResp', 'formResp', 'blockResp', 'answer'];
     this.lastUpdate = localStorage.getItem('lastUpdate');
     this.statusTable = $vpApi.db.getCollection('statusTable');
+
 
     if (this.lastUpdate) {
         this.lastUpdate = new Date(this.lastUpdate);
@@ -36,7 +41,7 @@ angular.module('vpApi.services')
 
         */
 
-        if (window.HAS_CONNECTION !== true) {
+        if (window.HAS_CONNECTION !== true || !$vpApi.user) {
             console.warn("No network found, sync cancelled.")
             return;
         }
@@ -45,13 +50,6 @@ angular.module('vpApi.services')
             console.log('[$sync.run.OnSucess]');
             $rootScope.$broadcast('sync-complete', data);
             callback(data, status);
-
-            //if (data.length > 0) {
-            //    $ionicLoading.show({ template: 'All responses successfully synced.',
-            //                     noBackdrop: true,
-            //                     duration: obj.toastDuration
-            //                    });
-            //}
 
             
         };
@@ -157,7 +155,7 @@ angular.module('vpApi.services')
             $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
         });
         
-    }
+    };
 
     this.clearSyncedFormstacks = function(){
         var dt, syncedAt, item;
@@ -184,9 +182,182 @@ angular.module('vpApi.services')
 
     this.updateReadOnly = function(){
         // TODO Make this happen
-        console.log("I NEED TO UPDATE FORMSTACKS AND MEDIA AND TILES???");
+        console.log("I NEED TO UPDATE MEDIA AND TILES???");
+        appObj = obj._updateApp();
 
-    }
+        
+        var updateListener = $rootScope.$on('app-updated', function(event, args){
+            console.log("in app-updated listener");
+
+            // Reconcile app formstacks and collection formstacks here.
+            
+            var formstackSlugs; // The combined list of formstacks that need updating.
+            var remoteFormstacks;
+
+            var localFormstacks = $formstack.getSlugs();
+            if (args.app.formstacks.length > 0 && args.app.formstacks[0].slug ) {
+                remoteFormstacks =  _.map(args.app.formstacks, function(fs) {return fs.slug;});
+            } else {
+                remoteFormstacks = args.app.localFormstacks;
+            }
+
+            var newFormstacks = _.difference(remoteFormstacks, localFormstacks);
+            var staleFormstacks = _.difference(localFormstacks, remoteFormstacks);
+
+            console.log("newFormstacks");
+            console.table(newFormstacks);
+
+            console.log("staleFormstacks");
+            console.table(staleFormstacks);
+
+            formstackSlugs = localFormstacks.concat(newFormstacks);
+            console.log("formstack slugs to update: ");
+            console.table(formstackSlugs);
+
+            obj._updateFormstacks(formstackSlugs);
+            updateListener();  // This destroys the listener?
+        });
+    };
+
+    this._updateApp = function(){
+        /*
+            Hits the un-nested app endpoint
+            /api/v2/pfomrs/app/<app-id>/&modified_gte
+        */
+        var app = $vpApi.getApp();
+
+        var entry;
+        console.log("Checking for app updates " + app.slug);
+        var entrys = obj.statusTable.chain()
+            .find({'resourceId': app.id})
+            .find({'method':'GET'})
+            .find({'status':'success'})
+            .simplesort({'lastAttempt': 'asc'})
+            .data();
+
+        if (entrys.length > 1) {
+            console.error("[sync._updateApp] More than 1 entry found in statusTable for app "  )
+        } else if (entrys.length === 1){
+            entry = entrys[0];
+            last_ts = entrys[0].lastAttempt;
+            entry.entrys++;
+            entry.status = "pending";
+            entry.lastAttempt = $vpApi.getTimestamp();
+            obj.statusTable.update(entry);
+        } else {
+            last_ts = new Date(2015 ,1,1).toISOString();
+            entry = {
+                "status": "pending",
+                "entrys": 1,
+                "lastAttempt": $vpApi.getTimestamp(),
+                "method": "GET",
+                "resourceUri": "/api/v2/pforms/app/" + app.id,
+                "resourceId": app.id,
+            }
+            obj.statusTable.insert(entry);
+        }
+        $vpApi.db.save();
+        success = function(data, status, slug){
+                app = $vpApi.getApp();
+                
+                if (data === null){
+                    console.log("[_updateApp] No updates found");
+                } else {
+                    // Need to insert the updated formstack into $loki.
+                    console.log("[_updateApp] app updated: " + app.slug);
+                }
+                // Update status table
+                var attempt = obj.statusTable.chain()
+                    .find({'resourceId': app.id})
+                    .find({'method':'GET'})
+                    .find({'status':'pending'})
+                    .simplesort({'lastAttempt': 'asc'})
+                    .data()[0];
+
+                attempt.status = 'success';
+                obj.statusTable.update(attempt);
+                $vpApi.db.save();
+                $rootScope.$broadcast("app-updated", {app:app});
 
 
+        } // end success()
+        error = function(data, status, slug){
+            console.warn("[_updateApp] update failed, status " + status);
+            console.log(data);
+        } // end error()
+        console.log("Checking for updates to app " + app.slug);
+        $app.updateBySlug(app.slug, last_ts, success, error);
+    };// end _updateApp()
+
+    this._updateFormstacks = function(formstackSlugs){
+                
+        _.each(formstackSlugs, function(fsSlug) {
+            
+            // Check status table for last formstack sync timestamp
+            
+            var attempt;
+            var fs = $vpApi.db.getCollection('formstack').find({'slug':fsSlug})[0];
+
+            
+
+
+            success = function(data, status, slug){
+                fs = $vpApi.db.getCollection('formstack').find({'slug':slug})[0];
+                
+                if (data === null){
+                    console.log("[updateReadOnly] No updates found");
+                } else {
+                    // Need to insert the updated formstack into $loki.
+                    console.log("[updateReadOnly] formstack updated: " + fs.slug);
+                };
+
+                // Update status table
+                var attempt = obj.statusTable.chain()
+                    .find({'resourceId': fs.id})
+                    .find({'method':'GET'})
+                    .find({'status':'pending'})
+                    .simplesort({'lastAttempt': 'asc'})
+                    .data()[0];
+
+                attempt.status = 'success';
+                obj.statusTable.update(attempt);
+                $vpApi.db.save();
+
+            }
+            error = function(data, status, slug){
+                console.warn("[updateReadOnly] update failed, status " + status);
+                console.log(data);
+            }
+            console.log("Checking for updates to formstack " + fs.slug);
+            var attempts = obj.statusTable.chain()
+                .find({'resourceId': fs.id})
+                .find({'method':'GET'})
+                .find({'status':'success'})
+                .simplesort({'lastAttempt': 'asc'})
+                .data();
+
+            if (attempts.length > 0){
+                attempt = attempts[0];
+                last_ts = attempts[0].lastAttempt;
+                attempt.attempts++;
+                attempt.status = "pending";
+                attempt.lastAttempt = $vpApi.getTimestamp();
+                obj.statusTable.update(attempt);
+            } else {
+                last_ts = new Date(2015 ,1,1).toISOString();
+                attempt = {
+                    "status": "pending",
+                    "attempts": 1,
+                    "lastAttempt": $vpApi.getTimestamp(),
+                    "method": "GET",
+                    "resourceUri": "/api/v2/pforms/formstack/" + fs.id,
+                    "resourceId": fs.id,
+                }
+                obj.statusTable.insert(attempt);
+            }
+            $vpApi.db.save();
+
+            $formstack.updateBySlug(fs.slug, last_ts, success, error);
+        });
+    }; // end _updateFormstacks()
 }]);
