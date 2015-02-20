@@ -1,4 +1,4 @@
-// build timestamp: Fri Feb 20 2015 10:51:07 GMT-0800 (PST)
+// build timestamp: Fri Feb 20 2015 13:49:21 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
 
@@ -115,12 +115,25 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             control: '='
         },
         link: function(scope, element, attrs) {
-
             if (!scope.question) return;
-            var options = scope.question.options;
-            
-            scope.errors = [];
+            var options;
 
+            isNumber = function (x) {
+                if (x === "") {
+                    return false;
+                };
+                
+                return !isNaN(x);
+            }
+
+            scope.setBlock = function(){
+                options = scope.question.options;
+                scope.errors = [];
+                scope.value = scope.question.value
+                scope.dummyValue = scope.value;
+            }
+            scope.setBlock();
+            
             scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
                     return BASE_URL+'number/templates/'+scope.question.options.templateUrl+'.html';
@@ -130,62 +143,55 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.renderHtml = function(htmlCode) {
                 return $sce.trustAsHtml(htmlCode);
-            };  
-                     
+            };
+            
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
-                if (typeof scope.value !== 'number' || isNaN(scope.value)) {
-                    if (options.required && options.required === true) {
-                        scope.errors.push('input must be an number');
-                        return false;
-                    }
+            
+                if ((!isNumber(scope.value) || scope.value == null) && options.required && options.required === true) {
+                    scope.errors.push('input must be a number');
+                    return false;
+                }
 
-                    if (scope.value !== "" && (!options.required || options.required === false)) {
+                if (scope.value !== null && scope.value !== undefined) {
+
+                    if (scope.value !== "" && !isNumber(scope.value) && (!options.required || options.required === false)) {
                         scope.errors.push('input must be a number');
                         return false;
                     }
 
-                }
-
-                if (options.min && (typeof options.min === 'number')) {
-                    if (scope.value < options.min){
-                        scope.errors.push('value must not be less than ' + options.min);
+                    if (options.min && isNumber(options.min)) {
+                        if (scope.value < options.min){
+                            scope.errors.push('value must not be less than ' + options.min);
+                        }
                     }
-                }
 
-                if (options.max && typeof(options.max === 'number')) {
-                    if (scope.value > options.max){
-                        scope.errors.push('value must not be more than ' + options.max);
+                    if (options.max && isNumber(options.max)) {
+                        if (scope.value > options.max){
+                            scope.errors.push('value must not be more than ' + options.max);
+                        }
                     }
                 }
 
                 return (scope.errors.length === 0);
             };
 
-            scope.showDummyValue = function() {
-                /*
-                in ionic, number qType uses a hidden input to save responses. 
-                From a purely UI standpoint - the shown input is a num/tel to display an appropriate keyboard.
-                As a result, to display the previousValue - that value must be set to the dummy input
-                */
-                if ((scope.value) && scope.value !== "") {
-                    scope.dummyValue = scope.value.toString();
-                }
+            scope.internalControl.clean_answer = function(){
+                
             };
 
-            scope.internalControl.clean_answer = function(){
-                scope.value = parseFloat(scope.value, 10);
-            };
 
             scope.$watch('dummyValue', function(newValue){
-                if (newValue) {
-                    scope.value = parseInt(newValue);
+                if (isNumber(newValue)) {
+                    scope.value = parseFloat(newValue);
+                } else if (newValue) {
+                    scope.value = newValue;
                 } else {
-                scope.value =  "";
+                    scope.value = "";
                 }
             });
 
@@ -193,6 +199,17 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
                 var contents = element.html(response).contents();
                 $compile(contents)(scope);
+            });
+
+            scope.$on('reset-block', function(event){
+                /*
+                Listens for the reset-block event fired by the map-form whenever the user 
+                gets to the intro or end page of the map-form. 
+                This is necessary becuase the map-form do not reloead that Controller
+                and qt-loader.
+                */
+                console.log('[number] reset-block');
+                scope.setBlock();
             });
 
         }
@@ -774,8 +791,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.$watch('dummyValue', function(newValue){
                 if (isInteger(newValue)) {
                     scope.value = parseInt(newValue);
+                } else if (newValue) {
+                    scope.value =  newValue;
                 } else {
-                scope.value =  "";
+                    scope.value = "";
                 }
             });
 
@@ -800,7 +819,6 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
     }
 }]);
 
-var reg = 
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
   .directive('email', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
@@ -1515,8 +1533,12 @@ angular.module('p97.questionTypes')
                 // This is availible in the main controller.
                 scope.internalControl = scope.control || {};
                 scope.internalControl.validate_answer = function(){
+
+                    scope.errors = [];
                     
                     if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
+
+                    return (scope.errors.length === 0);
 
                 };
 

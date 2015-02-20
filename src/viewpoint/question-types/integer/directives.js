@@ -87,8 +87,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.$watch('dummyValue', function(newValue){
                 if (isInteger(newValue)) {
                     scope.value = parseInt(newValue);
+                } else if (newValue) {
+                    scope.value =  newValue;
                 } else {
-                scope.value =  "";
+                    scope.value = "";
                 }
             });
 

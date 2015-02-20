@@ -32,8 +32,12 @@ angular.module('p97.questionTypes')
                 // This is availible in the main controller.
                 scope.internalControl = scope.control || {};
                 scope.internalControl.validate_answer = function(){
+
+                    scope.errors = [];
                     
                     if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
+
+                    return (scope.errors.length === 0);
 
                 };
 
