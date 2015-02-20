@@ -333,10 +333,10 @@ angular.module('vpApi.services', [])
         $vpApi.fetch(resource_name, data, 
             function(data, status){
                 
-                app = $vpApi.getApp();
+                //app = $vpApi.getApp();
                 // Update all fields that are not the formstacks.
                 app = null;
-                if (length.data === 1){
+                if (data.length === 1){
                     app = data[0];
                 }
                 success(app, status, slug);
