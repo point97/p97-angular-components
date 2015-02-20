@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 19 2015 11:55:06 GMT-0800 (PST)
+// build timestamp: Fri Feb 20 2015 10:51:07 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -1414,6 +1414,16 @@ angular.module('vpApi.services', [])
                         formstack.appId = data.id;
                         formstack.appSlug = data.slug;
                         $vpApi.db.getCollection('formstack').insert(formstack);
+
+                        item = {
+                            "status": "success",
+                            "attempts": 1,
+                            "lastAttempt": $vpApi.getTimestamp(),
+                            "method": "GET",
+                            "resourceUri": "/api/v2/pforms/formstack/" + formstack.id,
+                            "resourceId": formstack.id,
+                        }
+                        $vpApi.db.getCollection('statusTable').insert(item);
                     });
 
                     // Save the changes
@@ -1457,7 +1467,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$app', ['$vpApi', function($vpApi) {
+.service('$app', ['$vpApi', '$rootScope', function($vpApi, $rootScope) {
     var obj = this;
     this.resource_name = 'pforms/get/app';
 
@@ -1508,28 +1518,39 @@ angular.module('vpApi.services', [])
         }
 
     }; // fetchBySlug
-
-    this.updateBySlug = function(slug, success, error) {
+    
+    this.updateBySlug = function(slug, lastTimestamp, success, error) {
         /*
         Inputs:
             slug - [String]
-
+            lastTimestamp: [ISO 8601 String] last time the formstack was updated. 
             success - [Function] the success callback. This will called with arguements 
                         formstack, status from the $http.get. 
             
             error -  [Fucntion] the error callback. This will be called with arguments 
                          data, status from the $http.get
         */
-
-        var data = {'slug':slug};
         
-        $vpApi.fetch(this.resource_name, data, 
+        var resource_name = obj.resource_name;
+        var data = {'slug':slug};
+        if (lastTimestamp){
+            data.modified_gte = lastTimestamp;
+            resource_name = "pforms/app";
+        }
+                
+        $vpApi.fetch(resource_name, data, 
             function(data, status){
-                obj._fetchSuccess(data, status);
-                success(data[0]);
+                
+                //app = $vpApi.getApp();
+                // Update all fields that are not the formstacks.
+                app = null;
+                if (data.length === 1){
+                    app = data[0];
+                }
+                success(app, status, slug);
             },
             function(data, status){
-                obj._fetchFail(data, status);
+                obj._fetchFail(data, status, slug);
                 error(data, status);
             }
         );
@@ -1592,11 +1613,11 @@ angular.module('vpApi.services', [])
 
     }; // fetchBySlug
 
-    this.updateBySlug = function(slug, success, error) {
+    this.updateBySlug = function(slug, lastTimestamp, success, error) {
         /*
         Inputs:
             slug - [String]
-
+            lastTimestamp: [ISO 8601 String] last time the formstack was updated. 
             success - [Function] the success callback. This will called with arguements
                         formstack, status from the $http.get.
 
@@ -1605,15 +1626,22 @@ angular.module('vpApi.services', [])
         */
 
         var data = {'slug':slug};
+        if (lastTimestamp){
+            data.modified_gte = lastTimestamp;
+        }
 
         $vpApi.fetch(this.resource_name, data,
             function(data, status){
-                obj._fetchSuccess(data, status);
-                success(data[0]);
+                var fs = null;
+                if (data.length > 0) {
+                    obj._fetchSuccess(data, status, slug);
+                    fs = data[0]
+                }                 
+                success(fs,status, slug);
             },
             function(data, status){
-                obj._fetchFail(data, status);
-                error(data, status);
+                obj._fetchFail(data, status, slug);
+                error(data, status, slug);
             }
         );
     };
@@ -1649,6 +1677,16 @@ angular.module('vpApi.services', [])
         }
         return choice;
     };
+
+
+    this.getSlugs = function(){
+        var out = [];
+        formstacks = $vpApi.db.getCollection('formstack').data;
+        out = _.map(formstacks, function(fs){
+            return fs.slug;
+        })
+        return out;
+    }
 
 }])
 
@@ -1882,13 +1920,17 @@ angular.module('vpApi.services')
 .service( '$sync', ['$rootScope', 
                     '$http', 
                     'config', 
-                    '$vpApi', 
+                    '$vpApi',
+                    '$app',
+                    '$formstack',
                     '$fsResp',
                     '$ionicLoading',
             function($rootScope, 
                      $http, 
                      config, 
-                     $vpApi, 
+                     $vpApi,
+                     $app,
+                     $formstack, 
                      $fsResp,
                      $ionicLoading
                      ) {
@@ -1899,6 +1941,7 @@ angular.module('vpApi.services')
     this.collections = ['fsResp', 'formResp', 'blockResp', 'answer'];
     this.lastUpdate = localStorage.getItem('lastUpdate');
     this.statusTable = $vpApi.db.getCollection('statusTable');
+
 
     if (this.lastUpdate) {
         this.lastUpdate = new Date(this.lastUpdate);
@@ -1911,7 +1954,7 @@ angular.module('vpApi.services')
 
         */
 
-        if (window.HAS_CONNECTION !== true) {
+        if (window.HAS_CONNECTION !== true || !$vpApi.user) {
             console.warn("No network found, sync cancelled.")
             return;
         }
@@ -1920,13 +1963,6 @@ angular.module('vpApi.services')
             console.log('[$sync.run.OnSucess]');
             $rootScope.$broadcast('sync-complete', data);
             callback(data, status);
-
-            //if (data.length > 0) {
-            //    $ionicLoading.show({ template: 'All responses successfully synced.',
-            //                     noBackdrop: true,
-            //                     duration: obj.toastDuration
-            //                    });
-            //}
 
             
         };
@@ -2032,7 +2068,7 @@ angular.module('vpApi.services')
             $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
         });
         
-    }
+    };
 
     this.clearSyncedFormstacks = function(){
         var dt, syncedAt, item;
@@ -2059,9 +2095,182 @@ angular.module('vpApi.services')
 
     this.updateReadOnly = function(){
         // TODO Make this happen
-        console.log("I NEED TO UPDATE FORMSTACKS AND MEDIA AND TILES???");
+        console.log("I NEED TO UPDATE MEDIA AND TILES???");
+        appObj = obj._updateApp();
 
-    }
+        
+        var updateListener = $rootScope.$on('app-updated', function(event, args){
+            console.log("in app-updated listener");
+
+            // Reconcile app formstacks and collection formstacks here.
+            
+            var formstackSlugs; // The combined list of formstacks that need updating.
+            var remoteFormstacks;
+
+            var localFormstacks = $formstack.getSlugs();
+            if (args.app.formstacks.length > 0 && args.app.formstacks[0].slug ) {
+                remoteFormstacks =  _.map(args.app.formstacks, function(fs) {return fs.slug;});
+            } else {
+                remoteFormstacks = args.app.localFormstacks;
+            }
+
+            var newFormstacks = _.difference(remoteFormstacks, localFormstacks);
+            var staleFormstacks = _.difference(localFormstacks, remoteFormstacks);
+
+            console.log("newFormstacks");
+            console.table(newFormstacks);
+
+            console.log("staleFormstacks");
+            console.table(staleFormstacks);
+
+            formstackSlugs = localFormstacks.concat(newFormstacks);
+            console.log("formstack slugs to update: ");
+            console.table(formstackSlugs);
+
+            obj._updateFormstacks(formstackSlugs);
+            updateListener();  // This destroys the listener?
+        });
+    };
+
+    this._updateApp = function(){
+        /*
+            Hits the un-nested app endpoint
+            /api/v2/pfomrs/app/<app-id>/&modified_gte
+        */
+        var app = $vpApi.getApp();
+
+        var entry;
+        console.log("Checking for app updates " + app.slug);
+        var entrys = obj.statusTable.chain()
+            .find({'resourceId': app.id})
+            .find({'method':'GET'})
+            .find({'status':'success'})
+            .simplesort({'lastAttempt': 'asc'})
+            .data();
+
+        if (entrys.length > 1) {
+            console.error("[sync._updateApp] More than 1 entry found in statusTable for app "  )
+        } else if (entrys.length === 1){
+            entry = entrys[0];
+            last_ts = entrys[0].lastAttempt;
+            entry.entrys++;
+            entry.status = "pending";
+            entry.lastAttempt = $vpApi.getTimestamp();
+            obj.statusTable.update(entry);
+        } else {
+            last_ts = new Date(2015 ,1,1).toISOString();
+            entry = {
+                "status": "pending",
+                "entrys": 1,
+                "lastAttempt": $vpApi.getTimestamp(),
+                "method": "GET",
+                "resourceUri": "/api/v2/pforms/app/" + app.id,
+                "resourceId": app.id,
+            }
+            obj.statusTable.insert(entry);
+        }
+        $vpApi.db.save();
+        success = function(data, status, slug){
+                app = $vpApi.getApp();
+                
+                if (data === null){
+                    console.log("[_updateApp] No updates found");
+                } else {
+                    // Need to insert the updated formstack into $loki.
+                    console.log("[_updateApp] app updated: " + app.slug);
+                }
+                // Update status table
+                var attempt = obj.statusTable.chain()
+                    .find({'resourceId': app.id})
+                    .find({'method':'GET'})
+                    .find({'status':'pending'})
+                    .simplesort({'lastAttempt': 'asc'})
+                    .data()[0];
+
+                attempt.status = 'success';
+                obj.statusTable.update(attempt);
+                $vpApi.db.save();
+                $rootScope.$broadcast("app-updated", {app:app});
 
 
+        } // end success()
+        error = function(data, status, slug){
+            console.warn("[_updateApp] update failed, status " + status);
+            console.log(data);
+        } // end error()
+        console.log("Checking for updates to app " + app.slug);
+        $app.updateBySlug(app.slug, last_ts, success, error);
+    };// end _updateApp()
+
+    this._updateFormstacks = function(formstackSlugs){
+                
+        _.each(formstackSlugs, function(fsSlug) {
+            
+            // Check status table for last formstack sync timestamp
+            
+            var attempt;
+            var fs = $vpApi.db.getCollection('formstack').find({'slug':fsSlug})[0];
+
+            
+
+
+            success = function(data, status, slug){
+                fs = $vpApi.db.getCollection('formstack').find({'slug':slug})[0];
+                
+                if (data === null){
+                    console.log("[updateReadOnly] No updates found");
+                } else {
+                    // Need to insert the updated formstack into $loki.
+                    console.log("[updateReadOnly] formstack updated: " + fs.slug);
+                };
+
+                // Update status table
+                var attempt = obj.statusTable.chain()
+                    .find({'resourceId': fs.id})
+                    .find({'method':'GET'})
+                    .find({'status':'pending'})
+                    .simplesort({'lastAttempt': 'asc'})
+                    .data()[0];
+
+                attempt.status = 'success';
+                obj.statusTable.update(attempt);
+                $vpApi.db.save();
+
+            }
+            error = function(data, status, slug){
+                console.warn("[updateReadOnly] update failed, status " + status);
+                console.log(data);
+            }
+            console.log("Checking for updates to formstack " + fs.slug);
+            var attempts = obj.statusTable.chain()
+                .find({'resourceId': fs.id})
+                .find({'method':'GET'})
+                .find({'status':'success'})
+                .simplesort({'lastAttempt': 'asc'})
+                .data();
+
+            if (attempts.length > 0){
+                attempt = attempts[0];
+                last_ts = attempts[0].lastAttempt;
+                attempt.attempts++;
+                attempt.status = "pending";
+                attempt.lastAttempt = $vpApi.getTimestamp();
+                obj.statusTable.update(attempt);
+            } else {
+                last_ts = new Date(2015 ,1,1).toISOString();
+                attempt = {
+                    "status": "pending",
+                    "attempts": 1,
+                    "lastAttempt": $vpApi.getTimestamp(),
+                    "method": "GET",
+                    "resourceUri": "/api/v2/pforms/formstack/" + fs.id,
+                    "resourceId": fs.id,
+                }
+                obj.statusTable.insert(attempt);
+            }
+            $vpApi.db.save();
+
+            $formstack.updateBySlug(fs.slug, last_ts, success, error);
+        });
+    }; // end _updateFormstacks()
 }]);
