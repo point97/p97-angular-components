@@ -1,4 +1,4 @@
-// build timestamp: Fri Feb 20 2015 13:49:21 GMT-0800 (PST)
+// build timestamp: Fri Feb 20 2015 15:08:02 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -2224,16 +2224,21 @@ angular.module('vpApi.services')
                     console.log("[updateReadOnly] formstack updated: " + fs.slug);
                 };
 
-                // Update status table
-                var attempt = obj.statusTable.chain()
+                 // Update status table
+                var attempts = obj.statusTable.chain()
                     .find({'resourceId': fs.id})
                     .find({'method':'GET'})
                     .find({'status':'pending'})
                     .simplesort({'lastAttempt': 'asc'})
-                    .data()[0];
+                    .data();
 
-                attempt.status = 'success';
-                obj.statusTable.update(attempt);
+                var attempt = {};    
+                if (attempts.length > 0) {
+                    attempt = attempts[0];
+                    attempt.status = 'success';
+                    obj.statusTable.update(attempt);
+                };
+
                 $vpApi.db.save();
 
             }
