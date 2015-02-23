@@ -320,11 +320,13 @@ angular.module('vpApi.services')
                     .data();
 
                 var attempt = {};    
-                if (attempts.length > 0) {
+                if (attempts.length === 1) {
                     attempt = attempts[0];
                     attempt.status = 'success';
                     obj.statusTable.update(attempt);
-                };
+                } else if (attempts.length > 0){
+                    console.warn("[sync._updateFormstacks()] Found more than 1 attempt record in the statusTable.");
+                }
 
                 $vpApi.db.save();
 
