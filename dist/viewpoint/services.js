@@ -1,4 +1,4 @@
-// build timestamp: Fri Feb 20 2015 15:08:02 GMT-0800 (PST)
+// build timestamp: Mon Feb 23 2015 10:33:46 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -2233,11 +2233,13 @@ angular.module('vpApi.services')
                     .data();
 
                 var attempt = {};    
-                if (attempts.length > 0) {
+                if (attempts.length === 1) {
                     attempt = attempts[0];
                     attempt.status = 'success';
                     obj.statusTable.update(attempt);
-                };
+                } else if (attempts.length > 0){
+                    console.warn("[sync._updateFormstacks()] Found more than 1 attempt record in the statusTable.");
+                }
 
                 $vpApi.db.save();
 
