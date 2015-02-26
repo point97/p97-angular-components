@@ -1,4 +1,4 @@
-// build timestamp: Mon Feb 23 2015 14:36:57 GMT-0800 (PST)
+// build timestamp: Thu Feb 26 2015 09:19:43 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -55,6 +55,9 @@ angular.module('cache.services', [])
                 _.each(block.questions, function(q){
                     if (q.options.geojsonChoices && q.options.geojsonChoices.url){
                         fnames.push(q.options.geojsonChoices.url);
+                    }
+                    if (q.options.geoFence && q.options.geoFence.url){
+                        fnames.push(q.options.geoFence.url);
                     }
                 }); // End questions loop
             }); // End block loop
@@ -279,6 +282,45 @@ angular.module('cache.services', [])
         callback(event);
     };
 }])
+angular.module('mock-ionic.services', [])
+
+.service( '$ionicLoading', [function() {
+    console.log("mock $ionicLoading ");
+
+    this.show = function(){
+        console.log("mock $ionicLoading.show()");
+    }
+
+    this.hide = function(){
+        console.log("mock $ionicLoading.hide()");
+    }
+}])
+
+.service( '$ionicModal', ["$q", function($q) {
+    console.log("mock $ionicModal");
+
+
+    this.fromTemplateUrl = function(){
+        return $q(function(resolve, reject){
+            resolve("Fake resolve");
+        })
+    };
+}])
+
+.service( '$ionicPopup', ["$q", function($q) {
+    console.log("mock $ionicPopup")
+
+    this.confirm = function(){
+        return $q(function(resolve, reject){
+            resolve("Fake resolve");
+        })
+    }
+}])
+
+.service( '$ionicScrollDelegate', [function() {
+    console.log("mock $ionicScrollDelegate");
+}]);
+
 
 angular.module('survey.services', [])
 
