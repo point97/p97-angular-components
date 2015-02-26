@@ -55,6 +55,9 @@ angular.module('cache.services', [])
                     if (q.options.geojsonChoices && q.options.geojsonChoices.url){
                         fnames.push(q.options.geojsonChoices.url);
                     }
+                    if (q.options.geoFence && q.options.geoFence.url){
+                        fnames.push(q.options.geoFence.url);
+                    }
                 }); // End questions loop
             }); // End block loop
         }); // End forms loop
