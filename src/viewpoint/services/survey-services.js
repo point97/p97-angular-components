@@ -75,9 +75,10 @@ angular.module('survey.services', [])
             */
 
             scope.repeatCount = 0;
-            if ($location.hash().length === 0){
-                $location.hash("intro");
-            }
+            // if ($location.hash().length === 0){
+            //     $location.hash("intro");
+            // }
+            $location.hash('intro'); // Also go to intropage on load.
             scope.current.hash = $location.hash();
 
             stateParams.formRespId = 'new';

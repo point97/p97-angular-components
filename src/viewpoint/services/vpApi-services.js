@@ -115,13 +115,13 @@ angular.module('vpApi.services', [])
         var headers = {}// {'Authorization':'Token ' + this.user.token};
         $http.post(url, data, headers)
             .success(function(res, status){
-                var users = obj.users.find({'username': data.username});
+                var users = obj.users.find({'username': res.username});
                 if (users.length === 0){
-                    user = obj.users.insert({'username':data.username, token:res.token})
+                    user = obj.users.insert({'username':res.username, token:res.token});
                 } else {
                     user = users[0];
                     user.token = res.token;
-                    user.username = data.username;
+                    user.username = res.username;
                     obj.users.update(user);
                 }
                 obj.user = user;
@@ -180,7 +180,7 @@ angular.module('vpApi.services', [])
 .service('$user', ['$rootScope', '$vpApi', '$app', '$formstack', '$profile', function($rootScope, $vpApi, $app, $formstack, $profile){
     var obj = this;
 
-    $rootScope.$on('authenticated', function(event, args){
+    this.authenticatedCallback = function(event, args){
         $profile.fetch(function(){
             $vpApi.db.save(); // This is to save the profile to indexedDB.
 
@@ -232,7 +232,12 @@ angular.module('vpApi.services', [])
         function(data, status){
             console.log('Error fetching profile.');
         });
-    })
+    };
+
+    $rootScope.$on('authenticated', function(event, args){
+        obj.authenticatedCallback(event, args);
+    });
+
 }])
 
 .service( '$profile', ['$http', '$vpApi', 'config', function($http, $vpApi, config){
