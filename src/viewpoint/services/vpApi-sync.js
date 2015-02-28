@@ -41,8 +41,13 @@ angular.module('vpApi.services')
 
         */
 
-        if (window.HAS_CONNECTION !== true || !$vpApi.user) {
-            console.warn("No network found, sync cancelled.")
+        if (window.HAS_CONNECTION !== true) {
+            console.warn("[sync.run()] No network found, sync cancelled.");
+            return;
+        }
+
+        if (!$vpApi.user) {
+            console.warn("[sync.run()] No user found, sync cancelled.");
             return;
         }
 
