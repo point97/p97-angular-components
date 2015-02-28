@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 26 2015 09:19:43 GMT-0800 (PST)
+// build timestamp: Fri Feb 27 2015 16:53:08 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
 
@@ -49,10 +49,10 @@ angular.module('p97.questionTypes')
             scope.errors = [];
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'datetime/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'datetime/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'datetime/templates/ionic/datetime.html';
+                    return BASE_TEMPLATE_URL+'datetime/templates/'+platform+'/datetime.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -135,10 +135,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.setBlock();
             
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'number/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'number/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'number/templates/ionic/number.html';
+                    return BASE_TEMPLATE_URL+'number/templates/'+platform+'/number.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -232,10 +232,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'textarea/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'textarea/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'textarea/templates/ionic/textarea.html';
+                    return BASE_TEMPLATE_URL+'textarea/templates/'+platform+'/textarea.html';
             }
             
             scope.renderHtml = function(htmlCode) {
@@ -332,10 +332,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'yes-no/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'yes-no/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'yes-no/templates/ionic/yes-no.html';
+                    return BASE_TEMPLATE_URL+'yes-no/templates/'+platform+'/yes-no.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -410,10 +410,10 @@ angular.module('p97.questionTypes')
             scope.setBlock();
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'single-select/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/checkbox-single.html';
+                    return BASE_TEMPLATE_URL+'single-select/templates/'+platform+'/checkbox-single.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -618,10 +618,10 @@ angular.module('p97.questionTypes')
             link: function(scope, element, attrs) {
 
                 scope.getContentUrl = function() {
-                    if(scope.question.options.templateUrl)
-                        return BASE_URL+'text/templates/'+scope.question.options.templateUrl+'.html';
+                    if(scope.question.options.widget)
+                        return BASE_TEMPLATE_URL+'text/templates/'+scope.question.options.widget+'.html';
                     else
-                        return BASE_URL+'text/templates/ionic/text.html';
+                        return BASE_TEMPLATE_URL+'text/templates/'+platform+'/text.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {
@@ -738,10 +738,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.setBlock();
             
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'integer/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'integer/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'integer/templates/ionic/integer.html';
+                    return BASE_TEMPLATE_URL+'integer/templates/'+platform+'/integer.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -841,10 +841,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.errors = [];
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'email/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'email/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'email/templates/ionic/email.html';
+                    return BASE_TEMPLATE_URL+'email/templates/'+platform+'/email.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -911,10 +911,10 @@ angular.module('p97.questionTypes')
             scope.errors = [];
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'date/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'date/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'date/templates/ionic/date.html';
+                    return BASE_TEMPLATE_URL+'date/templates/'+platform+'/date.html';
             }    
 
             scope.renderHtml = function(htmlCode) {
@@ -1027,10 +1027,10 @@ angular.module('p97.questionTypes')
             var regInternational = /^[0-9 ]+$/;
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'phonenumber/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
+                    return BASE_TEMPLATE_URL+'phonenumber/templates/'+platform+'/phonenumber.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -1140,10 +1140,10 @@ angular.module('p97.questionTypes')
             
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'multi-select/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'multi-select/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'multi-select/templates/ionic/toggle-multi.html';
+                    return BASE_TEMPLATE_URL+'multi-select/templates/'+platform+'/toggle-multi.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -1377,10 +1377,10 @@ angular.module('p97.questionTypes')
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'toggle/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'toggle/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'toggle/templates/ionic/toggle.html';
+                    return BASE_TEMPLATE_URL+'toggle/templates/'+platform+'/toggle.html';
             }
 
             scope.renderHtml = function(htmlCode) {
@@ -1443,10 +1443,10 @@ angular.module('p97.questionTypes')
             link: function(scope, element, attrs) {
 
                 scope.getContentUrl = function() {
-                    if(scope.question.options.templateUrl)
-                        return BASE_URL+'autocomplete-search/templates/'+scope.question.options.templateUrl+'.html';
+                    if(scope.question.options.widget)
+                        return BASE_TEMPLATE_URL+'autocomplete-search/templates/'+scope.question.options.widget+'.html';
                     else
-                        return BASE_URL+'autocomplete-search/templates/ionic/autocomplete.html';
+                        return BASE_TEMPLATE_URL+'autocomplete-search/templates/'+platform+'/autocomplete.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {
@@ -1516,10 +1516,10 @@ angular.module('p97.questionTypes')
 
                 scope.getContentUrl = function() {
 
-                    if (scope.question.hasOwnProperty('options') && scope.question.options.templateUrl) {
-                        return BASE_URL+'info/templates/'+scope.question.options.templateUrl+'.html';
+                    if (scope.question.options.widget) {
+                        return BASE_TEMPLATE_URL+'info/templates/'+scope.question.options.widget+'.html';
                     } else {
-                        return BASE_URL+'info/templates/ionic/info.html';
+                        return BASE_TEMPLATE_URL+'info/templates/'+platform+'/info.html';
                     }                    
                 }
 

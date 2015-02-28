@@ -27,10 +27,10 @@ angular.module('p97.questionTypes')
             var regInternational = /^[0-9 ]+$/;
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'phonenumber/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'phonenumber/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'phonenumber/templates/ionic/phonenumber.html';
+                    return BASE_TEMPLATE_URL+'phonenumber/templates/'+platform+'/phonenumber.html';
             }
 
             scope.renderHtml = function(htmlCode) {

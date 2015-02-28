@@ -15,10 +15,10 @@ angular.module('p97.questionTypes')
 
                 scope.getContentUrl = function() {
 
-                    if (scope.question.hasOwnProperty('options') && scope.question.options.templateUrl) {
-                        return BASE_URL+'info/templates/'+scope.question.options.templateUrl+'.html';
+                    if (scope.question.options.widget) {
+                        return BASE_TEMPLATE_URL+'info/templates/'+scope.question.options.widget+'.html';
                     } else {
-                        return BASE_URL+'info/templates/ionic/info.html';
+                        return BASE_TEMPLATE_URL+'info/templates/'+platform+'/info.html';
                     }                    
                 }
 
