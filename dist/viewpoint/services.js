@@ -1,4 +1,4 @@
-// build timestamp: Thu Feb 26 2015 16:29:54 GMT-0800 (PST)
+// build timestamp: Fri Feb 27 2015 17:33:36 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -1338,7 +1338,7 @@ angular.module('vpApi.services', [])
             out = formstacks.find({'slug':slug})[0]
         }
         if(!out)
-            console.error('[$vpApi.getFormstack()] Could not find formstack');
+            console.warn('[$vpApi.getFormstack()] Could not find formstack');
 
         return out;
     }
@@ -1376,7 +1376,7 @@ angular.module('vpApi.services', [])
                     obj.users.update(user);
                 }
                 obj.user = user;
-
+                debugger
                 obj.db.save();
                 localStorage.setItem('user', JSON.stringify(obj.user));
                 $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
@@ -1498,13 +1498,14 @@ angular.module('vpApi.services', [])
     this.fetch = function(successCallback, errorCallback){
         /*
         Fetches profile and updates the obj.db. DOSE NOT save to localStorage
-        */
+        */ 
         var url = apiBase +'account/info/?user__username=';
         var token = $vpApi.user.token;
 
         var headers = {headers: {'Authorization':'Token ' + token}};
         $http.get(url+$vpApi.user.username, headers)
             .success(function(data, status){
+                if (data.length === 0) console.error("[$profile.fetch() User profile not found.]");
                 $vpApi.user.profile = data[0];
                 $vpApi.users.update($vpApi.user);
                 successCallback();
@@ -2002,8 +2003,13 @@ angular.module('vpApi.services')
 
         */
 
-        if (window.HAS_CONNECTION !== true || !$vpApi.user) {
-            console.warn("No network found, sync cancelled.")
+        if (window.HAS_CONNECTION !== true) {
+            console.warn("[sync.run()] No network found, sync cancelled.");
+            return;
+        }
+
+        if (!$vpApi.user) {
+            console.warn("[sync.run()] No user found, sync cancelled.");
             return;
         }
 
