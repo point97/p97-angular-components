@@ -844,9 +844,9 @@ Inside the directives link function you will need to define a function to get th
 ```
 scope.getContentUrl = function() {
                 if(scope.question.options.templateUrl)
-                    return BASE_URL+'<QUESTION_TYPE>/templates/<QUESTION_TYPE>/'+scope.question.options.templateUrl;
+                    return BASE_TEMPLATE_URL+'<QUESTION_TYPE>/templates/<QUESTION_TYPE>/'+scope.question.options.templateUrl;
                 else
-                    return BASE_URL+'<QUESTION_TYPE>/templates/ionic/<QUESTION_TYPE>.html';
+                    return BASE_TEMPLATE_URL+'<QUESTION_TYPE>/templates/ionic/<QUESTION_TYPE>.html';
             }
             
 // Compile the template into the directive's scope.

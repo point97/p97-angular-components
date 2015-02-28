@@ -15,10 +15,10 @@ angular.module('p97.questionTypes')
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'toggle/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'toggle/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'toggle/templates/ionic/toggle.html';
+                    return BASE_TEMPLATE_URL+'toggle/templates/'+platform+'/toggle.html';
             }
 
             scope.renderHtml = function(htmlCode) {

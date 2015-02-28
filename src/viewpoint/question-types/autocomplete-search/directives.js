@@ -14,10 +14,10 @@ angular.module('p97.questionTypes')
             link: function(scope, element, attrs) {
 
                 scope.getContentUrl = function() {
-                    if(scope.question.options.templateUrl)
-                        return BASE_URL+'autocomplete-search/templates/'+scope.question.options.templateUrl+'.html';
+                    if(scope.question.options.widget)
+                        return BASE_TEMPLATE_URL+'autocomplete-search/templates/'+scope.question.options.widget+'.html';
                     else
-                        return BASE_URL+'autocomplete-search/templates/ionic/autocomplete.html';
+                        return BASE_TEMPLATE_URL+'autocomplete-search/templates/'+platform+'/autocomplete.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {

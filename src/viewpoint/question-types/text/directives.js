@@ -14,10 +14,10 @@ angular.module('p97.questionTypes')
             link: function(scope, element, attrs) {
 
                 scope.getContentUrl = function() {
-                    if(scope.question.options.templateUrl)
-                        return BASE_URL+'text/templates/'+scope.question.options.templateUrl+'.html';
+                    if(scope.question.options.widget)
+                        return BASE_TEMPLATE_URL+'text/templates/'+scope.question.options.widget+'.html';
                     else
-                        return BASE_URL+'text/templates/ionic/text.html';
+                        return BASE_TEMPLATE_URL+'text/templates/'+platform+'/text.html';
                 }
 
                 scope.renderHtml = function(htmlCode) {

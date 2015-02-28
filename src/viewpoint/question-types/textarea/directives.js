@@ -14,10 +14,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'textarea/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'textarea/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'textarea/templates/ionic/textarea.html';
+                    return BASE_TEMPLATE_URL+'textarea/templates/'+platform+'/textarea.html';
             }
             
             scope.renderHtml = function(htmlCode) {
