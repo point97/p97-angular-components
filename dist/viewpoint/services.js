@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-// build timestamp: Fri Feb 27 2015 17:33:36 GMT-0800 (PST)
-=======
-// build timestamp: Fri Feb 27 2015 16:53:08 GMT-0800 (PST)
->>>>>>> 49d4ef9d56f76edc6948ac0eb82c64ab3cb98219
+// build timestamp: Fri Feb 27 2015 17:46:10 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
