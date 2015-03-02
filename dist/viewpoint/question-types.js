@@ -1,4 +1,4 @@
-// build timestamp: Fri Feb 27 2015 16:53:08 GMT-0800 (PST)
+// build timestamp: Mon Mar 02 2015 13:19:37 GMT-0800 (PST)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
 
@@ -1143,7 +1143,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.widget)
                     return BASE_TEMPLATE_URL+'multi-select/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_TEMPLATE_URL+'multi-select/templates/'+platform+'/toggle-multi.html';
+                    return BASE_TEMPLATE_URL+'multi-select/templates/'+platform+'/checkbox.html';
             }
 
             scope.renderHtml = function(htmlCode) {

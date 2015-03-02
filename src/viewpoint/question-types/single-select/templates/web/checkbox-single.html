@@ -1,0 +1,27 @@
+<div class="question_bg form">
+  <div class="p97-single-select">
+      <label ng-bind-html="renderHtml(question.body)"></label>
+
+        <div ng-repeat="choice in localChoices">
+          <input type="checkbox" 
+            ng-hide="(question.options.hideInput === true)"
+            ng-change="changeSelected(choice)"
+            ng-value="choice.value"
+            ng-model="choice.checked"
+            ng-required="question.option.required"
+          />
+          {{choice.verbose}}
+        </div>
+        
+        <div ng-show="showOtherInput">
+            <input type="text"
+                ng-blur="otherValueBlur()"
+                ng-model="otherValue"
+                placeholder="'Other' Choice">
+        </div>
+
+        <div class="item item-divider warning" ng-show="errors.length>0"> 
+            <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+        </div>
+  </div>
+</div>

@@ -44,7 +44,7 @@ angular.module('p97.questionTypes')
                 if(scope.question.options.widget)
                     return BASE_TEMPLATE_URL+'multi-select/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_TEMPLATE_URL+'multi-select/templates/'+platform+'/toggle-multi.html';
+                    return BASE_TEMPLATE_URL+'multi-select/templates/'+platform+'/checkbox.html';
             }
 
             scope.renderHtml = function(htmlCode) {

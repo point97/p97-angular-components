@@ -1,21 +1,23 @@
-<div class="p97-multi-select">
-    <div ng-bind-html="renderHtml(question.body)"></div>
-    <div class="list">
-        <div ng-repeat="choice in question.choices" ng-hide="(question.options.hideInput === true)">
-            <input  type="checkbox"
-                    ng-click="toggleAnswers(choice.value)"
-                    ng-value="choice.value"
-                    ng-model="choice.checked"
-                    ng-required='question.options.required'
-                    ng-class="{'error':errors.length>0}">
-            <label> {{choice.verbose}}</label>
-        </div> 
-        <div ng-show="showOtherInput">
-            <input type="text"
-                ng-model="otherValue"
-                ng-blur="otherValueBlur()"
-                placeholder="'Other' Choice">
+<div class="question_bg form">
+    <div class="p97-multi-select">
+        <label ng-bind-html="renderHtml(question.body)"></label>
+
+            <div ng-repeat="choice in question.choices" ng-hide="(question.options.hideInput === true)">
+                <input  type="checkbox"
+                        ng-click="addChoicesToArray(choice.value)"
+                        ng-value="choice.value"
+                        ng-model="choice.checked"
+                        ng-required='question.options.required'
+                        ng-class="{'error':errors.length>0}">
+                {{choice.verbose}}
+            </div> 
+            <div ng-show="showOtherInput">
+                <input type="text"
+                    ng-model="otherValue"
+                    ng-blur="otherValueBlur()"
+                    placeholder="'Other' Choice">
+            </div>
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
         </div>
-        <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
     </div>
 </div>
