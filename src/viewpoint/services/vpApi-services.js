@@ -20,6 +20,13 @@ angular.module('vpApi.services', [])
 
         // Makes the loki database available at $vpApi.db.
         obj.db = data.db;
+        if (platform === 'web'){
+            obj.db.save = function(){
+                console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
+                $rootScope.$broadcast("db.save");
+            }
+        };
+
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
@@ -536,9 +543,16 @@ angular.module('vpApi.services', [])
         $rootScope.$broadcast('fsResp-deleted', {fsRespId: fsRespId});
     }
 
+    this.fetchByFormstackSlug = function(fsSlug){
+        /*
+        
+        */ 
+
+    }
+
     this.getFullResp = function(fsRespId){
         /*
-        Returns a full nested formstack response object for syncing.
+        Creates a full nested formstack response object for syncing.
         
         Returns
         {
