@@ -495,7 +495,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$fsResp', ['$vpApi', '$rootScope', function($vpApi, $rootScope){
+.service('$fsResp', ['$vpApi', '$rootScope', '$q', function($vpApi, $rootScope, $q){
     /*
         A form response is of the form
         {
@@ -509,12 +509,33 @@ angular.module('vpApi.services', [])
 
     $rootScope.$on('db_loaded', function(e){
         this.objects = $vpApi.db.getCollection('fsResp');
-    })
+    });
+
+    this.clear = function(){
+        /*
+        Deletes all responses and children
+        */
+
+        var fsResps = $vpApi.db.getCollection('fsResp');
+        var formResps = $vpApi.db.getCollection('formResp');
+        var blockResps = $vpApi.db.getCollection('blockResp');
+        var answers = $vpApi.db.getCollection('answer');
+    
+        fsResps.clear();
+        formResps.clear();
+        blockResps.clear();
+        answers.clear();
+
+        $vpApi.db.save();
+    };
 
     this.delete = function(fsRespId){
         /*
-        A cascading delete for formResps, this will delete the children of the fsResp.
+        DEPRACTED 3/3/2015 by WB, use delete2() instead. 
 
+
+        A cascading delete for formResps, this will delete the children of the fsResp.
+        
         */
 
         obj.objects = $vpApi.db.getCollection('fsResp');
@@ -545,9 +566,49 @@ angular.module('vpApi.services', [])
 
     this.fetchByFormstackSlug = function(fsSlug){
         /*
-        
+        Returns a promise.
         */ 
 
+
+        var defer = $q.defer();
+
+        $vpApi.fetch("pforms/formstack-response", {"formstack__slug":fsSlug}, function(data, status){
+            // Success, add the formstack responses
+            if (data.results.length > 0){
+                obj.loadResponses(data.results);
+            };
+            defer.resolve(data.results, status);
+        }, function(data, status){
+            // Fail
+            defer.reject(data.results, status)
+        });
+        return defer.promise;
+    }
+
+    this.loadResponses = function(fsRespNested) {
+
+        _.each(fsRespNested, function(fsResp){
+            var formResps = angular.copy(fsResp.formResps);
+            fsResp.formResps = undefined;
+            $vpApi.db.getCollection('fsResp').insert(fsResp);
+
+            _.each(formResps, function(formResp){
+                blockResps = angular.copy(formResp.blockResps);
+                formResp.blockResps = undefined;
+                $vpApi.db.getCollection('formResp').insert(formResp);
+                
+                _.each(blockResps, function(blockResp){
+                    answers = angular.copy(blockResp.answerss);
+                    blockResp.answers = undefined;
+                    $vpApi.db.getCollection('blockResp').insert(blockResp);
+                    
+                    _.each(answers, function(ans){
+                        $vpApi.db.getCollection('answer').insert(ans);
+                    });
+
+                });
+            });
+        });
     }
 
     this.getFullResp = function(fsRespId){
