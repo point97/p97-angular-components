@@ -1,17 +1,24 @@
 <div class="question_bg form">
   <div class="p97-single-select">
       <label ng-bind-html="renderHtml(question.body)"></label>
+      <div class="select-wrapper">
+        <label class="button-select btn-lg" 
+          ng-repeat="choice in localChoices" 
+          ng-class="{'selected': choice.checked}">
 
-        <div ng-repeat="choice in localChoices">
-          <input type="checkbox" 
+          <input type="checkbox"
             ng-hide="(question.options.hideInput === true)"
             ng-change="changeSelected(choice)"
             ng-value="choice.value"
             ng-model="choice.checked"
             ng-required="question.option.required"
           />
-          {{choice.verbose}}
-        </div>
+          <span class="glyphicon glyphicon-ok-sign" 
+                aria-hidden="true" 
+                ng-if="choice.checked">
+          </span>&nbsp;{{choice.verbose}}
+
+        </label>
         
         <div ng-show="showOtherInput">
             <input type="text"
@@ -22,6 +29,7 @@
 
         <div class="item item-divider warning" ng-show="errors.length>0"> 
             <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+        </div>
         </div>
   </div>
 </div>
