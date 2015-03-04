@@ -1,14 +1,28 @@
 angular.module('mock-ionic.services', [])
 
-.service( '$ionicLoading', [function() {
+.service( '$ionicLoading', [ "$modal", function($modal) {
     console.log("mock $ionicLoading ");
 
+    obj = this;
+
     this.show = function(){
-        console.log("mock $ionicLoading.show()");
+        if (platform === "web"){
+            obj.modal = $modal({
+              content: "",
+              template: "/templates/web/partials/loading-modal.html",
+              backdrop: 'static',
+              show: true,
+              position: 'center'
+            });
+        }
+        
     }
 
     this.hide = function(){
-        console.log("mock $ionicLoading.hide()");
+        if (platform === "web"){
+            obj.hide();
+        }
+        
     }
 }])
 
