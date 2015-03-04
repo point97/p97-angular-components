@@ -28,7 +28,8 @@ var QUESTION_TYPES = [
                       'multi-select',
                       'toggle',
                       'autocomplete-search',
-                      'info'
+                      'info',
+                      'geojson'
                      ]
 
 
