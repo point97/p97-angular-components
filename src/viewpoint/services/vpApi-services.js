@@ -87,7 +87,7 @@ angular.module('vpApi.services', [])
             out = formstacks.find({'slug':slug})[0]
         }
         if(!out)
-            console.error('[$vpApi.getFormstack()] Could not find formstack');
+            console.warn('[$vpApi.getFormstack()] Could not find formstack');
 
         return out;
     }
@@ -115,17 +115,17 @@ angular.module('vpApi.services', [])
         var headers = {}// {'Authorization':'Token ' + this.user.token};
         $http.post(url, data, headers)
             .success(function(res, status){
-                var users = obj.users.find({'username': data.username});
+                var users = obj.users.find({'username': res.username});
                 if (users.length === 0){
-                    user = obj.users.insert({'username':data.username, token:res.token})
+                    user = obj.users.insert({'username':res.username, token:res.token});
                 } else {
                     user = users[0];
                     user.token = res.token;
-                    user.username = data.username;
+                    user.username = res.username;
                     obj.users.update(user);
                 }
                 obj.user = user;
-
+                debugger
                 obj.db.save();
                 localStorage.setItem('user', JSON.stringify(obj.user));
                 $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
@@ -180,7 +180,7 @@ angular.module('vpApi.services', [])
 .service('$user', ['$rootScope', '$vpApi', '$app', '$formstack', '$profile', function($rootScope, $vpApi, $app, $formstack, $profile){
     var obj = this;
 
-    $rootScope.$on('authenticated', function(event, args){
+    this.authenticatedCallback = function(event, args){
         $profile.fetch(function(){
             $vpApi.db.save(); // This is to save the profile to indexedDB.
 
@@ -232,7 +232,12 @@ angular.module('vpApi.services', [])
         function(data, status){
             console.log('Error fetching profile.');
         });
-    })
+    };
+
+    $rootScope.$on('authenticated', function(event, args){
+        obj.authenticatedCallback(event, args);
+    });
+
 }])
 
 .service( '$profile', ['$http', '$vpApi', 'config', function($http, $vpApi, config){
@@ -242,13 +247,14 @@ angular.module('vpApi.services', [])
     this.fetch = function(successCallback, errorCallback){
         /*
         Fetches profile and updates the obj.db. DOSE NOT save to localStorage
-        */
+        */ 
         var url = apiBase +'account/info/?user__username=';
         var token = $vpApi.user.token;
 
         var headers = {headers: {'Authorization':'Token ' + token}};
         $http.get(url+$vpApi.user.username, headers)
             .success(function(data, status){
+                if (data.length === 0) console.error("[$profile.fetch() User profile not found.]");
                 $vpApi.user.profile = data[0];
                 $vpApi.users.update($vpApi.user);
                 successCallback();
