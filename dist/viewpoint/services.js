@@ -1,4 +1,4 @@
-// build timestamp: Wed Mar 04 2015 15:51:57 GMT-0800 (PST)
+// build timestamp: Wed Mar 04 2015 16:15:53 GMT-0800 (PST)
 
 angular.module('cache.services', [])
 
@@ -284,15 +284,29 @@ angular.module('cache.services', [])
 }])
 angular.module('mock-ionic.services', [])
 
-.service( '$ionicLoading', [function() {
+.service( '$ionicLoading', [ "$modal", function($modal) {
     console.log("mock $ionicLoading ");
 
+    obj = this;
+
     this.show = function(){
-        console.log("mock $ionicLoading.show()");
+        if (platform === "web"){
+            obj.modal = $modal({
+              content: "",
+              template: "/templates/web/partials/loading-modal.html",
+              backdrop: 'static',
+              show: true,
+              position: 'center'
+            });
+        }
+        
     }
 
     this.hide = function(){
-        console.log("mock $ionicLoading.hide()");
+        if (platform === "web"){
+            obj.modal.hide();
+        }
+        
     }
 }])
 
@@ -1271,10 +1285,16 @@ angular.module('vpApi.services', [])
 
         // Makes the loki database available at $vpApi.db.
         obj.db = data.db;
+        // if (platform === 'web'){
+        //     obj.db.save = function(){
+        //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
+        //         $rootScope.$broadcast("db.save");
+        //     }
+        // };
+
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
-
         // Add listeners to generate uuid's 
         obj.db.getCollection('formResp').on('insert', function(item){
             item.id = obj.generateUUID();
@@ -1739,7 +1759,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$fsResp', ['$vpApi', '$rootScope', function($vpApi, $rootScope){
+.service('$fsResp', ['$vpApi', '$rootScope', '$q', function($vpApi, $rootScope, $q){
     /*
         A form response is of the form
         {
@@ -1753,12 +1773,33 @@ angular.module('vpApi.services', [])
 
     $rootScope.$on('db_loaded', function(e){
         this.objects = $vpApi.db.getCollection('fsResp');
-    })
+    });
+
+    this.clear = function(){
+        /*
+        Deletes all responses and children
+        */
+
+        var fsResps = $vpApi.db.getCollection('fsResp');
+        var formResps = $vpApi.db.getCollection('formResp');
+        var blockResps = $vpApi.db.getCollection('blockResp');
+        var answers = $vpApi.db.getCollection('answer');
+    
+        fsResps.clear();
+        formResps.clear();
+        blockResps.clear();
+        answers.clear();
+
+        $vpApi.db.save();
+    };
 
     this.delete = function(fsRespId){
         /*
-        A cascading delete for formResps, this will delete the children of the fsResp.
+        DEPRACTED 3/3/2015 by WB, use delete2() instead. 
 
+
+        A cascading delete for formResps, this will delete the children of the fsResp.
+        
         */
 
         obj.objects = $vpApi.db.getCollection('fsResp');
@@ -1787,9 +1828,56 @@ angular.module('vpApi.services', [])
         $rootScope.$broadcast('fsResp-deleted', {fsRespId: fsRespId});
     }
 
+    this.fetchByFormstackSlug = function(fsSlug){
+        /*
+        Returns a promise.
+        */ 
+
+
+        var defer = $q.defer();
+
+        $vpApi.fetch("pforms/formstack-response", {"formstack__slug":fsSlug}, function(data, status){
+            // Success, add the formstack responses
+            if (data.results.length > 0){
+                obj.loadResponses(data.results);
+            };
+            defer.resolve(data.results, status);
+        }, function(data, status){
+            // Fail
+            defer.reject(data.results, status)
+        });
+        return defer.promise;
+    }
+
+    this.loadResponses = function(fsRespNested) {
+
+        _.each(fsRespNested, function(fsResp){
+            var formResps = angular.copy(fsResp.formResps);
+            fsResp.formResps = undefined;
+            $vpApi.db.getCollection('fsResp').insert(fsResp);
+
+            _.each(formResps, function(formResp){
+                blockResps = angular.copy(formResp.blockResps);
+                formResp.blockResps = undefined;
+                $vpApi.db.getCollection('formResp').insert(formResp);
+                
+                _.each(blockResps, function(blockResp){
+                    answers = angular.copy(blockResp.answerss);
+                    blockResp.answers = undefined;
+                    $vpApi.db.getCollection('blockResp').insert(blockResp);
+                    
+                    _.each(answers, function(ans){
+                        $vpApi.db.getCollection('answer').insert(ans);
+                    });
+
+                });
+            });
+        });
+    }
+
     this.getFullResp = function(fsRespId){
         /*
-        Returns a full nested formstack response object for syncing.
+        Creates a full nested formstack response object for syncing.
         
         Returns
         {
@@ -1974,6 +2062,7 @@ angular.module('vpApi.services')
                     '$formstack',
                     '$fsResp',
                     '$ionicLoading',
+                    '$timeout',
             function($rootScope, 
                      $http, 
                      config, 
@@ -1981,8 +2070,15 @@ angular.module('vpApi.services')
                      $app,
                      $formstack, 
                      $fsResp,
-                     $ionicLoading
+                     $ionicLoading,
+                     $timeout
                      ) {
+
+    /*
+    Handles all syncing. Just wrap it in a setInterval.
+
+    Also listens for 'db.save' event and will just run pushFsResps() to save to server. 
+    */
 
     var obj = this;
     this.toasDuration = 3000;
@@ -2027,10 +2123,13 @@ angular.module('vpApi.services')
         };
 
         // Get formstack responses and then submit them
-        var submitted = angular.copy($vpApi.db.getCollection('fsResp').find({'status':'submitted'}));
-        if (submitted.length === 0) onSucess([], 'There are no submitted formstack to sync.');
-        this.submitFormstacks(submitted, onSucess, onError);
+        var fsResps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        if (fsResps.length === 0) {
+            onSucess([], 'There are no formstack responses to sync.');
+            return;
+        }
 
+        this.pushFsResps(fsResps, onSucess, onError);
 
         // Remove any old synced responses
         obj.clearSyncedFormstacks();
@@ -2041,7 +2140,7 @@ angular.module('vpApi.services')
 
     };
 
-    this.submitFormstacks = function(resps, onSucess, onError) {
+    this.pushFsResps = function(resps, onSucess, onError) {
         /*
 
         This function POST's the formstack respoinses to the
@@ -2053,6 +2152,7 @@ angular.module('vpApi.services')
         var fsResp;
         var count = 0;
         var resource;
+        var statusTable = $vpApi.db.getCollection('statusTable');
 
         submitSuccess = function(data, status){
             console.log('Submit successful: ' + data.id);
@@ -2060,12 +2160,14 @@ angular.module('vpApi.services')
 
 
             // Update statusTable
-            item = obj.statusTable.find({'resourceId':data.id})[0];
+            item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';
 
-            // Update record's status
+
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
-            fsResp.status = 'synced';
+
+            // Update record's status to synced to lock it if it was submitted.
+            fsResp.status = (data.status === 'submitted')? 'synced': data.status;
             fsResp.syncedAt = $vpApi.getTimestamp();
 
             $vpApi.db.save();
@@ -2080,7 +2182,8 @@ angular.module('vpApi.services')
             console.log('I failed ' + status);
 
             // Update statusTable
-            item = obj.statusTable.find({'resourceId':data.id});
+            
+            item = statusTable.find({'resourceId':data.id});
             item.status = 'fail';
             $vpApi.db.save();
 
@@ -2092,13 +2195,15 @@ angular.module('vpApi.services')
         }
 
         _.each(resps, function( resp ){
+
             fsFullResp = $fsResp.getFullResp(resp.$loki);
 
             resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
             console.log("About to post to " + resource);
 
             // Update status table
-            item = obj.statusTable.find({'resourceId':resp.id});
+            var statusTable = $vpApi.db.getCollection('statusTable');
+            item = statusTable.find({'resourceId':resp.id});
 
             if (item.length === 0) {
                 // This must be a new attempt
@@ -2111,12 +2216,12 @@ angular.module('vpApi.services')
                     "resourceId": resp.id
                 }
 
-                obj.statusTable.insert(item);
+                statusTable.insert(item);
             } else {
                 item.status = 'pending';
                 item.attempts++;
                 item.lastAttempt = $vpApi.getTimestamp();
-                obj.statusTable.update(item);
+                statusTable.update(item);
             }
             $vpApi.db.save();
             $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
@@ -2334,4 +2439,26 @@ angular.module('vpApi.services')
             $formstack.updateBySlug(fs.slug, last_ts, success, error);
         });
     }; // end _updateFormstacks()
+
+    saveListenerHandler = function(){
+        obj.saveListener(); // This should remove it
+        var onSucess = function(data, status){
+            console.log("[db.save] Success")
+        }
+        var onError = function(data, status){
+            console.log("[db.save] Fail")
+
+        }
+
+        var resps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        obj.pushFsResps(resps, onSucess, onError);
+
+        // Remove the listener for a liitle bit so we don't spam the server.
+        
+        $timeout(function() {
+            console.log("restarting db.save listener")
+            obj.saveListener  = $rootScope.$on('db.save', saveListenerHandler);
+        }, 1000);
+    }
+    obj.saveListener  = $rootScope.$on('db.save', saveListenerHandler);
 }]);
