@@ -3,6 +3,10 @@ angular.module('p97.questionTypes')
     if ($injector.has('$ionicPopup')) {
         var $ionicPopup = $injector.get('$ionicPopup');
     }
+
+    if ($injector.has('$modal')) {
+        var $modal = $injector.get('$modal');
+    }
     return {
         template: '',
         restrict: 'EA',
@@ -18,6 +22,8 @@ angular.module('p97.questionTypes')
 
             var reg = /^[A-Za-z\d() _.,-]*$/;
             var options = scope.question.options;
+            scope.errorLength = false;
+            scope.errorDuplicate = false;
 
             scope.setBlock = function(){
                 scope.errors = [];
@@ -110,43 +116,42 @@ angular.module('p97.questionTypes')
 
             //show Other Input in Modal on click
             scope.otherInputModal = function() {
-                var otherInputPopup = $ionicPopup.show({
-                  template: '<input type="text" ng-model="obj.otherValue">',
-                  title: 'Other Option',
-                  scope: scope,
-                  subTitle: 'Please enter your input below',
-                  buttons: [
-                    { 
-                      text: 'Cancel',
-                      onTap: function(e) {
-                        scope.cancelOther();
-                      } 
-                    },
-                    {
-                      text: '<b>Confirm</b>',
-                      type: 'button-positive',
-                      onTap: function(e) {
-                          if (scope.otherValueCheck() == false) {
-                            return false;
-                          };
+                //modal popup for hybrid/ionic
+                if (platform === 'hybrid') {
+                    var otherInputPopup = $ionicPopup.show({
+                      template: '<input type="text" ng-model="obj.otherValue">',
+                      title: 'Other Option',
+                      scope: scope,
+                      subTitle: 'Please enter your input below',
+                      buttons: [
+                        { 
+                          text: 'Cancel',
+                          onTap: function(e) {
+                            scope.cancelOther();
+                          } 
+                        },
+                        {
+                          text: '<b>Confirm</b>',
+                          type: 'button-positive',
+                          onTap: function(e) {
+                            scope.confirmModalOtherValue();
+                          }
+                        }
+                      ]
+                    });
+                }
 
-                          _.each(scope.localChoices, function (i) {
-                            if ((i.verbose.substring(0, 13)) === 'User Entered:') {
-                                scope.localChoices = _.reject(scope.localChoices, i)
-                                }
-                                return scope.localChoices;
-                            });
+                //web - angular-strap modal
+                if (platform === 'web') {
+                    scope.errorLength = false;
+                    scope.errorDuplicate = false;
+                     var myOtherModal = $modal({
+                        scope: scope, 
+                        template: 'templates/web/partials/other-input-modal.html', 
+                        show: true
+                    });
+                };
 
-                          var newChoice = { 'verbose': 'User Entered: '+scope.obj.otherValue, 'value': scope.obj.otherValue, 'checked': true};
-                          //inserts newChoice into question.choices in front of 'Other'
-                          scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
-                          scope.localChoices[scope.localChoices.length - 1].checked = false;
-                          scope.inputValue = scope.obj.otherValue; 
-                          scope.obj.otherValue = '';
-                      }
-                    }
-                  ]
-                });
             }
 
             // Compile the template into the directive's scope.
@@ -163,33 +168,66 @@ angular.module('p97.questionTypes')
                 }
             });
 
+            //confirmation function for otherInputModal
+            scope.confirmModalOtherValue = function() {
+                if (scope.otherValueCheck() == false) {
+                  return false;
+                };
+
+                _.each(scope.localChoices, function (i) {
+                  if ((i.verbose.substring(0, 13)) === 'User Entered:') {
+                      scope.localChoices = _.reject(scope.localChoices, i)
+                      }
+                      return scope.localChoices;
+                  });
+
+                var newChoice = { 'verbose': 'User Entered: '+scope.obj.otherValue, 'value': scope.obj.otherValue, 'checked': true};
+                //inserts newChoice into question.choices in front of 'Other'
+                scope.localChoices.splice(scope.localChoices.length -1, 0, newChoice);
+                scope.localChoices[scope.localChoices.length - 1].checked = false;
+                scope.inputValue = scope.obj.otherValue; 
+                scope.obj.otherValue = '';
+            };
+
             scope.otherValueCheck = function () {
 
                 if (scope.obj.otherValue.length > 0) {
-
                     localContains = (_.some(scope.localChoices, function(i) {
                         return i.value == scope.obj.otherValue
                     }))
                     
                     if (localContains) {
-                        ($ionicPopup ? $ionicPopup.alert({
-                                            title: 'Duplicate Entries',
-                                            template: 'You have typed a duplicate answer. Please try again.'
-                                        }) 
-                                     :  alert('You have typed a duplicate answer. Please try again.')
-                        );
+                        scope.errorDuplicate = false;
+                        if (platform === 'hybrid') {
+                            $ionicPopup.alert({
+                                title: 'Duplicate Entries',
+                                template: 'You have typed a duplicate answer. Please try again.'
+                            }); 
+                        };
+
+                        if (platform === 'web') {
+                            scope.errorDuplicate = true;
+                        };
+
                         scope.obj.otherValue = '';
                         scope.cancelOther();
                         return false;
                     }; //end contains duplicate
 
                     if (scope.obj.otherValue.length > scope.question.options.other_max_length) {
-                        ($ionicPopup ? $ionicPopup.alert({
-                                            title: 'Too long',
-                                            template: 'You have typed an answer that is too long. Please try again.'
-                                        }) 
-                                     :  alert('You have typed an answer that is too long. Please try again.')
-                        );
+                        scope.errorLength = false;
+
+                        if (platform === 'hybrid') {
+                            $ionicPopup.alert({
+                                title: 'Too long',
+                                template: 'You have typed an answer that is too long. Please try again.'
+                            }); 
+                        };
+
+                        if (platform === 'web') {
+                            scope.errorLength = true;
+                        };
+
                         scope.obj.otherValue = '';
                         scope.cancelOther();
                         return false;
@@ -221,6 +259,3 @@ angular.module('p97.questionTypes')
         }
     } // end return 
 }])
-
-
-
