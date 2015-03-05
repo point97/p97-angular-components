@@ -22,8 +22,6 @@ angular.module('p97.questionTypes')
 
             var reg = /^[A-Za-z\d() _.,-]*$/;
             var options = scope.question.options;
-            scope.errorLength = false;
-            scope.errorDuplicate = false;
 
             scope.setBlock = function(){
                 scope.errors = [];
@@ -143,9 +141,7 @@ angular.module('p97.questionTypes')
 
                 //web - angular-strap modal
                 if (platform === 'web') {
-                    scope.errorLength = false;
-                    scope.errorDuplicate = false;
-                     var myOtherModal = $modal({
+                    scope.myOtherModal = $modal({
                         scope: scope, 
                         template: 'templates/web/partials/other-input-modal.html', 
                         show: true
@@ -189,12 +185,31 @@ angular.module('p97.questionTypes')
                 scope.obj.otherValue = '';
             };
 
-            scope.otherValueCheck = function () {
+            //notification confirmation for 'other' answer
+            scope.otherValueCheck = function() {
+                scope.errorEmpty = false;
+                scope.errorDuplicate = false;
+                scope.errorLength = false;
+
+                if (scope.obj.otherValue === null || scope.obj.otherValue === "") {
+                    if (platform === 'hybrid'){
+                        $ionicPopup.alert({
+                            title: 'No Entry Made',
+                            template: 'No entry has been made. Please try again or click Cancel.'
+                        });
+                    };
+
+                    if (platform === 'web') {
+                        scope.errorEmpty = true;
+                    }
+                    scope.cancelOther();
+                    return false;
+                };
 
                 if (scope.obj.otherValue.length > 0) {
                     localContains = (_.some(scope.localChoices, function(i) {
                         return i.value == scope.obj.otherValue
-                    }))
+                    }));
                     
                     if (localContains) {
                         scope.errorDuplicate = false;
@@ -202,38 +217,44 @@ angular.module('p97.questionTypes')
                             $ionicPopup.alert({
                                 title: 'Duplicate Entries',
                                 template: 'You have typed a duplicate answer. Please try again.'
-                            }); 
+                            });
                         };
 
-                        if (platform === 'web') {
+                        if (platform === 'web'){
                             scope.errorDuplicate = true;
-                        };
+                        }; 
 
                         scope.obj.otherValue = '';
                         scope.cancelOther();
                         return false;
                     }; //end contains duplicate
 
-                    if (scope.obj.otherValue.length > scope.question.options.other_max_length) {
-                        scope.errorLength = false;
-
-                        if (platform === 'hybrid') {
+                    if (scope.obj.otherValue.length > options.other_max_length) {
+                       if (platform === 'hybrid'){
                             $ionicPopup.alert({
                                 title: 'Too long',
                                 template: 'You have typed an answer that is too long. Please try again.'
-                            }); 
-                        };
+                            });
+                        }; 
 
-                        if (platform === 'web') {
+                        if (platform === 'web'){
                             scope.errorLength = true;
                         };
 
-                        scope.obj.otherValue = '';
                         scope.cancelOther();
                         return false;
                     }; //end lengthy input
-                }          
-            }
+
+                    scope.closeModal = function() {
+                        if (platform === 'web' 
+                            && scope.errorLength === false
+                            && scope.errorDuplicate === false
+                            && scope.errorEmpty === false ) {
+                            scope.myOtherModal.$promise.then(scope.myOtherModal.hide);
+                        };
+                    };
+                }
+            };
 
             //used multiple times throughout directive - unchecks and removes 'other' value
             scope.cancelOther = function () {

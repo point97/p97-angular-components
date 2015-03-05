@@ -22,8 +22,6 @@ angular.module('p97.questionTypes')
 
             var options = scope.question.options;
             var reg = /^[A-Za-z\d() _.,-]*$/;
-            scope.errorDuplicate = false;
-            scope.errorLength = false;
             
             scope.setBlock = function(){
                 scope.showOtherInput = false;
@@ -76,6 +74,8 @@ angular.module('p97.questionTypes')
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
                 scope.errors = [];
+
+                scope.choicesSelected = scope.value.length;
 
                 if (options.required && options.required === true) {
                     if (scope.value.length === 0) {
@@ -161,9 +161,7 @@ angular.module('p97.questionTypes')
 
                 //web - angular-strap
                 if (platform === 'web') {
-                    scope.errorDuplicate = false;
-                    scope.errorLength = false;
-                     var myOtherModal = $modal({
+                    scope.myOtherModal = $modal({
                         scope: scope, 
                         template: 'templates/web/partials/other-input-modal.html', 
                         show: true
@@ -188,10 +186,27 @@ angular.module('p97.questionTypes')
 
             //notification confirmation for 'other' answer
             scope.otherValueCheck = function() {
+                scope.errorEmpty = false;
+                scope.errorDuplicate = false;
+                scope.errorLength = false;
+
+                if (scope.obj.otherValue === null || scope.obj.otherValue === "") {
+                    if (platform === 'hybrid'){
+                        $ionicPopup.alert({
+                            title: 'No Entry Made',
+                            template: 'No entry has been made. Please try again or click Cancel.'
+                        });
+                    };
+
+                    if (platform === 'web') {
+                        scope.errorEmpty = true;
+                    }
+                    scope.cancelOther();
+                    return false;
+                };
 
                 if (scope.obj.otherValue.length > 0) {
                     if (_.contains(scope.value, scope.obj.otherValue)) {
-                        scope.errorDuplicate = false;
                         if (platform === 'hybrid'){
                             $ionicPopup.alert({
                                 title: 'Duplicate Entries',
@@ -209,7 +224,6 @@ angular.module('p97.questionTypes')
                     }; //end contains duplicate
 
                     if (scope.obj.otherValue.length > options.other_max_length) {
-                        scope.errorLength = false;
                        if (platform === 'hybrid'){
                             $ionicPopup.alert({
                                 title: 'Too long',
@@ -224,15 +238,20 @@ angular.module('p97.questionTypes')
                         scope.cancelOther();
                         return false;
                     }; //end lengthy input
+
+                    scope.closeModal = function() {
+                        if (platform === 'web' 
+                            && scope.errorLength === false
+                            && scope.errorDuplicate === false
+                            && scope.errorEmpty === false ) {
+                            scope.myOtherModal.$promise.then(scope.myOtherModal.hide);
+                        };
+                    };
                 }
             };
 
             scope.$watch('valueArray', function(newValues) {
                 if (!newValues) return;
-
-                //watch  the number of choices selected within valueArray
-                var choicesSelected = newValues.length;
-                scope.choicesSelected = choicesSelected;
 
                 //show or hides text input depending on if valueArray contains an 'other' value
                 if (_.contains(newValues, 'other')) {
