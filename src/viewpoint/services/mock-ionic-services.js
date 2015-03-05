@@ -20,7 +20,7 @@ angular.module('mock-ionic.services', [])
 
     this.hide = function(){
         if (platform === "web"){
-            obj.hide();
+            obj.modal.hide();
         }
         
     }

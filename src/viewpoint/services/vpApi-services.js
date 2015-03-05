@@ -20,17 +20,16 @@ angular.module('vpApi.services', [])
 
         // Makes the loki database available at $vpApi.db.
         obj.db = data.db;
-        if (platform === 'web'){
-            obj.db.save = function(){
-                console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
-                $rootScope.$broadcast("db.save");
-            }
-        };
+        // if (platform === 'web'){
+        //     obj.db.save = function(){
+        //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
+        //         $rootScope.$broadcast("db.save");
+        //     }
+        // };
 
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
-
         // Add listeners to generate uuid's 
         obj.db.getCollection('formResp').on('insert', function(item){
             item.id = obj.generateUUID();
