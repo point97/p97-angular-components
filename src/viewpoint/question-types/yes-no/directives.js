@@ -15,10 +15,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
         link: function(scope, element, attrs) {
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'yes-no/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'yes-no/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'yes-no/templates/ionic/yes-no.html';
+                    return BASE_TEMPLATE_URL+'yes-no/templates/'+platform+'/yes-no.html';
             }
 
             scope.renderHtml = function(htmlCode) {

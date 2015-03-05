@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
 
-var BASE_URL = 'js/p97-components/src/viewpoint/question-types/';
+var BASE_TEMPLATE_URL = 'js/p97-components/src/viewpoint/question-types/';
 var TEMPLATE_THEME = 'ionic';
 
 angular.module('starter', ['ionic', 'starter.controllers', 'p97.questionTypes'])

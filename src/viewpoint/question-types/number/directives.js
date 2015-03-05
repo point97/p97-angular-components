@@ -33,10 +33,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.setBlock();
             
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'number/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'number/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'number/templates/ionic/number.html';
+                    return BASE_TEMPLATE_URL+'number/templates/'+platform+'/number.html';
             }
 
             scope.renderHtml = function(htmlCode) {

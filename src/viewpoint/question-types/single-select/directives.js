@@ -34,10 +34,10 @@ angular.module('p97.questionTypes')
             scope.setBlock();
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'single-select/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'single-select/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'single-select/templates/ionic/checkbox-single.html';
+                    return BASE_TEMPLATE_URL+'single-select/templates/'+platform+'/checkbox-single.html';
             }
 
             scope.renderHtml = function(htmlCode) {

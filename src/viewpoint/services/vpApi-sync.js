@@ -12,6 +12,7 @@ angular.module('vpApi.services')
                     '$formstack',
                     '$fsResp',
                     '$ionicLoading',
+                    '$timeout',
             function($rootScope, 
                      $http, 
                      config, 
@@ -19,8 +20,15 @@ angular.module('vpApi.services')
                      $app,
                      $formstack, 
                      $fsResp,
-                     $ionicLoading
+                     $ionicLoading,
+                     $timeout
                      ) {
+
+    /*
+    Handles all syncing. Just wrap it in a setInterval.
+
+    Also listens for 'db.save' event and will just run pushFsResps() to save to server. 
+    */
 
     var obj = this;
     this.toasDuration = 3000;
@@ -65,10 +73,13 @@ angular.module('vpApi.services')
         };
 
         // Get formstack responses and then submit them
-        var submitted = angular.copy($vpApi.db.getCollection('fsResp').find({'status':'submitted'}));
-        if (submitted.length === 0) onSucess([], 'There are no submitted formstack to sync.');
-        this.submitFormstacks(submitted, onSucess, onError);
+        var fsResps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        if (fsResps.length === 0) {
+            onSucess([], 'There are no formstack responses to sync.');
+            return;
+        }
 
+        this.pushFsResps(fsResps, onSucess, onError);
 
         // Remove any old synced responses
         obj.clearSyncedFormstacks();
@@ -79,7 +90,7 @@ angular.module('vpApi.services')
 
     };
 
-    this.submitFormstacks = function(resps, onSucess, onError) {
+    this.pushFsResps = function(resps, onSucess, onError) {
         /*
 
         This function POST's the formstack respoinses to the
@@ -91,6 +102,7 @@ angular.module('vpApi.services')
         var fsResp;
         var count = 0;
         var resource;
+        var statusTable = $vpApi.db.getCollection('statusTable');
 
         submitSuccess = function(data, status){
             console.log('Submit successful: ' + data.id);
@@ -98,12 +110,14 @@ angular.module('vpApi.services')
 
 
             // Update statusTable
-            item = obj.statusTable.find({'resourceId':data.id})[0];
+            item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';
 
-            // Update record's status
+
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
-            fsResp.status = 'synced';
+
+            // Update record's status to synced to lock it if it was submitted.
+            fsResp.status = (data.status === 'submitted')? 'synced': data.status;
             fsResp.syncedAt = $vpApi.getTimestamp();
 
             $vpApi.db.save();
@@ -118,7 +132,8 @@ angular.module('vpApi.services')
             console.log('I failed ' + status);
 
             // Update statusTable
-            item = obj.statusTable.find({'resourceId':data.id});
+            
+            item = statusTable.find({'resourceId':data.id});
             item.status = 'fail';
             $vpApi.db.save();
 
@@ -130,13 +145,15 @@ angular.module('vpApi.services')
         }
 
         _.each(resps, function( resp ){
+
             fsFullResp = $fsResp.getFullResp(resp.$loki);
 
             resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
             console.log("About to post to " + resource);
 
             // Update status table
-            item = obj.statusTable.find({'resourceId':resp.id});
+            var statusTable = $vpApi.db.getCollection('statusTable');
+            item = statusTable.find({'resourceId':resp.id});
 
             if (item.length === 0) {
                 // This must be a new attempt
@@ -149,12 +166,12 @@ angular.module('vpApi.services')
                     "resourceId": resp.id
                 }
 
-                obj.statusTable.insert(item);
+                statusTable.insert(item);
             } else {
                 item.status = 'pending';
                 item.attempts++;
                 item.lastAttempt = $vpApi.getTimestamp();
-                obj.statusTable.update(item);
+                statusTable.update(item);
             }
             $vpApi.db.save();
             $vpApi.post(resource, fsFullResp, submitSuccess, submitFail);
@@ -372,4 +389,26 @@ angular.module('vpApi.services')
             $formstack.updateBySlug(fs.slug, last_ts, success, error);
         });
     }; // end _updateFormstacks()
+
+    saveListenerHandler = function(){
+        obj.saveListener(); // This should remove it
+        var onSucess = function(data, status){
+            console.log("[db.save] Success")
+        }
+        var onError = function(data, status){
+            console.log("[db.save] Fail")
+
+        }
+
+        var resps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        obj.pushFsResps(resps, onSucess, onError);
+
+        // Remove the listener for a liitle bit so we don't spam the server.
+        
+        $timeout(function() {
+            console.log("restarting db.save listener")
+            obj.saveListener  = $rootScope.$on('db.save', saveListenerHandler);
+        }, 1000);
+    }
+    obj.saveListener  = $rootScope.$on('db.save', saveListenerHandler);
 }]);

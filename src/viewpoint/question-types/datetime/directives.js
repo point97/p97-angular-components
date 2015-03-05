@@ -19,10 +19,10 @@ angular.module('p97.questionTypes')
             scope.errors = [];
 
             scope.getContentUrl = function() {
-                if(scope.question.options.templateUrl)
-                    return BASE_URL+'datetime/templates/'+scope.question.options.templateUrl+'.html';
+                if(scope.question.options.widget)
+                    return BASE_TEMPLATE_URL+'datetime/templates/'+scope.question.options.widget+'.html';
                 else
-                    return BASE_URL+'datetime/templates/ionic/datetime.html';
+                    return BASE_TEMPLATE_URL+'datetime/templates/'+platform+'/datetime.html';
             }
 
             scope.renderHtml = function(htmlCode) {
