@@ -100,14 +100,15 @@ angular.module('vpApi.services')
         var changes = $vpApi.db.generateChangesNotification(['fsResp']);
         var fsResps = [];
         
-        console.log("[sync.run()] Changes: " + changes);
+        console.log("[sync.run()] Changes: " + _.map(changes, function(item){console.log(item);}) );
         
         if (changes.length > 0){
             fsResps = _.map(changes, function(change){
-                if (!change.obj.id) return null;  // Insert operations have no ID. That is done after the insert.
-                var fsRespObj = $vpApi.db.getCollection('fsResp').find({'id':change.obj.id});
                 console.log("change.obj.id: ")
                 console.log(change.obj.id)
+                if (!change.obj.id) return null;  // Insert operations have no ID. That is done after the insert.
+                var fsRespObj = $vpApi.db.getCollection('fsResp').find({'id':change.obj.id});
+                
                 console.log(fsRespObj);
                 if (fsRespObj.length > 0){
                     return angular.copy(fsRespObj[0]);

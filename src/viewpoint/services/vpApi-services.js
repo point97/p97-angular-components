@@ -34,27 +34,27 @@ angular.module('vpApi.services', [])
         // Add listeners to generate uuid's 
         var col = obj.db.getCollection('fsResp');
         col.setChangesApi(true);
-        col.on('insert', function(item){
+        col.on('pre-insert', function(item){
             item.id = obj.generateUUID();
         });
 
         col = obj.db.getCollection('formResp');
         col.setChangesApi(true);
-        col.on('insert', function(item){
+        col.on('pre-insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
         col = obj.db.getCollection('blockResp');
         col.setChangesApi(true);
-        col.on('insert', function(item){
+        col.on('pre-insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
         col = obj.db.getCollection('answer');
         col.setChangesApi(true);
-        col.on('insert', function(item){
+        col.on('pre-insert', function(item){
             item.id = obj.generateUUID();
         });
 
