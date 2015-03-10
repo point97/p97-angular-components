@@ -81,19 +81,20 @@ describe("vpApi sync service", function () {
         inject(function (_$sync_, $httpBackend) {
             sync = _$sync_;
             httpBackend = $httpBackend;
-
-
     }));
 
-    it("Create a fsResp and run sync.run()", function () {
+
+
+    it("Create a fsResp and run sync.run().", function () {
 
         var fsResp = {
             'fsId': 1,
             'fsSlug':'test-formstack',
             'cupdate': $vpApi.getTimestamp(),
             'ccreated': $vpApi.getTimestamp(),
-            'status': 'in-progress'
+            'status': 'in-progress',
         };
+        
 
         var app = {
                 id: 1,
@@ -116,8 +117,6 @@ describe("vpApi sync service", function () {
 
         var entry = $vpApi.db.getCollection('fsResp').insert(fsResp);
         
-        
-
         var success = function(data, res){
             sync.run(function(){
                 var statusTable = $vpApi.db.getCollection('statusTable').find({'resourceId':entry.id});
@@ -152,10 +151,6 @@ describe("vpApi sync service", function () {
 
         $app.fetchBySlug("short-test-app", success, fail);
         httpBackend.flush();
-
-        
-
-
 
     });
 

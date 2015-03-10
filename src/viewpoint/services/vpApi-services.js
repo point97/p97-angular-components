@@ -7,7 +7,8 @@ angular.module('vpApi.services', [])
     this.username = '';
     this.user = {};
     this.users;
-    this.dbLoaded = false
+    this.dbLoaded = false;
+
     this.dbinit = function(initCallback){
         /*
             Loads or creates the database. 
@@ -31,25 +32,33 @@ angular.module('vpApi.services', [])
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
         // Add listeners to generate uuid's 
-        obj.db.getCollection('formResp').on('insert', function(item){
+        var col = obj.db.getCollection('fsResp');
+        col.setChangesApi(true);
+        col.on('insert', function(item){
+            item.id = obj.generateUUID();
+        });
+
+        col = obj.db.getCollection('formResp');
+        col.setChangesApi(true);
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
-        obj.db.getCollection('fsResp').on('insert', function(item){
+        col = obj.db.getCollection('blockResp');
+        col.setChangesApi(true);
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
-        obj.db.getCollection('blockResp').on('insert', function(item){
-            item.id = obj.generateUUID();
-
-        });
-
-        obj.db.getCollection('answer').on('insert', function(item){
+        col = obj.db.getCollection('answer');
+        col.setChangesApi(true);
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
         });
 
+        obj.db.save(); // This is required in order for the UUID's and the changes API to work.
         return;
 
     }
@@ -131,7 +140,6 @@ angular.module('vpApi.services', [])
                     obj.users.update(user);
                 }
                 obj.user = user;
-                debugger
                 obj.db.save();
                 localStorage.setItem('user', JSON.stringify(obj.user));
                 $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
