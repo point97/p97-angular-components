@@ -1,4 +1,4 @@
-// build timestamp: Tue Mar 10 2015 12:35:14 GMT-0700 (PDT)
+// build timestamp: Tue Mar 10 2015 13:39:41 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1299,27 +1299,27 @@ angular.module('vpApi.services', [])
         // Add listeners to generate uuid's 
         var col = obj.db.getCollection('fsResp');
         col.setChangesApi(true);
-        col.on('pre-insert', function(item){
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
         });
 
         col = obj.db.getCollection('formResp');
         col.setChangesApi(true);
-        col.on('pre-insert', function(item){
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
         col = obj.db.getCollection('blockResp');
         col.setChangesApi(true);
-        col.on('pre-insert', function(item){
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
 
         });
 
         col = obj.db.getCollection('answer');
         col.setChangesApi(true);
-        col.on('pre-insert', function(item){
+        col.on('insert', function(item){
             item.id = obj.generateUUID();
         });
 
