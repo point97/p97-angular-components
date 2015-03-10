@@ -22,8 +22,11 @@ module.exports = function(config) {
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/underscore/underscore-min.js',
       'bower_components/datejs/build/production/date.min.js',
+      'bower_components/lokijs/build/lokijs.min.js',
+      'bower_components/lokijs/build/lokiIndexedAdapter.min.js',
 
-      // Our app
+            // Our app
+      'app/scripts/p97-components/src/viewpoint/services/*.js',
       'app/scripts/p97-components/src/viewpoint/question-types/*.js',  // Get the main module
       'app/scripts/p97-components/src/viewpoint/question-types/**/*.js', // Get all the directives and controllers
 
@@ -32,7 +35,7 @@ module.exports = function(config) {
 
       'app/scripts/**/*.js',
       'test/mock/**/*.js',
-      'test/spec/**/*.js',
+      'test/spec/services/*.js',
 
       'bower_components/jquery/dist/jquery.js',
     ],

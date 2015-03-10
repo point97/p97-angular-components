@@ -11,7 +11,6 @@ angular.module('vpApi.services')
                     '$app',
                     '$formstack',
                     '$fsResp',
-                    '$ionicLoading',
                     '$timeout',
             function($rootScope, 
                      $http, 
@@ -20,7 +19,6 @@ angular.module('vpApi.services')
                      $app,
                      $formstack, 
                      $fsResp,
-                     $ionicLoading,
                      $timeout
                      ) {
 
@@ -60,10 +58,9 @@ angular.module('vpApi.services')
         }
 
         onSucess = function(data, status) {
-            console.log('[$sync.run.OnSucess]');
             $rootScope.$broadcast('sync-complete', data);
             callback(data, status);
-
+            $vpApi.db.clearChanges();
             
         };
 
@@ -73,12 +70,25 @@ angular.module('vpApi.services')
         };
 
         // Get formstack responses and then submit them
-        var fsResps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        var changes = $vpApi.db.serializeChanges(['fsResp', 'formResp', 'blockResp', 'answer']);
+        var fsResps = [];
+        
+
+        if (changes === "[]"){
+            var resps = $vpApi.db.getCollection('fsResp').chain()
+                            .find({"collection": "fsResp"})
+                            .find({"status": "pending"})
+                            .data()
+            fsResps = angular.copy(resps)
+        } else {
+            fsResps = angular.copy($vpApi.db.getCollection('fsResp').data);
+        }
+
         if (fsResps.length === 0) {
             onSucess([], 'There are no formstack responses to sync.');
             return;
         }
-
+        
         this.pushFsResps(fsResps, onSucess, onError);
 
         // Remove any old synced responses
@@ -105,14 +115,10 @@ angular.module('vpApi.services')
         var statusTable = $vpApi.db.getCollection('statusTable');
 
         submitSuccess = function(data, status){
-            console.log('Submit successful: ' + data.id);
-            console.log(data);
-
 
             // Update statusTable
             item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';
-
 
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
 
@@ -149,8 +155,7 @@ angular.module('vpApi.services')
             fsFullResp = $fsResp.getFullResp(resp.$loki);
 
             resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
-            console.log("About to post to " + resource);
-
+            
             // Update status table
             var statusTable = $vpApi.db.getCollection('statusTable');
             item = statusTable.find({'resourceId':resp.id});
@@ -163,6 +168,7 @@ angular.module('vpApi.services')
                     "lastAttempt": $vpApi.getTimestamp(),
                     "method": "POST",
                     "resourceUri": resource,
+                    "collection": "fsResp",
                     "resourceId": resp.id
                 }
 
@@ -203,20 +209,16 @@ angular.module('vpApi.services')
     };
 
     this.updateReadOnly = function(){
-        // TODO Make this happen
-        console.log("I NEED TO UPDATE MEDIA AND TILES???");
-        appObj = obj._updateApp();
-
         
+        appObj = obj._updateApp();
         var updateListener = $rootScope.$on('app-updated', function(event, args){
-            console.log("in app-updated listener");
-
             // Reconcile app formstacks and collection formstacks here.
             
             var formstackSlugs; // The combined list of formstacks that need updating.
             var remoteFormstacks;
 
             var localFormstacks = $formstack.getSlugs();
+
             if (args.app.formstacks.length > 0 && args.app.formstacks[0].slug ) {
                 remoteFormstacks =  _.map(args.app.formstacks, function(fs) {return fs.slug;});
             } else {
@@ -226,15 +228,8 @@ angular.module('vpApi.services')
             var newFormstacks = _.difference(remoteFormstacks, localFormstacks);
             var staleFormstacks = _.difference(localFormstacks, remoteFormstacks);
 
-            console.log("newFormstacks");
-            console.table(newFormstacks);
-
-            console.log("staleFormstacks");
-            console.table(staleFormstacks);
 
             formstackSlugs = localFormstacks.concat(newFormstacks);
-            console.log("formstack slugs to update: ");
-            console.table(formstackSlugs);
 
             obj._updateFormstacks(formstackSlugs);
             updateListener();  // This destroys the listener?
@@ -249,7 +244,6 @@ angular.module('vpApi.services')
         var app = $vpApi.getApp();
 
         var entry;
-        console.log("Checking for app updates " + app.slug);
         var entrys = obj.statusTable.chain()
             .find({'resourceId': app.id})
             .find({'method':'GET'})
@@ -283,9 +277,9 @@ angular.module('vpApi.services')
                 app = $vpApi.getApp();
                 
                 if (data === null){
-                    console.log("[_updateApp] No updates found");
+
                 } else {
-                    // Need to insert the updated formstack into $loki.
+                    
                     console.log("[_updateApp] app updated: " + app.slug);
                 }
                 // Update status table
@@ -307,7 +301,6 @@ angular.module('vpApi.services')
             console.warn("[_updateApp] update failed, status " + status);
             console.log(data);
         } // end error()
-        console.log("Checking for updates to app " + app.slug);
         $app.updateBySlug(app.slug, last_ts, success, error);
     };// end _updateApp()
 

@@ -7,11 +7,15 @@
     "es5-shim": "~3.1.0",
     "bootstrap-sass-official": "~3.2.0",
     "underscore": "~1.7.0",
-    "datejs": "~1.0.0-rc1"
+    "datejs": "~1.0.0-rc1",
+    "lokijs": "*"
   },
   "devDependencies": {
     "angular-mocks": "1.2.25",
     "angular-scenario": "1.2.25"
   },
-  "appPath": "app"
+  "appPath": "app",
+  "resolutions": {
+    "angular": "1.2.25"
+  }
 }

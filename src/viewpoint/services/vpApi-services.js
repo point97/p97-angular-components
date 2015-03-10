@@ -150,9 +150,11 @@ angular.module('vpApi.services', [])
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
 
         $http.get(url, config).success(function(data, status){
+
           success(data, status);
         })
         .error(function(data, status){
+          console.log("get fail");
           fail(data, status);
         });
     }
@@ -294,7 +296,6 @@ angular.module('vpApi.services', [])
         /*
         Get the formstack from the VP2 server. 
         */
-
         if(HAS_CONNECTION){
           $vpApi.fetch(
             this.resource_name, 
@@ -311,13 +312,12 @@ angular.module('vpApi.services', [])
                 successCallback(data[0], status);
             },
             function(data, status){
-                console.log("Failed to fetch " + obj.resource_name + ". Returned Status: " + status);
-                console.log(data);
                 errorCallback(data, status)
             }
           );
 
         }else{
+            
             debugger
         }
 
@@ -585,7 +585,7 @@ angular.module('vpApi.services', [])
     }
 
     this.loadResponses = function(fsRespNested) {
-
+        debugger
         _.each(fsRespNested, function(fsResp){
             var formResps = angular.copy(fsResp.formResps);
             fsResp.formResps = undefined;
@@ -600,7 +600,7 @@ angular.module('vpApi.services', [])
                     answers = angular.copy(blockResp.answerss);
                     blockResp.answers = undefined;
                     $vpApi.db.getCollection('blockResp').insert(blockResp);
-                    
+                    debugger
                     _.each(answers, function(ans){
                         $vpApi.db.getCollection('answer').insert(ans);
                     });
