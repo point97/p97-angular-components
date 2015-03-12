@@ -747,7 +747,7 @@ angular.module('vpApi.services', [])
     }
 }])
 
-.service('$blockResponse', ['$formstack', '$block', '$rootScope', '$answers', '$formResponse', '$vpApi', function($formstack, $block, $rootScope, $answers, $formResponse, $vpApi){
+.service('$blockResponse', ['$vpApi', function($vpApi){
     /*
         A block response is of the form
         {
@@ -761,11 +761,6 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/block-response'; //This is currently client side only
 
-
-    $rootScope.$on('answer-created', function(event, data){
-        debugger;
-    })
-
     this.delete = function(blockRespId){
         /*
         Deleting entire block responses
@@ -775,9 +770,12 @@ angular.module('vpApi.services', [])
         // Remove the responses in block
         $vpApi.db.getCollection('blockResp').remove(blockResp);
 
-        var mapFeatureCollection = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId});
-        // Remove map feature
-        $vpApi.db.getCollection('answer').remove(mapFeatureCollection);
+        var answers = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId})
+
+
+        _.each(answers, function(ans){
+            $vpApi.db.getCollection('answer').remove(ans);
+        });
 
         $vpApi.db.save();
     }
