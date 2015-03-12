@@ -646,7 +646,7 @@ angular.module('survey.services', [])
 
         */
 
-        fsRespId = fsRespId || scope.current.fsResp.$loki;
+        fsRespId = fsRespId || scope.current.fsResp.id;
 
         answers = $vpApi.db.getCollection('answer');
         var ans = $vpApi.db.getCollection('answer').chain()
@@ -896,7 +896,8 @@ angular.module('survey.services', [])
     parseHash = function(raw){
         /*
         Returns 'intro', 'end', or [formRespId, blockRespId, qIndex]
-
+        
+        qIndex will always be an integer, formRespId and blockRespId are strings.
         */
         var out;
         if (raw === 'intro' || raw === 'end') {

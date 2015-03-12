@@ -4,6 +4,7 @@ angular.module('mock-ionic.services', [])
     console.log("mock $ionicLoading ");
 
     obj = this;
+    obj.modal = false;
 
     this.show = function(){
         if (platform === "web"){
@@ -20,7 +21,10 @@ angular.module('mock-ionic.services', [])
 
     this.hide = function(){
         if (platform === "web"){
-            obj.modal.hide();
+            if (obj.modal) {
+                obj.modal.hide();
+            }
+            
         }
         
     }
