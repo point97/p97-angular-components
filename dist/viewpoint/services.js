@@ -1,4 +1,4 @@
-// build timestamp: Tue Mar 10 2015 13:39:41 GMT-0700 (PDT)
+// build timestamp: Thu Mar 12 2015 14:17:58 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -284,27 +284,24 @@ angular.module('cache.services', [])
 }])
 angular.module('mock-ionic.services', [])
 
-.service( '$ionicLoading', [ "$modal", function($modal) {
+.service( '$ionicLoading', [ "blockUI", "$timeout", function(blockUI, $timeout) {
     console.log("mock $ionicLoading ");
 
     obj = this;
+    var myBlockUI = blockUI.instances.get('myBlockUI'); 
 
-    this.show = function(){
+    this.show = function(func){
         if (platform === "web"){
-            obj.modal = $modal({
-              content: "",
-              template: "/templates/web/partials/loading-modal.html",
-              backdrop: 'static',
-              show: true,
-              position: 'center'
-            });
-        }
-        
+            myBlockUI.reset();
+           myBlockUI.start();
+        }    
     }
 
     this.hide = function(){
         if (platform === "web"){
-            obj.modal.hide();
+            $timeout(function(){
+                myBlockUI.stop();
+            }, 2000);
         }
         
     }
@@ -2012,7 +2009,7 @@ angular.module('vpApi.services', [])
     }
 }])
 
-.service('$blockResponse', ['$formstack', '$block', '$rootScope', '$answers', '$formResponse', function($formstack, $block, $rootScope, $answers, $formResponse){
+.service('$blockResponse', ['$formstack', '$block', '$rootScope', '$answers', '$formResponse', '$vpApi', function($formstack, $block, $rootScope, $answers, $formResponse, $vpApi){
     /*
         A block response is of the form
         {
@@ -2026,9 +2023,27 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/block-response'; //This is currently client side only
 
+
     $rootScope.$on('answer-created', function(event, data){
         debugger;
     })
+
+    this.delete = function(blockRespId){
+        /*
+        Deleting entire block responses
+
+        */
+        var blockResp = $vpApi.db.getCollection('blockResp').find({'$loki': blockRespId});
+        // Remove the responses in block
+        $vpApi.db.getCollection('blockResp').remove(blockResp);
+
+        var mapFeatureCollection = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId});
+        // Remove map feature
+        $vpApi.db.getCollection('answer').remove(mapFeatureCollection);
+
+        $vpApi.db.save();
+    }
+
 
 }])
 
@@ -2090,7 +2105,7 @@ angular.module('vpApi.services')
     - sync-complete
 
     */
-
+    var VERBOSE = true;  // Set to true to turn on console.logs.
     var obj = this;
     this.toasDuration = 3000;
     this.intervalHandle = null; // A handle for the setInterval that runs the sync.
@@ -2133,7 +2148,7 @@ angular.module('vpApi.services')
             };
 
             onError = function(data, status) {
-                console.log('[$sync.run.OnError]');
+                if (VERBOSE === true) console.log('[$sync.run.OnError]');
                 //$ionicLoading.show({ template: 'There was a problem syncing some responses.', noBackdrop: true, duration: obj.toastDuration });
             };
 
@@ -2158,30 +2173,30 @@ angular.module('vpApi.services')
         var changes = $vpApi.db.generateChangesNotification(['fsResp']);
         var fsResps = [];
         
-        console.log("[sync.run()] Changes: " + _.map(changes, function(item){console.log(item);}) );
+        if (VERBOSE === true) console.log("[sync.run()] Changes: " + _.map(changes, function(item){if (VERBOSE === true) console.log(item);}) );
         
         if (changes.length > 0){
             fsResps = _.map(changes, function(change){
-                console.log("change.obj.id: ")
-                console.log(change.obj.id)
+                if (VERBOSE === true) console.log("change.obj.id: ")
+                if (VERBOSE === true) console.log(change.obj.id)
                 if (!change.obj.id) return null;  // Insert operations have no ID. That is done after the insert.
                 var fsRespObj = $vpApi.db.getCollection('fsResp').find({'id':change.obj.id});
                 
-                console.log(fsRespObj);
+                if (VERBOSE === true) console.log(fsRespObj);
                 if (fsRespObj.length > 0){
                     return angular.copy(fsRespObj[0]);
                 }
             });
         }
         fsResps = _.compact(fsResps);
-        console.log("[sync.run()] found "+fsResps.length+" fsResps that changed");
+        if (VERBOSE === true) console.log("[sync.run()] found "+fsResps.length+" fsResps that changed");
         
         // Get unsynced responses
-        var resps = $vpApi.db.getCollection('fsResp').chain()
+        var resps = $vpApi.db.getCollection('statusTable').chain()
                         .find({"collection": "fsResp"})
                         .find({"status": "pending"})
                         .data();
-        console.log("[sync.run()] found "+resps.length+" 'pending' fsResps");
+        if (VERBOSE === true) console.log("[sync.run()] found "+resps.length+" 'pending' fsResps");
         fsResps = fsResps.concat(angular.copy(resps));
 
         return fsResps;
@@ -2195,7 +2210,7 @@ angular.module('vpApi.services')
 
         */
 
-        console.log("[sync.pushFsResps()] Attempting to sync resp, count: " + resps.length)
+        if (VERBOSE === true) console.log("[sync.pushFsResps()] Attempting to sync resp, count: " + resps.length)
         var fsFullResp; // This will be the full nested formstack response.
         var fsResp;
         var count = 0;
@@ -2221,13 +2236,13 @@ angular.module('vpApi.services')
             successCount++;
             if (count === resps.length) {
                 // This is the last response.
-                console.log("[sync.pushFsResps()] " + successCount +" successully sumbitted, "+ failCount + " failed.");
+                if (VERBOSE === true) console.log("[sync.pushFsResps()] " + successCount +" successully sumbitted, "+ failCount + " failed.");
                 onSucess([1,2], 'Finished submitting formstacks.');
             }
         }
 
         submitFail = function(data, status){
-            console.log('I failed ' + status);
+            if (VERBOSE === true) console.log('I failed ' + status);
             $rootScope.$broadcast('sync-failed', {data:data, status:status});
             // Update statusTable
             
@@ -2284,7 +2299,7 @@ angular.module('vpApi.services')
             .where(function(resp) {
                 syncedAt = new Date(resp.syncedAt);
                 dt = (now - syncedAt)/1000;
-                console.log(dt)
+                if (VERBOSE === true) console.log(dt)
                 return (dt > config.ARCHIVE_DT);
             })
             .data();
@@ -2300,7 +2315,7 @@ angular.module('vpApi.services')
     };
 
     this.updateReadOnly = function(){
-        console.log("[sync.updateReadOnly()] ")
+        if (VERBOSE === true) console.log("[sync.updateReadOnly()] ")
         appObj = obj._updateApp();
         var updateListener = $rootScope.$on('app-updated', function(event, args){
             // Reconcile app formstacks and collection formstacks here.
@@ -2335,16 +2350,14 @@ angular.module('vpApi.services')
         var app = $vpApi.getApp();
 
         var entry;
-        var entrys = obj.statusTable.chain()
-            .find({'resourceId': app.id})
-            .find({'method':'GET'})
-            .find({'status':'success'})
-            .simplesort({'lastAttempt': 'asc'})
-            .data();
+        var entrys = obj.statusTable.find({'resourceId': app.id});
 
-        if (entrys.length > 1) {
-            console.warn("[sync._updateApp] More than 1 entry found in statusTable for app "  )
-        } else if (entrys.length === 1){
+
+        if (entrys.length > 0){
+            if (entrys.length > 1) {
+                console.warn("[sync._updateApp] More than 1 entry found in statusTable for app " + app.slug + ". Using the first one.");
+            }
+            entry = entrys[0]
             entry = entrys[0];
             last_ts = entrys[0].lastAttempt;
             entry.entrys++;
@@ -2360,6 +2373,7 @@ angular.module('vpApi.services')
                 "method": "GET",
                 "resourceUri": "/api/v2/pforms/app/" + app.id,
                 "resourceId": app.id,
+                "collection": "app" 
             }
             obj.statusTable.insert(entry);
         }
@@ -2371,15 +2385,10 @@ angular.module('vpApi.services')
 
                 } else {
                     
-                    console.log("[sync._updateApp] app updated: " + app.slug);
+                    if (VERBOSE === true) console.log("[sync._updateApp] app updated: " + app.slug);
                 }
                 // Update status table
-                var attempt = obj.statusTable.chain()
-                    .find({'resourceId': app.id})
-                    .find({'method':'GET'})
-                    .find({'status':'pending'})
-                    .simplesort({'lastAttempt': 'asc'})
-                    .data()[0];
+                var attempt = obj.statusTable.find({'resourceId': app.id})[0];
 
                 attempt.status = 'success';
                 obj.statusTable.update(attempt);
@@ -2390,7 +2399,7 @@ angular.module('vpApi.services')
         } // end success()
         error = function(data, status, slug){
             console.warn("sync.[_updateApp] update failed, status " + status);
-            console.log(data);
+            if (VERBOSE === true) console.log(data);
         } // end error()
         $app.updateBySlug(app.slug, last_ts, success, error);
     };// end _updateApp()
@@ -2407,10 +2416,10 @@ angular.module('vpApi.services')
                 fs = $vpApi.db.getCollection('formstack').find({'slug':slug})[0];
                 
                 if (data === null){
-                    console.log("[sync._updateFormstacks] No updates found");
+                    if (VERBOSE === true) console.log("[sync._updateFormstacks] No updates found for " + slug);
                 } else {
                     // Need to insert the updated formstack into $loki.
-                    console.log("[sync._updateFormstacks] formstack updated: " + fs.slug);
+                    if (VERBOSE === true) console.log("[sync._updateFormstacks] formstack updated: " + fs.slug);
                 };
 
                  // Update status table
@@ -2431,9 +2440,9 @@ angular.module('vpApi.services')
             }
             error = function(data, status, slug){
                 console.warn("[sync._updateFormstacks] update failed, status " + status);
-                console.log(data);
+                if (VERBOSE === true) console.log(data);
             }
-            console.log("[sync._updateFormstacks] Checking for updates to formstack " + fs.slug);
+            if (VERBOSE === true) console.log("[sync._updateFormstacks] Checking for updates to formstack " + fs.slug);
             var attempts = obj.statusTable.find({'resourceId': fs.id});
 
             if (attempts.length === 1){
@@ -2469,10 +2478,10 @@ angular.module('vpApi.services')
         */
         obj.saveListener(); // This should remove it
         var onSucess = function(data, status){
-            console.log("[db.save] Success")
+            if (VERBOSE === true) console.log("[db.save] Success")
         }
         var onError = function(data, status){
-            console.log("[db.save] Fail")
+            if (VERBOSE === true) console.log("[db.save] Fail")
 
         }
 
@@ -2482,7 +2491,7 @@ angular.module('vpApi.services')
         // Remove the listener for a liitle bit so we don't spam the server.
         
         $timeout(function() {
-            console.log("restarting db.save listener")
+            if (VERBOSE === true) console.log("restarting db.save listener")
             obj.saveListener  = $rootScope.$on('db.save', saveListenerHandler);
         }, 1000);
     }
