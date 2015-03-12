@@ -1,26 +1,23 @@
 angular.module('mock-ionic.services', [])
 
-.service( '$ionicLoading', [ "$modal", function($modal) {
+.service( '$ionicLoading', [ "blockUI", "$timeout", function(blockUI, $timeout) {
     console.log("mock $ionicLoading ");
 
     obj = this;
+    var myBlockUI = blockUI.instances.get('myBlockUI'); 
 
-    this.show = function(){
+    this.show = function(func){
         if (platform === "web"){
-            obj.modal = $modal({
-              content: "",
-              template: "/templates/web/partials/loading-modal.html",
-              backdrop: 'static',
-              show: true,
-              position: 'center'
-            });
-        }
-        
+            myBlockUI.reset();
+           myBlockUI.start();
+        }    
     }
 
     this.hide = function(){
         if (platform === "web"){
-            obj.modal.hide();
+            $timeout(function(){
+                myBlockUI.stop();
+            }, 2000);
         }
         
     }
