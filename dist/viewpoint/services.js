@@ -1,4 +1,4 @@
-// build timestamp: Thu Mar 12 2015 14:17:58 GMT-0700 (PDT)
+// build timestamp: Thu Mar 12 2015 16:18:13 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -288,6 +288,7 @@ angular.module('mock-ionic.services', [])
     console.log("mock $ionicLoading ");
 
     obj = this;
+
     var myBlockUI = blockUI.instances.get('myBlockUI'); 
 
     this.show = function(func){
@@ -980,7 +981,7 @@ angular.module('survey.services', [])
 
         */
 
-        fsRespId = fsRespId || scope.current.fsResp.$loki;
+        fsRespId = fsRespId || scope.current.fsResp.id;
 
         answers = $vpApi.db.getCollection('answer');
         var ans = $vpApi.db.getCollection('answer').chain()
@@ -1230,7 +1231,8 @@ angular.module('survey.services', [])
     parseHash = function(raw){
         /*
         Returns 'intro', 'end', or [formRespId, blockRespId, qIndex]
-
+        
+        qIndex will always be an integer, formRespId and blockRespId are strings.
         */
         var out;
         if (raw === 'intro' || raw === 'end') {
@@ -2009,7 +2011,7 @@ angular.module('vpApi.services', [])
     }
 }])
 
-.service('$blockResponse', ['$formstack', '$block', '$rootScope', '$answers', '$formResponse', '$vpApi', function($formstack, $block, $rootScope, $answers, $formResponse, $vpApi){
+.service('$blockResponse', ['$vpApi', function($vpApi){
     /*
         A block response is of the form
         {
@@ -2023,11 +2025,6 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/block-response'; //This is currently client side only
 
-
-    $rootScope.$on('answer-created', function(event, data){
-        debugger;
-    })
-
     this.delete = function(blockRespId){
         /*
         Deleting entire block responses
@@ -2037,9 +2034,12 @@ angular.module('vpApi.services', [])
         // Remove the responses in block
         $vpApi.db.getCollection('blockResp').remove(blockResp);
 
-        var mapFeatureCollection = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId});
-        // Remove map feature
-        $vpApi.db.getCollection('answer').remove(mapFeatureCollection);
+        var answers = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId})
+
+
+        _.each(answers, function(ans){
+            $vpApi.db.getCollection('answer').remove(ans);
+        });
 
         $vpApi.db.save();
     }
@@ -2105,7 +2105,7 @@ angular.module('vpApi.services')
     - sync-complete
 
     */
-    var VERBOSE = true;  // Set to true to turn on console.logs.
+    var VERBOSE = false;  // Set to true to turn on console.logs.
     var obj = this;
     this.toasDuration = 3000;
     this.intervalHandle = null; // A handle for the setInterval that runs the sync.
