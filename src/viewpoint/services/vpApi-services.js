@@ -370,7 +370,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$formstack', ['$vpApi', function($vpApi) {
+.service('$formstack', ['$vpApi', '$rootScope', function($vpApi, $rootScope) {
     var obj = this;
     this.resource_name = 'pforms/formstack';
 
@@ -410,6 +410,7 @@ angular.module('vpApi.services', [])
                     formstacks.remove(formstack);
                 }
                 formstacks.insert(data[0]);
+                $rootScope.$broadcast('formstack-updated', slug);
                 successCallback(data[0], status);
             },
             function(data, status){
@@ -448,7 +449,8 @@ angular.module('vpApi.services', [])
                 if (data.length > 0) {
                     obj._fetchSuccess(data, status, slug);
                     fs = data[0]
-                }                 
+                }
+                $rootScope.$broadcast('formstack-updated', slug);                 
                 success(fs,status, slug);
             },
             function(data, status){
