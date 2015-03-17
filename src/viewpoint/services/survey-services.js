@@ -47,7 +47,7 @@ angular.module('survey.services', [])
             scope.current.blockIndex = 0;
         } else {
             // Set current fsResp
-            scope.current.fsResp = scope.fsResps.get(parseInt(stateParams.fsRespId, 10));
+            scope.current.fsResp = scope.fsResps.find({id:stateParams.fsRespId})[0];
             if (!scope.current.fsResp) console.error('Could not find Formstack Response: ' + stateParams.formRespId);
         }
 
@@ -128,7 +128,7 @@ angular.module('survey.services', [])
                 /************** REPEATABLE BLOCK STUFF *******************/
                 // get or create formResp
                 var formResps = scope.formResps.chain()
-                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
                     .find({'formId': scope.current.form.id})
                     .data();
 
@@ -136,12 +136,12 @@ angular.module('survey.services', [])
                 if (formResps.length === 0) {
                     scope.current.formResp = scope.formResps.insert({
                         'fsSlug':scope.formstack.slug,
-                        'fsRespId': scope.current.fsResp.$loki,
+                        'fsRespId': scope.current.fsResp.id,
                         'formId': scope.current.form.id,
                         'formIndex': scope.current.formIndex,
                         'formRepeatItem':null,
-                        'ccreated': $vpApi.getTimestamp(),
-                        'cupdate': $vpApi.getTimestamp()
+                        'client_created': $vpApi.getTimestamp(),
+                        'client_updated': $vpApi.getTimestamp()
                     });
                     $vpApi.db.save()
                 } else {
@@ -149,14 +149,14 @@ angular.module('survey.services', [])
                 }
 
                 scope.current.form.blockResps = scope.blockResps.chain()
-                    .find({'fsRespId': scope.current.fsResp.$loki})
+                    .find({'fsRespId': scope.current.fsResp.id})
                     .find({'formId': scope.current.form.id})
                     .data();
             } else {
                 //****************** DEFAULT FORM STUFF *************************/
                 // get or create formResp
                 var formResps = scope.formResps.chain()
-                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                    .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
                     .find({'formId': scope.current.form.id})
                     .data();
 
@@ -164,11 +164,11 @@ angular.module('survey.services', [])
                 if (formResps.length === 0) {
                     scope.current.formResp = scope.formResps.insert({
                         'fsSlug':scope.formstack.slug,
-                        'fsRespId': scope.current.fsResp.$loki,
+                        'fsRespId': scope.current.fsResp.id,
                         'formId': scope.current.form.id,
                         'formIndex': scope.current.formIndex,
                         'formRepeatItem':null,
-                        'cupdate': $vpApi.getTimestamp()
+                        'client_updated': $vpApi.getTimestamp()
                     });
                     $vpApi.db.save()
                 } else {
@@ -177,8 +177,8 @@ angular.module('survey.services', [])
 
                 // Look for block Resp
                 var blockResps = scope.blockResps.chain()
-                    .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
-                    .find({'formRespId': scope.current.formResp.$loki})
+                    .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
+                    .find({'formRespId': scope.current.formResp.id})
                     .find({'blockId': scope.current.block.id})
                     .data();
 
@@ -201,7 +201,7 @@ angular.module('survey.services', [])
             */
 
             scope.current.form = _.find(scope.formstack.forms, function(form){
-                return (form.id === parseInt(stateParams.formId, 10));
+                return (form.id === stateParams.formId);
             });
             scope.current.formIndex = _.indexOf(scope.formstack.forms, scope.current.form);
             scope.current.page = stateParams.page;
@@ -249,7 +249,7 @@ angular.module('survey.services', [])
                 // We expect to have a formRespId
                 if (stateParams.formRespId.length < 1) console.error('No formRespId found in the URL');
 
-                scope.current.formResp = scope.formResps.get(parseInt(stateParams.formRespId, 10));
+                scope.current.formResp = scope.formResps.find({id:stateParams.formRespId})[0];
                 scope.current.formIndex = scope.current.formResp.formIndex;
                 scope.current.form = scope.formstack.forms[scope.current.formIndex];
             }
@@ -273,7 +273,7 @@ angular.module('survey.services', [])
                 // We expect to have a formRespId
                 if (stateParams.blockRespId.length < 1) console.error('No blockRespId found in the URL');
 
-                scope.current.blockResp = scope.blockResps.get(parseInt(stateParams.blockRespId, 10 )) ;
+                scope.current.blockResp = scope.blockResps.find({id:stateParams.blockRespId})[0] ;
                 scope.current.blockIndex = scope.current.blockResp.blockIndex;
                 scope.current.block = scope.current.form.blocks[scope.current.blockIndex];
             }
@@ -366,7 +366,7 @@ angular.module('survey.services', [])
 
             */
 
-            fsRespId = $scope.current.fsResp.$loki;
+            fsRespId = $scope.current.fsResp.id;
             answers = $vpApi.db.getCollection('answer');
             var ans = $vpApi.db.getCollection('answer').chain()
                 .find({'questionSlug':qSlug})
@@ -374,7 +374,7 @@ angular.module('survey.services', [])
                 .data();
 
             if (ans.length > 1){
-                console.log("found more than one answer, returns the first one.");
+                console.warn("[getAnswer()] found more than one answer, returns the first one.");
                 console.table(ans);
                 ans = ans[0];
             } else if (ans.length === 1){
@@ -407,15 +407,15 @@ angular.module('survey.services', [])
                 // Get the an already existing blockResp or make a new one
                 var blockRespId, page;
                 if (action === 'forward') {
-                    formRespId = $scope.current.formResp.$loki
+                    formRespId = $scope.current.formResp.id;
                     var blockResps = $scope.blockResps
                         .chain()
                         .find({'blockId':nextBlock.id})
-                        .find({'formRespId':$scope.current.formResp.$loki})
+                        .find({'formRespId':$scope.current.formResp.id})
                         .data();
 
                     if (blockResps.length > 0) {
-                        blockRespId = blockResps.slice(-1)[0].$loki; // Grab the last one.
+                        blockRespId = blockResps.slice(-1)[0].id; // Grab the last one.
                     } else {
                         blockRespId = 'new-' + nextBlock.id
                     }
@@ -436,10 +436,10 @@ angular.module('survey.services', [])
                     if ($scope.current.form.type === 'map-form'){
                         // Just change the hash, not the URL.
                         var blockRespId = "new-" + $scope.current.block.id; // This is the server Id.
-                        $location.hash([$scope.current.formResp.$loki, blockRespId, 0].join("/"));
+                        $location.hash([$scope.current.formResp.id, blockRespId, 0].join("/"));
                         return;
                     } else {
-                        formRespId = $scope.current.formResp.$loki
+                        formRespId = $scope.current.formResp.
                         blockRespId = 'new-' + nextBlock.id;
                         newHash = '0'  // TODO Make this a conditional based on if newForm is a map-form.
                     }
@@ -456,7 +456,7 @@ angular.module('survey.services', [])
                 }
                 newStateParams = {
                     'fsSlug': $scope.formstack.slug,
-                    'fsRespId': $scope.current.fsResp.$loki,
+                    'fsRespId': $scope.current.fsResp.id,
                     'formRespId': formRespId,
                     'formId': $scope.current.form.id,
                     'blockRespId': blockRespId,
@@ -477,13 +477,13 @@ angular.module('survey.services', [])
                     
                     // Send them to the first formResp created if found.
                     formResps = $scope.formResps.chain()
-                        .find({'fsRespId':$scope.current.fsResp.$loki})
+                        .find({'fsRespId':$scope.current.fsResp.id})
                         .find({'formId': nextForm.id})
                         .simplesort('created')
                         .data();
 
                     if (formResps.length > 0){
-                        nextFormRespId = formResps[0].$loki;
+                        nextFormRespId = formResps[0].id;
 
                     } else {
                         nextFormRespId = 'new-' + nextForm.id;
@@ -498,14 +498,14 @@ angular.module('survey.services', [])
                     } else {
                         // Send them to the first blockResp created if found.
                         blockResps = $scope.blockResps.chain()
-                            .find({'fsRespId':$scope.current.fsResp.$loki})
+                            .find({'fsRespId':$scope.current.fsResp.id})
                             .find({'formRespId': nextFormRespId})
                             .find({'blockId': nextBlock.id})
                             .simplesort('$loki',false)
                             .data();
 
                         if (blockResps.length > 0){
-                            nextBlockRespId = blockResps[0].$loki;
+                            nextBlockRespId = blockResps[0].id;
                         } else {
                             nextBlockRespId = 'new-' + nextBlock.id;
                         }
@@ -519,7 +519,7 @@ angular.module('survey.services', [])
                     }
                     newStateParams = {
                         'fsSlug': $scope.formstack.slug,
-                        'fsRespId': $scope.current.fsResp.$loki,
+                        'fsRespId': $scope.current.fsResp.id,
                         'formId': nextForm.id,
                         'formRespId': nextFormRespId,
                         'blockRespId': nextBlockRespId,
@@ -535,11 +535,11 @@ angular.module('survey.services', [])
                     // Update the fsResp
 
                     $scope.current.fsResp.status = 'complete';
-                    $scope.current.fsResp.cupdate = $vpApi.getTimestamp();
+                    $scope.current.fsResp.client_updated = $vpApi.getTimestamp();
                     $vpApi.db.save();
 
                     console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
-                    $state.go('app.complete', {'fsRespId':$scope.current.fsResp.$loki});  // Use $state.go here instead of $location.path or $location.url
+                    $state.go('app.complete', {'fsRespId':$scope.current.fsResp.id});  // Use $state.go here instead of $location.path or $location.url
                     return;
                 }
             }
@@ -556,7 +556,7 @@ angular.module('survey.services', [])
                 //var prevBlockResps = $scope.blockResps.find({blockId:prevBlock.id})
                 var prevBlockResps = $scope.blockResps.chain()
                     .find({blockId:prevBlock.id})
-                    .find({formRespId:$scope.current.formResp.$loki})
+                    .find({formRespId:$scope.current.formResp.id})
                     .data();
 
                 if (prevBlockResps.length > 0){
@@ -568,9 +568,9 @@ angular.module('survey.services', [])
                 newState += ($scope.current.form.type) ? $scope.current.form.type : 'form';
                 newStateParams = {
                     'fsSlug': $scope.formstack.slug,
-                    'fsRespId': $scope.current.fsResp.$loki,
-                    'formRespId': $scope.current.formResp.$loki,
-                    'blockRespId': prevBlockResp.$loki,
+                    'fsRespId': $scope.current.fsResp.id,
+                    'formRespId': $scope.current.formResp.id,
+                    'blockRespId': prevBlockResp.id,
                     'hash': newHash
                 }
             } else {
@@ -584,7 +584,7 @@ angular.module('survey.services', [])
                     // Get the last form response
                     var prevFormResp = $scope.formResps
                         .chain()
-                        .find({fsRespId: $scope.current.fsResp.$loki})
+                        .find({fsRespId: $scope.current.fsResp.id})
                         .find({formId:prevForm.id})
                         .data();
 
@@ -602,7 +602,7 @@ angular.module('survey.services', [])
                     var prevBlockResp = $scope.blockResps
                         .chain()
                         .find({blockId:prevBlock.id})
-                        .find({formRespId:prevFormResp.$loki})
+                        .find({formRespId:prevFormResp.id})
                         .data();
 
                     if (prevBlockResp.length > 1) {
@@ -620,10 +620,10 @@ angular.module('survey.services', [])
                     }
                     newStateParams = {
                         'fsSlug': $scope.formstack.slug,
-                        'fsRespId': $scope.current.fsResp.$loki,
-                        'formRespId': prevFormResp.$loki,
+                        'fsRespId': $scope.current.fsResp.id,
+                        'formRespId': prevFormResp.id,
                         'formId': prevForm.id, // This is needed for map-form and map-form-foreach
-                        'blockRespId': prevBlockResp.$loki,
+                        'blockRespId': prevBlockResp.id,
                         'hash': page,
                         'page': page
                     }
@@ -723,7 +723,7 @@ angular.module('survey.services', [])
 
         _.each(scope.current.form.forEach, function(item){
             item.formResp = scope.formResps.chain()
-                .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
+                .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
                 .find({'formId': scope.current.form.id})
                 .find({'formRepeatItem': item.value})
                 .data();
@@ -733,14 +733,14 @@ angular.module('survey.services', [])
                 console.log("Create a formResp for " + item);
                 item.formResp = scope.formResps.insert({
                     'fsSlug':scope.formstack.slug,
-                    'fsRespId': scope.current.fsResp.$loki,
+                    'fsRespId': scope.current.fsResp.id,
                     'formId': scope.current.form.id,
                     'formIndex': scope.current.formIndex,
                     'formRepeatItem':item.value,
                     'formForEachItem':item.value,
                     'formForEachQuestionSlug': scope.current.form.options.forEachAnswer,
-                    'ccreated': $vpApi.getTimestamp(),
-                    'cupdate': $vpApi.getTimestamp()
+                    'client_created': $vpApi.getTimestamp(),
+                    'client_updated': $vpApi.getTimestamp()
                 });
                 $vpApi.db.save()
             } else {
@@ -749,15 +749,15 @@ angular.module('survey.services', [])
 
             // Get the block responses.
             item.blockResps = scope.blockResps.chain()
-                .find({'fsRespId': scope.current.fsResp.$loki}) // There should only be one form response for a given item.
-                .find({'formRespId': item.formResp.$loki})
+                .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
+                .find({'formRespId': item.formResp.id})
                 .simplesort('created')
                 //.find({'formForEachItem': item.value})
                 //.simplesort('created', false)
                 .data()
             if (item.blockResps.length > 0) {
                 item.formRespId = item.blockResps[0].formRespId;
-                item.blockRespId = item.blockResps[0].$loki;
+                item.blockRespId = item.blockResps[0].id;
                 item.isNew = false;
             } else {
                 item.formRespId = "new-" + scope.current.form.id;
@@ -772,7 +772,7 @@ angular.module('survey.services', [])
         // in current.form.forEach
         var res = scope.formResps.chain()
             .find({'formId': scope.current.form.id})
-            .find({'fsRespId': scope.current.fsResp.$loki})
+            .find({'fsRespId': scope.current.fsResp.id})
 
         // Exclude resps that have forEach items on the forRach array.
         _.each(scope.current.form.forEach, function(item){
@@ -783,7 +783,7 @@ angular.module('survey.services', [])
         console.log("Stale Form Resps");
         console.table(staleFormResps);
         _.each(staleFormResps, function(resp){
-            $formResp.delete(resp.$loki);
+            $formResp.delete(resp.id);
         });
 
     };
@@ -862,9 +862,9 @@ angular.module('survey.services', [])
             $scope.previousAnswers = [];
         } else {
             $scope.previousAnswers = $scope.answers.chain()
-               .find({'fsRespId': parseInt(fsRespId, 10)})
-               .find({'formRespId': parseInt(formRespId, 10)})
-               .find({'blockRespId': parseInt(blockRespId, 10)})
+               .find({'fsRespId': fsRespId})
+               .find({'formRespId': formRespId})
+               .find({'blockRespId': blockRespId})
                .data();
         };
 
@@ -879,15 +879,15 @@ angular.module('survey.services', [])
             if (ans) {
                 q.value = ans.value;
                 q.previousValue = ans.value;
-                q.answerCid = ans.$loki;
+                q.answerId = ans.id;
             } else if ( typeof(q.options['default']) !==  'undefined'){
                 q.value = q.options['default'];
                 q.previousValue = q.options['default'];
-                q.answerCid = null;
+                q.answerId = null;
             } else {
                 q.value = '';
                 q.previousValue = '';
-                q.answerCid = null;
+                q.answerId = null;
             }
         });
     };

@@ -35,28 +35,37 @@ angular.module('vpApi.services', [])
         var col = obj.db.getCollection('fsResp');
         col.setChangesApi(true);
         col.on('insert', function(item){
-            item.id = obj.generateUUID();
+            if (!item.id){
+                item.id = obj.generateUUID();
+            }
+
         });
 
         col = obj.db.getCollection('formResp');
         col.setChangesApi(true);
         col.on('insert', function(item){
-            item.id = obj.generateUUID();
+            if (!item.id){
+                item.id = obj.generateUUID();
+            }
 
         });
 
         col = obj.db.getCollection('blockResp');
         col.setChangesApi(true);
         col.on('insert', function(item){
-            item.id = obj.generateUUID();
+            if (!item.id){
+                item.id = obj.generateUUID();
+            }
 
         });
 
         col = obj.db.getCollection('answer');
         col.setChangesApi(true);
         col.on('insert', function(item){
-            item.id = obj.generateUUID();
-        });
+            if (!item.id){
+                item.id = obj.generateUUID();
+            }
+    });
 
         obj.db.save(); // This is required in order for the UUID's and the changes API to work.
         return;
@@ -281,7 +290,7 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$app', ['$vpApi', '$rootScope', function($vpApi, $rootScope) {
+.service('$app', ['$vpApi', '$rootScope', '$q', function($vpApi, $rootScope, $q) {
     var obj = this;
     this.resource_name = 'pforms/get/app';
 
@@ -328,6 +337,40 @@ angular.module('vpApi.services', [])
             
             debugger
         }
+
+    }; // fetchBySlug
+
+
+    this.fetchBySlug2 = function(slug, successCallback, errorCallback){
+        /*
+        Get the formstack from the VP2 server. 
+        Same as fetchBySlug but returns a promise.
+        */
+        var defer = $q.defer();
+
+        if(HAS_CONNECTION){
+          $vpApi.fetch(this.resource_name, {'slug':slug}, 
+            function(data, status){
+                obj.objects = data;
+
+                var apps = $vpApi.db.getCollection('app');
+                var app = apps.find({'slug':slug});
+                if (app.length > 0){
+                    apps.remove(app);
+                }
+                apps.insert(data[0]);
+                defer.resolve(data[0], status);
+                //successCallback(data[0], status);
+            },
+            function(data, status){
+                defer.reject(data, status);
+            }
+          );
+
+        }else{
+            defer.reject({}, "Network not found");
+        };
+        return defer.promise;
 
     }; // fetchBySlug
     
@@ -578,7 +621,6 @@ angular.module('vpApi.services', [])
         Returns a promise.
         */ 
 
-
         var defer = $q.defer();
 
         $vpApi.fetch("pforms/formstack-response", {"formstack__slug":fsSlug}, function(data, status){
@@ -595,7 +637,7 @@ angular.module('vpApi.services', [])
     }
 
     this.loadResponses = function(fsRespNested) {
-        debugger
+        console.log("[loadResponses]")
         _.each(fsRespNested, function(fsResp){
             var formResps = angular.copy(fsResp.formResps);
             fsResp.formResps = undefined;
@@ -607,10 +649,9 @@ angular.module('vpApi.services', [])
                 $vpApi.db.getCollection('formResp').insert(formResp);
                 
                 _.each(blockResps, function(blockResp){
-                    answers = angular.copy(blockResp.answerss);
+                    answers = angular.copy(blockResp.answers);
                     blockResp.answers = undefined;
                     $vpApi.db.getCollection('blockResp').insert(blockResp);
-                    debugger
                     _.each(answers, function(ans){
                         $vpApi.db.getCollection('answer').insert(ans);
                     });
@@ -622,8 +663,11 @@ angular.module('vpApi.services', [])
 
     this.getFullResp = function(fsRespId){
         /*
+
         Creates a full nested formstack response object for syncing.
         
+        Params: The UUID of the fsResp.
+
         Returns
         {
             fsId:
@@ -657,52 +701,48 @@ angular.module('vpApi.services', [])
         out = {};
 
         // Get fs Info
-        fsResp = angular.copy($vpApi.db.getCollection('fsResp').get(fsRespId));
+        var item = $vpApi.db.getCollection('fsResp').find({id:fsRespId})[0];
+        fsResp = angular.copy(item);
 
-        out.id = fsResp.id;
-        out.fsId = fsResp.fsId;
-        out.client_created = fsResp.ccreated;
-        out.client_updated = fsResp.cupdate;
-        out.formResps = [];
-
+        fsResp.meta = undefined;
+        fsResp.fsSlug = undefined;
+        fsResp.$loki = undefined;
+        fsResp.formResps = [];
 
         // Get the form resps
         formResps = angular.copy($vpApi.db.getCollection('formResp').find({'fsRespId':fsRespId}));
         _.each(formResps, function(formResp){
-            formResp.client_created = formResp.ccreated;
-            formResp.client_updated = formResp.cupdate;
             blockResps = angular.copy($vpApi.db.getCollection('blockResp').chain()
                 .find({'fsRespId':fsRespId})
-                .find({'formRespId': formResp.$loki})
+                .find({'formRespId': formResp.id})
                 .data());
             
             _.each(blockResps, function(blockResp){
                 answers = angular.copy($vpApi.db.getCollection('answer').chain()
                     .find({'fsRespId':fsRespId})
-                    .find({'formRespId': formResp.$loki})
-                    .find({'blockRespId': blockResp.$loki})
+                    .find({'formRespId': formResp.id})
+                    .find({'blockRespId': blockResp.id})
                     .data());
                 _.each(answers, function(ans){
                     // Clean the answers
                     if (ans.value === undefined) ans.value = null;
                 });
-
                 blockResp.answers = answers;
-                blockResp.client_created = blockResp.ccreated;
-                blockResp.client_updated = blockResp.cupdate;
+                // blockResp.client_created = blockResp.ccreated;
+                // blockResp.client_updated = blockResp.cupdate;
 
-                _.each(blockResp.answers, function(ans){
-                    ans.client_created = ans.ccreated;
-                    ans.client_updated = ans.cupdate;
-                })
+                // _.each(blockResp.answers, function(ans){
+                //     ans.client_created = ans.ccreated;
+                //     ans.client_updated = ans.cupdate;
+                // })
             })
             formResp.blockResps = blockResps;
-            formResp.cid = formResp.$loki;
+            
 
-            out.formResps.push(formResp);
+            fsResp.formResps.push(formResp);
         });
 
-        return out;
+        return fsResp;
     }
 }])
 
@@ -749,7 +789,7 @@ angular.module('vpApi.services', [])
     }
 }])
 
-.service('$blockResponse', ['$vpApi', function($vpApi){
+.service('$blockResp', ['$vpApi', function($vpApi){
     /*
         A block response is of the form
         {

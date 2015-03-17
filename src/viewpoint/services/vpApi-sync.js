@@ -123,8 +123,21 @@ angular.module('vpApi.services')
                         .find({"collection": "fsResp"})
                         .find({"status": "pending"})
                         .data();
-        if (VERBOSE === true) console.log("[sync.run()] found "+resps.length+" 'pending' fsResps");
-        fsResps = fsResps.concat(angular.copy(resps));
+        
+        var staleResps = [];
+        if (resps.length > 0) {
+            staleResps = _.map(resps, function(resp){
+                var item = $vpApi.db.getCollection('fsResp').find({'id':resp.resourceId});
+                if (item.length > 1){
+                    console.warn("[sync.getFsResps] Found more than one fsResp")
+                }
+                return item[0];
+            });
+        }
+
+        if (VERBOSE === true) console.log("[sync.run()] found "+staleResps.length+" 'pending' fsResps");
+        
+        fsResps = fsResps.concat(angular.copy(staleResps));
 
         return fsResps;
     };
@@ -186,7 +199,7 @@ angular.module('vpApi.services')
         }
 
         _.each(resps, function( resp ){
-            fsFullResp = $fsResp.getFullResp(resp.$loki);
+            fsFullResp = $fsResp.getFullResp(resp.id);
             resource = "pforms/formstack/"+fsFullResp.fsId+"/submit";
             
             // Update status table
@@ -237,7 +250,7 @@ angular.module('vpApi.services')
             item = obj.statusTable.find({'resourceId':resp.id})[0];
             obj.statusTable.remove(item);
 
-            $fsResp.delete(resp.$loki);
+            $fsResp.delete(resp.id);
         });
     };
 
