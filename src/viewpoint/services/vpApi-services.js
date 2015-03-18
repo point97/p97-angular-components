@@ -335,7 +335,7 @@ angular.module('vpApi.services', [])
 
         }else{
             
-            debugger
+            console.warn("[$app.fetchBySlug()] No network connection.");
         }
 
     }; // fetchBySlug
@@ -464,7 +464,7 @@ angular.module('vpApi.services', [])
           );
 
         }else{
-            debugger
+            console.warn("[$vpApi-services.fetchBySlug()] No network connection.");
         }
 
     }; // fetchBySlug
