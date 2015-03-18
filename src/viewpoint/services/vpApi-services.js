@@ -808,7 +808,7 @@ angular.module('vpApi.services', [])
         Deleting entire block responses
 
         */
-        var blockResp = $vpApi.db.getCollection('blockResp').find({'$loki': blockRespId});
+        var blockResp = $vpApi.db.getCollection('blockResp').find({'id': blockRespId});
         // Remove the responses in block
         $vpApi.db.getCollection('blockResp').remove(blockResp);
 
