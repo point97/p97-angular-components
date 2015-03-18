@@ -637,6 +637,11 @@ angular.module('vpApi.services', [])
     }
 
     this.loadResponses = function(fsRespNested) {
+        /*
+        This function is used to load the fsResp nested json object returned
+        from the /api/v2/pforms/formstack-response/ endpoint.
+        */
+
         console.log("[loadResponses]")
         _.each(fsRespNested, function(fsResp){
             var formResps = angular.copy(fsResp.formResps);
@@ -646,13 +651,19 @@ angular.module('vpApi.services', [])
             _.each(formResps, function(formResp){
                 blockResps = angular.copy(formResp.blockResps);
                 formResp.blockResps = undefined;
+                formResp.fsSlug = fsResp.slug;
                 $vpApi.db.getCollection('formResp').insert(formResp);
                 
                 _.each(blockResps, function(blockResp){
                     answers = angular.copy(blockResp.answers);
                     blockResp.answers = undefined;
+                    blockResp.fsSlug = fsResp.slug;
+                    blockResp.formId = formResp.formId
                     $vpApi.db.getCollection('blockResp').insert(blockResp);
                     _.each(answers, function(ans){
+                        ans.formId = formResp.formId;
+                        ans.blockId = blockResp.blockId;
+                        ans.fsSlug = fsResp.slug;
                         $vpApi.db.getCollection('answer').insert(ans);
                     });
 
