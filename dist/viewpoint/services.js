@@ -1,4 +1,4 @@
-// build timestamp: Wed Mar 18 2015 10:01:05 GMT-0700 (PDT)
+// build timestamp: Wed Mar 18 2015 16:58:59 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -339,6 +339,7 @@ angular.module('survey.services', [])
 .factory('$formUtils', ['$vpApi', '$location','$formstack', '$formResp', function($vpApi, $location, $formstack, $formResp) {
     var obj = this;
 
+    var VERBOSE = false;
     setState = function(scope, state, stateParams){
         /*
         Sets scope.current with appropriate variables based on the URL and the hash.
@@ -718,7 +719,7 @@ angular.module('survey.services', [])
                 ans = null;
                 console.error("[]getAnswer] No answer found");
             }
-            console.log('Found answer: ' + ans );
+            if (VERBOSE) console.log('Found answer: ' + ans );
             return ans;
         };
 
@@ -737,7 +738,7 @@ angular.module('survey.services', [])
             }
 
             if (nextBlock) {
-                console.log('[LinearBlockCtrl.saveBlock()] found next block, setting state');
+                if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] found next block, setting state');
 
                 // Get the an already existing blockResp or make a new one
                 var blockRespId, page;
@@ -803,7 +804,7 @@ angular.module('survey.services', [])
                 return;
 
             } else {
-                console.log('[LinearBlockCtrl.saveBlock()] No more blocks in this form, so grabbing the first block of the next form');
+                if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] No more blocks in this form, so grabbing the first block of the next form');
                 //nextForm = $scope.formstack.forms[$scope.current.formIndex + 1];
                 var nextFormRespId, nextBlock, nextBlockRespId;
                 var nextForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
@@ -866,14 +867,14 @@ angular.module('survey.services', [])
                     return;
 
                 } else {
-                    console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
+                    if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
                     // Update the fsResp
 
                     $scope.current.fsResp.status = 'complete';
                     $scope.current.fsResp.client_updated = $vpApi.getTimestamp();
                     $vpApi.db.save();
 
-                    console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
+                    if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
                     $state.go('app.complete', {'fsRespId':$scope.current.fsResp.id});  // Use $state.go here instead of $location.path or $location.url
                     return;
                 }
@@ -885,7 +886,7 @@ angular.module('survey.services', [])
 
             if (prevBlock){
 
-                console.log('[LinearBlockCtrl.saveBlock()] found next block');
+                if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] found next block');
 
                 // Get the last blockResp
                 //var prevBlockResps = $scope.blockResps.find({blockId:prevBlock.id})
@@ -909,12 +910,12 @@ angular.module('survey.services', [])
                     'hash': newHash
                 }
             } else {
-                console.log('[LinearBlockCtrl.saveBlock()] This is the first block in the form');
+                if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] This is the first block in the form');
                 //prevForm = $scope.formstack.forms[$scope.current.formIndex - 1];
 
                 prevForm = this.getEligibleForm(action, $scope.current.formIndex, fsSlug);
                 if (prevForm){
-                    console.log('[LinearBlockCtrl.saveBlock()] Found prev form');
+                    if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] Found prev form');
 
                     // Get the last form response
                     var prevFormResp = $scope.formResps
@@ -964,7 +965,7 @@ angular.module('survey.services', [])
                     }
 
                 } else {
-                    console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
+                    if (VERBOSE) console.log('[LinearBlockCtrl.saveBlock()] No more forms. You are done.');
                     $state.go('app.home');  // Use $state.go here instead of $location.path or $location.url
                     return;
                 }
@@ -990,7 +991,7 @@ angular.module('survey.services', [])
             .data();
 
         if (ans.length > 1){
-            console.log("found more than one answer, returns the first one.");
+            if (VERBOSE) console.log("found more than one answer, returns the first one.");
             console.table(ans);
             ans = ans[0];
         } else if (ans.length === 1){
@@ -998,7 +999,7 @@ angular.module('survey.services', [])
         } else {
             ans = null;
         }
-        console.log('Found answer: ' + ans );
+        if (VERBOSE) console.log('Found answer: ' + ans );
         return ans;
     };
 
@@ -1014,7 +1015,7 @@ angular.module('survey.services', [])
         var blocks = form.blocks;
 
         function findEligibleBlock(direction){
-            console.log("[findEligibleNextBlock] looking for blockIndex " + currentBlockIndex);
+            if (VERBOSE) console.log("[findEligibleNextBlock] looking for blockIndex " + currentBlockIndex);
 
             if (direction === 'forward') {
                 block = blocks[currentBlockIndex + 1];
@@ -1027,7 +1028,7 @@ angular.module('survey.services', [])
                     rs = eval(block.options.skipWhen);
 
                     if (rs){
-                        console.log('[_getNextBlock()] I need to skip this block and get the next one');
+                        if (VERBOSE) console.log('[_getNextBlock()] I need to skip this block and get the next one');
 
                         if (direction === 'forward'){
                             // Increase index by 1
@@ -1039,11 +1040,11 @@ angular.module('survey.services', [])
                         findEligibleBlock(direction);
                         //
                     } else {
-                        console.log('[_getNextBlock()] I can use this block.');
+                        if (VERBOSE) console.log('[_getNextBlock()] I can use this block.');
                     }
                 } // End if skipWhen
             } else {
-                console.log("[_getNextBlock] there are no more blocks on this form" );
+                if (VERBOSE) console.log("[_getNextBlock] there are no more blocks on this form" );
             }
             return block;
         }
@@ -1065,7 +1066,7 @@ angular.module('survey.services', [])
 
             // A get or create on formResp and set item.formResp
             if (item.formResp.length === 0) {
-                console.log("Create a formResp for " + item);
+                if (VERBOSE) console.log("Create a formResp for " + item);
                 item.formResp = scope.formResps.insert({
                     'fsSlug':scope.formstack.slug,
                     'fsRespId': scope.current.fsResp.id,
@@ -1115,7 +1116,7 @@ angular.module('survey.services', [])
         });
 
         staleFormResps = res.data();
-        console.log("Stale Form Resps");
+        if (VERBOSE) console.log("Stale Form Resps");
         console.table(staleFormResps);
         _.each(staleFormResps, function(resp){
             $formResp.delete(resp.id);
@@ -1138,7 +1139,7 @@ angular.module('survey.services', [])
         var forms = $vpApi.getFormstack(fsSlug).forms;
 
         function findEligibleForm(direction){
-            console.log("[findNextEligibleForm] looking for formIndex " + currentFormIndex);
+            if (VERBOSE) console.log("[findNextEligibleForm] looking for formIndex " + currentFormIndex);
             if (direction === 'forward'){
                 form = forms[currentFormIndex + 1];
             } else {
@@ -1149,7 +1150,7 @@ angular.module('survey.services', [])
                     rs = eval(form.options.skipWhen);
 
                     if (rs){
-                        console.log('[_findNextEligibleForm()] I need to skip this form and get the next one');
+                        if (VERBOSE) console.log('[_findNextEligibleForm()] I need to skip this form and get the next one');
 
                         if (direction === 'forward') {
                             // Increase index by 1
@@ -1160,11 +1161,11 @@ angular.module('survey.services', [])
 
                         findEligibleForm(direction);
                     } else {
-                        console.log('[_findNextEligibleForm()] I can use this form.');
+                        if (VERBOSE) console.log('[_findNextEligibleForm()] I can use this form.');
                     }
                 } // End if skipWhen
             } else {
-                console.log("[_getNextBlock] there are no more forms on this form" );
+                if (VERBOSE) console.log("[_getNextBlock] there are no more forms on this form" );
             }
             return form;
         }
@@ -1599,7 +1600,7 @@ angular.module('vpApi.services', [])
 
         }else{
             
-            debugger
+            console.warn("[$app.fetchBySlug()] No network connection.");
         }
 
     }; // fetchBySlug
@@ -1728,7 +1729,7 @@ angular.module('vpApi.services', [])
           );
 
         }else{
-            debugger
+            console.warn("[$vpApi-services.fetchBySlug()] No network connection.");
         }
 
     }; // fetchBySlug
@@ -1901,6 +1902,11 @@ angular.module('vpApi.services', [])
     }
 
     this.loadResponses = function(fsRespNested) {
+        /*
+        This function is used to load the fsResp nested json object returned
+        from the /api/v2/pforms/formstack-response/ endpoint.
+        */
+
         console.log("[loadResponses]")
         _.each(fsRespNested, function(fsResp){
             var formResps = angular.copy(fsResp.formResps);
@@ -1910,13 +1916,19 @@ angular.module('vpApi.services', [])
             _.each(formResps, function(formResp){
                 blockResps = angular.copy(formResp.blockResps);
                 formResp.blockResps = undefined;
+                formResp.fsSlug = fsResp.slug;
                 $vpApi.db.getCollection('formResp').insert(formResp);
                 
                 _.each(blockResps, function(blockResp){
                     answers = angular.copy(blockResp.answers);
                     blockResp.answers = undefined;
+                    blockResp.fsSlug = fsResp.slug;
+                    blockResp.formId = formResp.formId
                     $vpApi.db.getCollection('blockResp').insert(blockResp);
                     _.each(answers, function(ans){
+                        ans.formId = formResp.formId;
+                        ans.blockId = blockResp.blockId;
+                        ans.fsSlug = fsResp.slug;
                         $vpApi.db.getCollection('answer').insert(ans);
                     });
 
@@ -2230,7 +2242,12 @@ angular.module('vpApi.services')
                 }
             });
         }
-        fsResps = _.compact(fsResps);
+
+        var unique = _.uniq(fsResps, function(item) { 
+            return item.id;
+        });
+
+        fsResps = _.compact(unique);
         if (VERBOSE === true) console.log("[sync.run()] found "+fsResps.length+" fsResps that changed");
         
         // Get unsynced responses
