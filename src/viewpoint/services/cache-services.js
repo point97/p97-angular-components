@@ -14,7 +14,8 @@ angular.module('cache.services', [])
         'media' with a keywords 'filename' and 'data'
 
         */
-        //if (!USE_INDEXED_DB) return;
+        
+        if (!USE_INDEXED_DB) return;
         var fnames = obj.getFilenames();
         // Cache all geojsonChoices
         _.each(fnames, function(fname){
