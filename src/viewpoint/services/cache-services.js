@@ -14,6 +14,7 @@ angular.module('cache.services', [])
         'media' with a keywords 'filename' and 'data'
 
         */
+        //if (!USE_INDEXED_DB) return;
         var fnames = obj.getFilenames();
         // Cache all geojsonChoices
         _.each(fnames, function(fname){
@@ -46,6 +47,7 @@ angular.module('cache.services', [])
     };
 
     this.getFilenames = function(){
+        
         // Get loop over formstack and get a list of files names to cache
         var fs = $vpApi.getFormstack();
         var fnames = [];
