@@ -1,7 +1,7 @@
 
 angular.module('cache.services', [])
 
-.service('$mediacache', ['$vpApi', '$formstack', '$http', function($vpApi, $formstack, $http){
+.service('$mediacache', ['$vpApi', '$formstack', '$http', '$q', function($vpApi, $formstack, $http, $q){
     var obj = this;
     obj.isCached = false;
 
@@ -44,6 +44,38 @@ angular.module('cache.services', [])
                 console.log("Could not load media file ")
             });
         });
+    };
+
+    this.get = function(fname, appSlug){
+        /* 
+        Params
+        -fname = file name plus extension
+        -appSlug
+
+        returns a promise with args (data, status)
+        */
+        console.log('[mediacache.get]');
+        var defer = $q.defer();
+        var medias = $vpApi.db.getCollection('media');
+        var entry = medias.find({'fname':fname});
+        if (entry.length > 0) {
+            console.log('[found entry]');
+            defer.resolve(entry[0], '');
+        } else {
+            console.log('[fetching over web]');
+            // var url = API_SERVER + "/media/apps/" + appSlug + "/files/" + fname;
+            var url = "mock/" + fname;
+            $http.get(url).success(function(data, status){
+                var entry = {
+                    fname: fname,
+                    data: data
+                }
+                defer.resolve(entry, '');
+            }).error(function(data, status){
+                console.log("[mediacache.get] Could not retrieve media file ");
+            });  
+        }
+        return defer.promise;
     };
 
     this.getFilenames = function(){
