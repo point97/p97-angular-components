@@ -29,6 +29,29 @@ Styles for Ionic Question Types
 	border-color: #16A085;
 }
 
+.table {
+  text-align: center;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.output {
+  padding-bottom: 0.3em;
+  padding-top: 0.3em;
+  text-align: right;
+  display: inline-block;
+}
+
+.table-height {
+  display: table;
+  width: 100%;
+}
+
+table tr td {
+  height: 50px;
+  border: 1px solid;
+}
+
 /* Validation */
 
 .error {
@@ -36,6 +59,5 @@ Styles for Ionic Question Types
 	font-size: 13px;
 	color: red;
 }
-
 
 

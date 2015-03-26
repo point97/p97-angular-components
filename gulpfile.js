@@ -29,7 +29,8 @@ var QUESTION_TYPES = [
                       'toggle',
                       'autocomplete-search',
                       'info',
-                      'geojson'
+                      'geojson',
+                      'numpad'
                      ]
 
 

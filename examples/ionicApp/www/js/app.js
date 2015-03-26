@@ -7,6 +7,7 @@
 
 var BASE_TEMPLATE_URL = 'js/p97-components/src/viewpoint/question-types/';
 var TEMPLATE_THEME = 'ionic';
+var platform = 'hybrid';
 
 angular.module('starter', ['ionic', 'starter.controllers', 'p97.questionTypes'])
 
