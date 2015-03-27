@@ -713,11 +713,21 @@ angular.module('vpApi.services', [])
 
         // Get fs Info
         var item = $vpApi.db.getCollection('fsResp').find({id:fsRespId})[0];
-        fsResp = angular.copy(item);
+        var lastUrl = $vpApi.db.getCollection("lastSavedUrl").data[0];
+        if (lastUrl){
+            lastSavedUrl = {
+                "path": lastUrl.path,
+                "timestamp": lastUrl.timestamp
+            }
+        }
 
+        fsResp = angular.copy(item);
         fsResp.meta = undefined;
         fsResp.fsSlug = undefined;
         fsResp.$loki = undefined;
+        fsResp.options = {
+            'lastSavedUrl': lastSavedUrl
+        };
         fsResp.formResps = [];
 
         // Get the form resps
