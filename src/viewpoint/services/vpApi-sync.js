@@ -173,7 +173,8 @@ angular.module('vpApi.services')
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
 
             // Update record's status to synced to lock it if it was submitted.
-            fsResp.status = (data.status === 'submitted')? 'synced': data.status;
+
+            fsResp.status = data.status;
             fsResp.syncedAt = $vpApi.getTimestamp();
 
             $vpApi.db.save();

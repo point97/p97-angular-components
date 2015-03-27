@@ -720,7 +720,6 @@ angular.module('vpApi.services', [])
                 "timestamp": lastUrl.timestamp
             }
         }
-
         fsResp = angular.copy(item);
         fsResp.meta = undefined;
         fsResp.fsSlug = undefined;
