@@ -110,8 +110,9 @@ angular.module('starter')
             'type': 'date',
             'options': {
                 'required': false,
-                'min': '2013-03-28',
-                'max': '2013-04-05'
+                'format': 'yyyy',
+                'min': '2000',
+                'max': '2012'
             }
         },{
             'body': 'How are you feeling?',
@@ -198,6 +199,27 @@ angular.module('starter')
             'body': '',
             'type': 'numpad',
             'options': {}
+        },
+        {
+            'body': 'Select a date:',
+            'type': 'date',
+            'options': {
+                'settings': 
+                {
+                  monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
+                  monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
+                  weekdaysFull: [ 'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu' ],
+                  weekdaysShort: [ 'Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab' ],
+                  today: 'hari ini',
+                  clear: 'menghapus',
+                  firstDay: 1,
+                  format: 'yyyy/mm/dd',
+                  formatSubmit: 'yyyy/mm/dd'
+                },
+                'min': ['2015', '03', '14'],
+                'max': ['2015', '04', '20'],
+                'initial':  ['2015', '03', '15']
+            }
         }]
     };
 

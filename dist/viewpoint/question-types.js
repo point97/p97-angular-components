@@ -1,6 +1,6 @@
-// build timestamp: Thu Mar 26 2015 13:49:50 GMT-0700 (PDT)
+// build timestamp: Thu Apr 02 2015 11:25:54 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
-angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
+angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker']);
 
 angular.module('p97.questionTypes')
   .directive( 'qtLoader', function ( $compile ) {
@@ -959,7 +959,19 @@ angular.module('p97.questionTypes')
 
             if (!scope.question) return;
             var options = scope.question.options;
-            
+
+            /*
+              see possible language translations options in URL below
+              https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations
+              use those to help fill out datePickerOptions
+            */
+            var datePickerOptions = options.settings;
+
+            if (options.initial && options.format !== 'yyyy') {
+                scope.selectedDate = new Date(options.initial[0], options.initial[1] - 1, options.initial[2]);
+            }
+                 
+
             //validates years between 1900-2100
             //we can expanded if needed
             var regYear = /^(19|20)\d{2}$/;
@@ -1050,6 +1062,10 @@ angular.module('p97.questionTypes')
                 $compile(contents)(scope);
             });
             
+
+            // scope.$watch('selectedDate', function(newValue){
+            //     scope.$parent.value = newValue;
+            // });
         }
     };
 }]);

@@ -1,5 +1,5 @@
 // p97.question-types module definition. This must be called first in the gulpfile
-angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places']);
+angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker']);
 
 angular.module('p97.questionTypes')
   .directive( 'qtLoader', function ( $compile ) {
