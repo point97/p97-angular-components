@@ -30,7 +30,8 @@ var QUESTION_TYPES = [
                       'autocomplete-search',
                       'info',
                       'geojson',
-                      'numpad'
+                      'numpad',
+                      'time'
                      ]
 
 

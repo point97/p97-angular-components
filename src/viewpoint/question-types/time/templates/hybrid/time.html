@@ -1,0 +1,13 @@
+<div class="p97-time">
+  <div ng-bind-html="renderHtml(question.body)"></div>
+    <div class="item item-input-inset" ng-hide="(question.options.hideInput === true)"> 
+        <ionic-time-picker etime="slots.epochTime" format="slots.format" step="slots.step" ng-model="value">
+          <label class="item-input-wrapper" >    
+              <span>{{getTime()}}</span>  
+          </label>
+        </ionic-time-picker>
+    </div>
+      <div class="item item-divider" ng-show="errors.length>0">
+        <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+      </div>
+</div>
