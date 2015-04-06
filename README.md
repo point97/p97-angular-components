@@ -234,12 +234,12 @@ IN PROGRESS but otherwise PASSING TESTS
   * required
   * default
 
-  * **date** 
+* **date** 
      PASSING TESTS
      `options`
 
      * templateUrl (web templates currently unavailable): 
-        * "hybrid/date.html"
+        * hybrid/date.html"
      * initial - currently only working when options.format `!== "yyyy"`
      * min - if options.format is `!== "yyyy"` - years must be input as an array of strings` ['yyyy', 'mm', 'dd'] `(ex.` ['2015', '03', '15']`)
        *  otherwise  if `"yyyy"` - min is a integer
@@ -320,7 +320,19 @@ PASSING TESTS
     * "web/autocomplete.html"
 
 * **numpad**
-currently avaialble in hybrid templates - allows for quick rapid input
+currently available in hybrid templates - allows for quick rapid input
+
+* **time** 
+  `options`
+  
+  * templateUrl: 
+      * "hyrbrid/time.html"
+  * format (defaults to 24): 12 || 24 
+  * increments (defaults to 15) [increase/decrease minutes in set increments] : 1 || 15
+  * required 
+  * initial (string needs to be consistent with format chosen)- 
+    * 12 hour format  `"12:45 PM"` (ensure spacing is correct)
+    * 24 hour format `"23:15"`
 
 
 ### Available in version v0.8
@@ -328,23 +340,6 @@ currently avaialble in hybrid templates - allows for quick rapid input
   PASSING TESTS - 
   `options`
 
-  * required
-  * default
-
-
-* **time** 
- 
-  `options`
-  
-  * templateUrl: 
-      * "ionic/time.html"
-      * "ionic/popup.html"
-      * "yeoman/time.html"
-      * "yeoman/popup.html"
-  * initial
-  * min 
-  * max
-  * datejs_format: [String] e.g. 'HH:mm:ss'
   * required
   * default
 
