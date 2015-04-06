@@ -118,10 +118,6 @@ angular.module('p97.questionTypes')
                 $compile(contents)(scope);
             });
             
-
-            // scope.$watch('selectedDate', function(newValue){
-            //     scope.$parent.value = newValue;
-            // });
         }
     };
 }]);

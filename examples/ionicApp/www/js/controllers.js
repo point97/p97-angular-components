@@ -220,7 +220,15 @@ angular.module('starter')
                 'max': ['2015', '04', '20'],
                 'initial':  ['2015', '03', '15']
             }
-        }]
+        },
+        {
+            'body': 'What is the time of the catch',
+            'type': 'time',
+            'options': {
+                'format': 24,
+                'increments': 15
+            }
+        },]
     };
 
     //Create empty answers array (one for each question)

@@ -74,6 +74,10 @@ table tr td {
   right: 0.05em;
 }
 
+ionic-time-picker {
+  width: 100%;
+}
+
 /* Validation */
 
 .error {
