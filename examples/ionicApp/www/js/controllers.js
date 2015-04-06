@@ -225,8 +225,9 @@ angular.module('starter')
             'body': 'What is the time of the catch',
             'type': 'time',
             'options': {
-                'format': 24,
-                'increments': 15
+                'format': 12,
+                'increments': 15,
+                'initial': "12:14 PM"
             }
         },]
     };
