@@ -27,7 +27,11 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return $sce.trustAsHtml(htmlCode);
             };
 
-            scope.getEpoch = function(initial) {
+            /*
+              converts units used in TimePickers directive
+              claims its EpochTime - but maybe slightly different
+            */
+            scope.getPickersUnits = function(initial) {
 
                 if (options.initial !== undefined) {
                     var timeStr = initial.replace(/\D/g,'');
@@ -45,7 +49,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.slots = {
                 
-                epochTime: scope.getEpoch(options.initial) || 0, 
+                epochTime: scope.getPickersUnits(options.initial) || null, 
 
                 //12||24 hour clock
                 format: options.format || 24,
@@ -54,15 +58,20 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 step: options.increments || 15
             };
 
+
             scope.getTime = function () {
+                if (scope.slots.epochTime === null ) return "Please Select a Time";
+
                 var decimalHours = scope.slots.epochTime/3600;
                 var readableHours = Math.floor(decimalHours);
-                var minutes = (decimalHours - readableHours) * 60;
+                var minutes = Math.round((decimalHours - readableHours) * 60);
                 var twelveHourClock = readableHours - 12;
 
                 doubleZero = function(minutes) {
                     if (minutes === 0) {
                         return "00";
+                    } else if (minutes < 10){
+                        return "0"+minutes;
                     } else {
                         return minutes;
                     }
@@ -92,6 +101,13 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
+
+                if (options.required && options.required === true) {
+                    if (scope.value === 'Please Select a Time') {
+                        scope.errors.push('This field is required')
+                    }
+                }
+
                 return (scope.errors.length === 0);
             };
 
@@ -103,6 +119,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             $http.get(scope.getContentUrl(), { cache: $templateCache }).success(function(response) {
                 var contents = element.html(response).contents();
                 $compile(contents)(scope);
+            });
+
+            scope.$watch("getTime()", function( value ) {
+                if (value === 'Please Select a Time' && (!options.required || options.required === false)) {
+                    scope.value = "";
+                } else {
+                    scope.value = value;
+                } 
             });
 
         }
