@@ -1,4 +1,4 @@
-// build timestamp: Mon Apr 06 2015 12:01:59 GMT-0700 (PDT)
+// build timestamp: Mon Apr 06 2015 15:32:39 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -1872,12 +1872,16 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     var hourStr = initial.substring(0,2);
                     var minutesStr = initial.substring(3,5);
 
-                    if (options.format === 12 && hourStr !== '12' && initial.slice(-2) === "PM") {
+                    if ((options.format === 12 && hourStr !== '12' && initial.slice(-2) === "AM")  
+                        || (options.format === 12 && hourStr === '12' && initial.slice(-2) === 'PM')
+                        || (options.format === 24)) {
                         return parseInt(hourStr) * 3600 + parseInt(minutesStr) * 60;
-                    } else {
-                        return parseInt(timeStr) * 36;
+                    } else if (hourStr !== '12' && initial.slice(-2) === "PM") {
+                        return (parseInt(hourStr) + 12) * 3600 + parseInt(minutesStr) * 60;
+                    } else if (hourStr === '12' && initial.slice(-2) === 'AM') {
+                        return parseInt(minutesStr) * 60;
                     }
-                }
+                };
             };
 
 
