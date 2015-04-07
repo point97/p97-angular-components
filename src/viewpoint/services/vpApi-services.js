@@ -1,3 +1,4 @@
+'user strict';
 
 angular.module('vpApi.services', [])
 
@@ -224,6 +225,7 @@ angular.module('vpApi.services', [])
         */
 
         $profile.fetch(function(){
+            console.log("Got profile")
             $vpApi.db.save(); // This is to save the profile to indexedDB.
 
             var allowedApps = $vpApi.user.profile.allowed_apps;
@@ -255,6 +257,7 @@ angular.module('vpApi.services', [])
             // Now use the allowed_apps to get first app.
             $app.fetchBySlug(appSlug,
                 function(data, status){
+                    console.log('Got app ', data)
                     formstacks = data["formstacks"];
                     //Clear data
                     oldStacks = $vpApi.db.getCollection('formstack').find();
