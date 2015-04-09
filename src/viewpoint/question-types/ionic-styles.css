@@ -86,4 +86,11 @@ ionic-time-picker {
 	color: red;
 }
 
+html, body, .p97-map-multi-select {
+    height: 100%;
+    width: 100%;
+}
 
+#map {
+  height: 400px;
+}

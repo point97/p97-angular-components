@@ -249,7 +249,7 @@ IN PROGRESS but otherwise PASSING TESTS
        * if `"yyyy"` is selected as a format - validates any year between 1900 and 2099
        * if `!=='yyyy'` `options.setting` can be added
       * settings - is an object (primarily for translations of languages) - see [https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations](https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations)
-      ``` javascript
+  ``` json
   {
       monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
       monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
@@ -334,8 +334,55 @@ currently available in hybrid templates - allows for quick rapid input
     * 12 hour format  `"12:45 PM"` (ensure spacing is correct)
     * 24 hour format `"23:15"`
 
+* **map-multi-select** - map questionType
+ `options`
+ * required
+ * tileSources (is an array of several tiles)
+``` json
+[
+{
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",
+    "attrib": "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'",
+    "name": "ESRI",
+    "storeName": "esri",
+    "maxZoom": 14,
+    "subdomain": ""
+},
+ {
+    "name": "Bing",
+    "bingType": "AerialWithLabels"
+}
+]
+  ```
+  * initial 
+    * center point of map - array (ex. `[-7.5, 116.5]`)
+    * zoom - starting zoom level - (ex. `6`)
+ * type - `list` || `featureCollection` 
+   * (how features are saved as)
+   * list saves an array of `id` 
+   * featureCollection saves all geosjon info
+ * geojsonChoices  - styling and path info for geojson 
+   * clickStyle - used if clickEvent color styling is a completely different than initial geojson styling
+ ``` json
+{
+    "path": "mock/mfish_grid.geojson",
+    "style": {
+        "color": "#000099",
+        "opacity": 0.6,
+        "fillOpacity": 0.0,
+        "weight": 1,
+        "clickable": true
+    },
+    "clickStyle": {
+        "fillColor": "#A28E2C",
+        "fillOpacity": 0.8
+    }
+}
+  ```
 
-### Available in version v0.8
+
+
+### Available in later stages
 * **email**
   PASSING TESTS - 
   `options`

@@ -31,7 +31,8 @@ var QUESTION_TYPES = [
                       'info',
                       'geojson',
                       'numpad',
-                      'time'
+                      'time',
+                      'map-multi-select'
                      ]
 
 
