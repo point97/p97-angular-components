@@ -20,7 +20,7 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
-        obj.db = data.db;
+        obj.db = window.data.db;
         // if (platform === 'web'){
         //     obj.db.save = function(){
         //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
@@ -198,7 +198,7 @@ angular.module('vpApi.services', [])
         console.table(data.db.getCollection(collectionName).data);
     }
 
-    this.dbinit();
+    if (window.data) this.dbinit();
 
 }])
 

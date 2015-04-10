@@ -1,4 +1,4 @@
-// build timestamp: Thu Apr 09 2015 14:32:44 GMT-0700 (PDT)
+// build timestamp: Thu Apr 09 2015 17:00:45 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -375,7 +375,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
 
 angular.module('p97.questionTypes')
-  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', function($http, $templateCache, $compile, $injector, $sce){
+  .directive('singleSelect', ['$http', '$templateCache', '$compile', '$injector', '$sce', '$formUtils', '$vpApi', function($http, $templateCache, $compile, $injector, $sce, $formUtils, $vpApi){
     if ($injector.has('$ionicPopup')) {
         var $ionicPopup = $injector.get('$ionicPopup');
     }
@@ -398,6 +398,19 @@ angular.module('p97.questionTypes')
 
             var reg = /^[A-Za-z\d() _.,-]*$/;
             var options = scope.question.options;
+
+
+            //if filter option exist, only show choices in group_value
+            if (options.filter) {
+                if ($formUtils && $vpApi.db) {
+                    var answer = $formUtils.getAnswer(scope, options.filter);
+                    if (answer !== null) {
+                        scope.localChoices = _.filter(question.choices, function(item) {
+                            return item.group_value === answer
+                        });
+                    };
+                };
+            };
 
             scope.setBlock = function(){
                 scope.errors = [];
@@ -438,6 +451,7 @@ angular.module('p97.questionTypes')
                     }
                 });
             };
+
 
             //if previousAnswer exists - check it upon return to the question
             scope.checkPreviousAnswer = function() {

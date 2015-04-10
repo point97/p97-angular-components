@@ -1,4 +1,4 @@
-// build timestamp: Thu Apr 09 2015 14:32:44 GMT-0700 (PDT)
+// build timestamp: Thu Apr 09 2015 17:00:45 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1320,7 +1320,7 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
-        obj.db = data.db;
+        obj.db = window.data.db;
         // if (platform === 'web'){
         //     obj.db.save = function(){
         //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
@@ -1498,7 +1498,7 @@ angular.module('vpApi.services', [])
         console.table(data.db.getCollection(collectionName).data);
     }
 
-    this.dbinit();
+    if (window.data) this.dbinit();
 
 }])
 

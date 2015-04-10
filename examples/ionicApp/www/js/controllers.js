@@ -76,8 +76,7 @@ angular.module('starter')
             'options': {
                 'required': false,
                 'allow_other': 1,
-                "other_max_length": 10,
-                "templateUrl": 'ionic/checkbox-single'
+                "other_max_length": 10
             }
         },{
             'body': 'Please choose one of the following',
@@ -85,13 +84,16 @@ angular.module('starter')
             "slug": "gear-type-2",
             'type': 'single-select',
             'choices': [
-                    {'verbose': 'Hook & Line', 'value': '5'},
-                    {'verbose': 'Trawl Net', 'value': '6'},
-                    {'verbose': 'Trap', 'value': '7'},
+                    {'verbose': 'Hook & Line', 'value': '5', 'group_value': '5'},
+                    {'verbose': 'Rod n Reel', 'value': 8, 'group_value': '5'},
+                    {'verbose': 'Shore Fishin', 'value': 9, 'group_value': '6'},
+                    {'verbose': 'Trawl Net', 'value': '6', 'group_value': '6'},
+                    {'verbose': 'Trap', 'value': '7', 'group_value': '7'},
                 ],
             'options': {
                 'required': true,
-                'templateUrl': 'ionic/drop-down-single',
+                'widget': 'hybrid/radio',
+                "filter": "gear-type-2",
                 'allow_other': 1,
                 "other_max_length": 10
             }
@@ -229,43 +231,7 @@ angular.module('starter')
                 'increments': 15,
                 'initial': "12:14 PM"
             }
-        },
-        {
-            'body': 'Please Map',
-            'type': 'map-multi-select',
-            'options': {
-                'tileSources': [{
-                    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",
-                    "attrib": "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'",
-                    "name": "ESRI",
-                    "storeName": "esri",
-                    "maxZoom": 14,
-                    "subdomain": ""
-                }],
-                'initial': {
-                    'center': [
-                        -7.5,
-                        116.5
-                    ],
-                    'zoom': 6
-                },
-                'type': 'list',
-                'geojsonChoices': {
-                    "path": "mock/mfish_grid.geojson",
-                    "style": {
-                      "color": "#000099",
-                      "opacity": 0.6,
-                      "fillOpacity": 0.0,
-                      "weight": 1,
-                      "clickable": true
-                    },
-                    "clickStyle": {
-                        "fillColor": "#A28E2C",
-                        "fillOpacity": 0.8
-                    }
-                }
-            }
-        }]
+        },]
     };
 
     //Create empty answers array (one for each question)
