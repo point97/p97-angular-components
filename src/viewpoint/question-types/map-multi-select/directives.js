@@ -8,7 +8,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
         // Scope should always look like this in all question types.
         scope: {
-            question: '=', 
+            question: '=',
             value: '=',
             control: '='
         },
@@ -30,7 +30,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             } else {
                 scope.selectedFeatures = [];
             }
-            
+
             scope.getContentUrl = function() {
                 if(scope.question.options.widget)
                     return BASE_TEMPLATE_URL+'map-multi-select/templates/'+scope.question.options.widget+'.html';
@@ -41,7 +41,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.renderHtml = function(htmlCode) {
                 return $sce.trustAsHtml(htmlCode);
             };
-           
+
 
             function onEachFeature(feature, layer) {
                var geojsonOptions = options.geojsonChoices;
@@ -86,10 +86,10 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     });
                 });
             };
-            
+
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
-            
+
             scope.internalControl.validate_answer = function(){
                 scope.errors = []
 
@@ -100,7 +100,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.internalControl.clean_answer = function(){
-                
+
             };
 
             // Compile the template into the directive's scope.
@@ -117,20 +117,20 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
                 _.each(tileSources, function(tileSource) {
 
-                    //add tile layer(s)           
-                    var mapOptions = { 
+                    //add tile layer(s)
+                    var mapOptions = {
                         maxZoom: tileSource.maxZoom,
-                        attribution: tileSource.attrib, 
+                        attribution: tileSource.attrib,
                         dbOnly: false,
-                        onReady: function(){}, 
-                        onError: function(){}, 
+                        onReady: function(){},
+                        onError: function(){},
                         storeName: tileSource.storeName,
                         subdomains: tileSource.subdomain,
                         dbOption: "IndexedDB" // "WebSQL"
                     }
 
                     //TODO - OFFLINE TILE CACHING
-                    
+
                     if (tileSource.name !== "NOAA Nautical Charts" && tileSource.name !== "Bing") {
 
                         layer = L.tileLayer(tileSource.url, mapOptions);
@@ -139,7 +139,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
                         //only a single layer can/should be added to scope.map
                         //this creates an array, where the first index can be grabbed within the timeout function
-                        layersArray.push(layer)                                
+                        layersArray.push(layer)
                     };
 
                     if (tileSource.name === 'Bing') {
@@ -149,8 +149,8 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                         });
                         baseLayers[tileSource.name] = bing;
                         layersArray.push(bing);
-                    }; 
-                    
+                    };
+
                     // NOAA tiles are NOT to be cached, as users are not accepting acknowledgement of usage prior to using leaflet.
                     // Complete User Agreement can be seen here: http://www.nauticalcharts.noaa.gov/mcd/Raster/download_agreement.htm
                     if (tileSource.name === 'NOAA Nautical Charts') {
@@ -163,7 +163,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                         baseLayers[tileSource.name] = nautical;
                         layersArray.push(nautical);
                     };
-                });      
+                });
 
                 $timeout(function(){
                     //grabs the first object in the array
@@ -179,7 +179,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                             style: options.geojsonChoices.style,
                             onEachFeature: onEachFeature
                         });
-                    geojsonLayer.addTo(scope.map);       
+                    geojsonLayer.addTo(scope.map).bringToFront();
                 };
             });
 
