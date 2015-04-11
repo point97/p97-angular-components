@@ -65,9 +65,13 @@ angular.module('vpApi.services', [])
             if (!item.id){
                 item.id = obj.generateUUID();
             }
-    });
+        });
 
         obj.db.save(); // This is required in order for the UUID's and the changes API to work.
+
+        if(typeof(initCallback) == 'function'){
+            initCallback();
+        }
         return;
 
     }
