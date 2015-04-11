@@ -13,9 +13,10 @@ angular.module('p97.questionTypes')
 
         // Scope should always look like this in all question types.
         scope: {
-            question: '=', 
+            question: '=',
             value: '=',
-            control: '='
+            control: '=',
+            current: '='
         },
         link: function(scope, element, attrs) {
             if (!scope.question) return;
@@ -24,21 +25,22 @@ angular.module('p97.questionTypes')
             var options = scope.question.options;
 
 
-            //if filter option exist, only show choices in group_value
-            if (options.filter) {
-                if ($formUtils && $vpApi.db) {
-                    var answer = $formUtils.getAnswer(scope, options.filter);
-                    if (answer !== null) {
-                        scope.localChoices = _.filter(question.choices, function(item) {
-                            return item.group_value === answer
-                        });
-                    };
-                };
-            };
-
             scope.setBlock = function(){
                 scope.errors = [];
-                scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+                //if filter option exist, only show choices in group_value
+                if (options.filter) {
+                    if ($formUtils && $vpApi.db && scope.current) {
+                        var answer = $formUtils.getAnswer(null, options.filter, scope.current.fsResp.id);
+                        if (answer !== null) {
+                            scope.localChoices = _.filter(scope.question.choices, function(item) {
+                                return item.group_value === answer.value
+                            });
+                        };
+                    };
+                }else{
+                    scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
+                }
+
                 scope.obj = {'otherValue': null}
 
                 if (scope.question.choices.length === 1) scope.value = scope.question.choices[0].value;
@@ -90,13 +92,13 @@ angular.module('p97.questionTypes')
                         scope.localChoices.splice(scope.localChoices.length -1, 0, addOther);
                     }
                     scope.inputValue = scope.value;
-                    
+
                     //find value and toggle choice as checked
                     var choice = _.find(scope.localChoices, {value: scope.inputValue});
                     choice.checked = true;
                 }
             };
-            
+
             // This is availible in the main controller.
             scope.internalControl = scope.control || {};
             scope.internalControl.validate_answer = function(){
@@ -136,11 +138,11 @@ angular.module('p97.questionTypes')
                       scope: scope,
                       subTitle: 'Please enter your input below',
                       buttons: [
-                        { 
+                        {
                           text: 'Cancel',
                           onTap: function(e) {
                             scope.cancelOther();
-                          } 
+                          }
                         },
                         {
                           text: '<b>Confirm</b>',
@@ -156,8 +158,8 @@ angular.module('p97.questionTypes')
                 //web - angular-strap modal
                 if (platform === 'web') {
                     scope.myOtherModal = $modal({
-                        scope: scope, 
-                        template: 'templates/web/partials/other-input-modal.html', 
+                        scope: scope,
+                        template: 'templates/web/partials/other-input-modal.html',
                         show: true
                     });
                 };
@@ -224,7 +226,7 @@ angular.module('p97.questionTypes')
                     localContains = (_.some(scope.localChoices, function(i) {
                         return i.value == scope.obj.otherValue
                     }));
-                    
+
                     if (localContains) {
                         scope.errorDuplicate = false;
                         if (platform === 'hybrid') {
@@ -236,7 +238,7 @@ angular.module('p97.questionTypes')
 
                         if (platform === 'web'){
                             scope.errorDuplicate = true;
-                        }; 
+                        };
 
                         scope.obj.otherValue = '';
                         scope.cancelOther();
@@ -249,7 +251,7 @@ angular.module('p97.questionTypes')
                                 title: 'Too long',
                                 template: 'You have typed an answer that is too long. Please try again.'
                             });
-                        }; 
+                        };
 
                         if (platform === 'web'){
                             scope.errorLength = true;
@@ -260,7 +262,7 @@ angular.module('p97.questionTypes')
                     }; //end lengthy input
 
                     scope.closeModal = function() {
-                        if (platform === 'web' 
+                        if (platform === 'web'
                             && scope.errorLength === false
                             && scope.errorDuplicate === false
                             && scope.errorEmpty === false ) {
@@ -273,7 +275,7 @@ angular.module('p97.questionTypes')
             //used multiple times throughout directive - unchecks and removes 'other' value
             scope.cancelOther = function () {
                 //unchecks 'other' on UI
-                scope.localChoices[scope.localChoices.length - 1].checked = false; 
+                scope.localChoices[scope.localChoices.length - 1].checked = false;
                 scope.inputValue = '';
             };
 
@@ -281,16 +283,16 @@ angular.module('p97.questionTypes')
 
             scope.$on('reset-block', function(event){
                 /*
-                Listens for the reset-block event fired by the map-form whenever the user 
-                gets to the intro or end page of the map-form. 
+                Listens for the reset-block event fired by the map-form whenever the user
+                gets to the intro or end page of the map-form.
                 This is necessary becuase the map-form do not reloead that Controller
                 and qt-loader.
                 */
                 console.log('[single-select] reset-block');
                 scope.setBlock();
-                scope.value = scope.question.value; 
+                scope.value = scope.question.value;
                 scope.checkPreviousAnswer();
             });
         }
-    } // end return 
+    } // end return
 }])
