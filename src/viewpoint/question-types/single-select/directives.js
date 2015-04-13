@@ -176,6 +176,7 @@ angular.module('p97.questionTypes')
                 if (newValue === 'other') {
                     scope.otherInputModal();
                 } else {
+                    scope.$emit("changed-value", {'changedVal': newValue || "", 'questionSlug': scope.question.slug});
                     scope.value = newValue;
                 }
             });

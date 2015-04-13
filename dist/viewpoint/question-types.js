@@ -1,4 +1,4 @@
-// build timestamp: Mon Apr 13 2015 10:50:26 GMT-0700 (PDT)
+// build timestamp: Mon Apr 13 2015 13:46:38 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -552,6 +552,7 @@ angular.module('p97.questionTypes')
                 if (newValue === 'other') {
                     scope.otherInputModal();
                 } else {
+                    scope.$emit("changed-value", {'changedVal': newValue || "", 'questionSlug': scope.question.slug});
                     scope.value = newValue;
                 }
             });
