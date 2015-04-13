@@ -1,4 +1,4 @@
-// build timestamp: Thu Apr 09 2015 17:00:45 GMT-0700 (PDT)
+// build timestamp: Mon Apr 13 2015 10:50:26 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1365,9 +1365,13 @@ angular.module('vpApi.services', [])
             if (!item.id){
                 item.id = obj.generateUUID();
             }
-    });
+        });
 
         obj.db.save(); // This is required in order for the UUID's and the changes API to work.
+
+        if(typeof(initCallback) == 'function'){
+            initCallback();
+        }
         return;
 
     }
