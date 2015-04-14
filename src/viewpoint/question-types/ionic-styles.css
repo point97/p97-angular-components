@@ -29,6 +29,10 @@ Styles for Ionic Question Types
 	border-color: #16A085;
 }
 
+.datepicker {
+  background-color: #eee !important;
+}
+
 .table {
   text-align: center;
   table-layout: fixed;
@@ -52,6 +56,28 @@ table tr td {
   border: 1px solid;
 }
 
+.picker__button--close {
+  display: none;
+}
+
+.picker__nav--next,
+.picker__nav--prev {
+  height: 2em;
+}
+
+.picker__nav--next:hover,
+.picker__nav--prev:hover {
+  background: none;
+}
+
+.picker__nav--next {
+  right: 0.05em;
+}
+
+ionic-time-picker {
+  width: 100%;
+}
+
 /* Validation */
 
 .error {
@@ -60,4 +86,11 @@ table tr td {
 	color: red;
 }
 
+html, body, .p97-map-multi-select {
+    height: 100%;
+    width: 100%;
+}
 
+#map {
+  height: 400px;
+}

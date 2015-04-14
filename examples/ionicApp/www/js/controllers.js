@@ -76,8 +76,7 @@ angular.module('starter')
             'options': {
                 'required': false,
                 'allow_other': 1,
-                "other_max_length": 10,
-                "templateUrl": 'ionic/checkbox-single'
+                "other_max_length": 10
             }
         },{
             'body': 'Please choose one of the following',
@@ -85,13 +84,16 @@ angular.module('starter')
             "slug": "gear-type-2",
             'type': 'single-select',
             'choices': [
-                    {'verbose': 'Hook & Line', 'value': '5'},
-                    {'verbose': 'Trawl Net', 'value': '6'},
-                    {'verbose': 'Trap', 'value': '7'},
+                    {'verbose': 'Hook & Line', 'value': '5', 'group_value': '5'},
+                    {'verbose': 'Rod n Reel', 'value': 8, 'group_value': '5'},
+                    {'verbose': 'Shore Fishin', 'value': 9, 'group_value': '6'},
+                    {'verbose': 'Trawl Net', 'value': '6', 'group_value': '6'},
+                    {'verbose': 'Trap', 'value': '7', 'group_value': '7'},
                 ],
             'options': {
                 'required': true,
-                'templateUrl': 'ionic/drop-down-single',
+                'widget': 'hybrid/radio',
+                "filter": "gear-type-2",
                 'allow_other': 1,
                 "other_max_length": 10
             }
@@ -110,8 +112,9 @@ angular.module('starter')
             'type': 'date',
             'options': {
                 'required': false,
-                'min': '2013-03-28',
-                'max': '2013-04-05'
+                'format': 'yyyy',
+                'min': '2000',
+                'max': '2012'
             }
         },{
             'body': 'How are you feeling?',
@@ -198,7 +201,37 @@ angular.module('starter')
             'body': '',
             'type': 'numpad',
             'options': {}
-        }]
+        },
+        {
+            'body': 'Select a date:',
+            'type': 'date',
+            'options': {
+                'settings': 
+                {
+                  monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
+                  monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
+                  weekdaysFull: [ 'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu' ],
+                  weekdaysShort: [ 'Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab' ],
+                  today: 'hari ini',
+                  clear: 'menghapus',
+                  firstDay: 1,
+                  format: 'yyyy/mm/dd',
+                  formatSubmit: 'yyyy/mm/dd'
+                },
+                'min': ['2015', '03', '14'],
+                'max': ['2015', '04', '20'],
+                'initial':  ['2015', '03', '15']
+            }
+        },
+        {
+            'body': 'What is the time of the catch',
+            'type': 'time',
+            'options': {
+                'format': 12,
+                'increments': 15,
+                'initial': "12:14 PM"
+            }
+        },]
     };
 
     //Create empty answers array (one for each question)

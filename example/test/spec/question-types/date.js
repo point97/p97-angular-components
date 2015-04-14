@@ -35,11 +35,12 @@ describe('Controller: DateCtrl', function () {
                 "label": "Dates",
                 "type": "date",
                 "options": {
-                    "min": '2014-04-20',
-                    "max": '2014-07-15' 
+                    'min': ['2015', '03', '14'],
+                    'max': ['2015', '04', '20'],
                 }
             }]
         };
+
 
     scope = $rootScope.$new();
     scope2 = $rootScope.$new();
@@ -119,7 +120,7 @@ describe('Controller: DateCtrl', function () {
         /* on browser this test isn't neccessary, while
         on mobile, ionic allows users to override min/max */      
         var isolated = elm2.isolateScope();
-        isolated.value = '2002-03-12';
+        isolated.value = ['2002', '09', '15' ];
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
@@ -129,7 +130,7 @@ describe('Controller: DateCtrl', function () {
         /* on browser this test isn't neccessary, while
         on mobile, ionic allows users to override min/max */      
         var isolated = elm2.isolateScope();
-        isolated.value = '2022-09-08';
+        isolated.value = ['2022', '12', '24'];
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(false);
@@ -139,7 +140,7 @@ describe('Controller: DateCtrl', function () {
         /* on browser this test isn't neccessary, while
         on mobile, ionic allows users to override min/max */   
         var isolated = elm2.isolateScope();
-        isolated.value = '2014-05-08';
+        isolated.value = ['2015', '03', '17'];
 
         var is_valid = isolated.internalControl.validate_answer();
         expect(is_valid).toBe(true);

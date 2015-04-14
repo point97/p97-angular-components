@@ -21,8 +21,14 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
-        obj.db = data.db;
 
+        obj.db = window.data.db;
+        // if (platform === 'web'){
+        //     obj.db.save = function(){
+        //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
+        //         $rootScope.$broadcast("db.save");
+        //     }
+        // };
 
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
@@ -61,9 +67,13 @@ angular.module('vpApi.services', [])
             if (!item.id){
                 item.id = obj.generateUUID();
             }
-    });
+        });
 
         obj.db.save(); // This is required in order for the UUID's and the changes API to work.
+
+        if(typeof(initCallback) == 'function'){
+            initCallback();
+        }
         return;
 
     }
@@ -194,7 +204,7 @@ angular.module('vpApi.services', [])
         console.table(data.db.getCollection(collectionName).data);
     }
 
-    this.dbinit();
+    if (window.data) this.dbinit();
 
 }])
 
@@ -752,11 +762,21 @@ angular.module('vpApi.services', [])
 
         // Get fs Info
         var item = $vpApi.db.getCollection('fsResp').find({id:fsRespId})[0];
-        fsResp = angular.copy(item);
+        var lastUrl = $vpApi.db.getCollection("lastSavedUrl").data[0];
+        if (lastUrl){
+            lastSavedUrl = {
+                "path": lastUrl.path,
+                "timestamp": lastUrl.timestamp
+            }
+        }
 
+        fsResp = angular.copy(item);
         fsResp.meta = undefined;
         fsResp.fsSlug = undefined;
         fsResp.$loki = undefined;
+        fsResp.options = {
+            'lastSavedUrl': lastSavedUrl
+        };
         fsResp.formResps = [];
 
         // Get the form resps

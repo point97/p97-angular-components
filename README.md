@@ -150,8 +150,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 
  `options`
  
-  * templateUrl (yeoman templates currently unavailable): 
-      * ionic/datetime.html
+  * templateUrl (web templates currently unavailable): 
+      * hybrid/datetime.html
   * initial
   * min 
   * max
@@ -162,8 +162,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
 * **number** - This can either be a decimal or an integer
   PASSING TESTS
   `options`
-   * templateUrl (yeoman templates currently unavailable): 
-      * ionic/number.html
+   * templateUrl (web templates currently unavailable): 
+      * hybrid/number.html
   * min
   * max
   * required
@@ -184,8 +184,8 @@ Viewpoint 2 defines ?? different question types. See the Viewppoint API at /api/
   * required
   * default
   *   templateUrl : 
-      * ionic/textarea.html
-      * yeoman/textarea.html
+      * hybrid/textarea.html
+      * web/textarea.html
 
 * **yes-no** (deprecated in v 0.4 in favor of toggle)
   DEPRACTED 
@@ -200,9 +200,9 @@ The 'other' options allows for a user to enter a single text answer. Other valid
   `options`
   
   * templateUrl
-     * "ionic/checkbox-single.html" (looks like checkbox.html used for multi-select - however only a single choice can be made -- DEFAULT)
-     * "ionic/drop-down-single.html" 
-     * "ionic/radio.html"
+     * "hybrid/checkbox-single.html" (looks like checkbox.html used for multi-select - however only a single choice can be made -- DEFAULT)
+     * "hybrid/drop-down-single.html" 
+     * "hybrid/radio.html"
      * "yeoman/drop-down-single.html"
      * "yeoman/radio.html"
   * choices_from_previous_question: [String] the question slug to who's choices to use as choices for this question.
@@ -220,10 +220,10 @@ IN PROGRESS but otherwise PASSING TESTS
   `options`
 
   * templateUrl 
-     * "ionic/toggle-multi.html"
-     * "ionic/checkbox.html"
-     * "yeoman/drop-down-multi.html"
-     * "yeoman/checkbox.html"
+     * "hybrid/toggle-multi.html"
+     * "hybrid/checkbox.html"
+     * "web/drop-down-multi.html"
+     * "web/checkbox.html"
   * min_choice
   * max_choice
   * grouping
@@ -235,18 +235,33 @@ IN PROGRESS but otherwise PASSING TESTS
   * default
 
 * **date** 
-   PASSING TESTS
-   `options`
+     PASSING TESTS
+     `options`
 
-   * templateUrl (yeoman templates currently unavailable): 
-      * "ionic/date.html"
-   * initial - currently only working when options.format = "yyyy"
-   * min - if options.format is not "yyyy" - years must be input as a string "yyyy-mm-dd" (eg. "2015-04-23")
-   * max - same requirements as min
-   * required
-   * default  
-    * format: "yyyy" or blank (if blank or not "yyyy" - date defaults to using the native datepicker)
-     * if "yyyy" is selected as a format - validates any year between 1900 and 2099
+     * templateUrl (web templates currently unavailable): 
+        * hybrid/date.html"
+     * initial - currently only working when options.format `!== "yyyy"`
+     * min - if options.format is `!== "yyyy"` - years must be input as an array of strings` ['yyyy', 'mm', 'dd'] `(ex.` ['2015', '03', '15']`)
+       *  otherwise  if `"yyyy"` - min is a integer
+     * max - same requirements as min
+     * required
+      * format: `"yyyy"` or blank (if blank or `!=="yyyy"` - date defaults to using the calendar datepicker for hybrid)
+       * if `"yyyy"` is selected as a format - validates any year between 1900 and 2099
+       * if `!=='yyyy'` `options.setting` can be added
+      * settings - is an object (primarily for translations of languages) - see [https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations](https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations)
+  ``` json
+  {
+      monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
+      monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
+      weekdaysFull: [ 'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu' ],
+        weekdaysShort: [ 'Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab' ],
+        today: 'hari ini',
+      clear: 'menghapus',
+      firstDay: 1,
+      format: 'yyyy/mm/dd',
+      formatSubmit: 'yyyy/mm/dd'
+  }
+  ```
    
 
 * **toggle**
@@ -260,8 +275,8 @@ PASSING TESTS
   * choices.negativeValue - [String]
   * choices.negativeLabel - [String] 
   * default - [String] - currently not implemented
-  * templateUrl (specific to Ionic): 
-      * "ionic/toggle.html"
+  * templateUrl (specific to hybrid): 
+      * "hybrid/toggle.html"
 
 
 
@@ -276,8 +291,8 @@ PASSING TESTS
   * required
   * default
   * templateUrl : 
-      * "ionic/integer.html"
-      * "yeoman/integer.html"
+      * "hybrid/integer.html"
+      * "web/integer.html"
 
 * **geojson**
   This question type collects geo spatial data as a GeoJson feature group. It displays a map that users can click toggle features on and off. 
@@ -301,32 +316,77 @@ PASSING TESTS
   * stateRestrict - an array of state abbreviations (ex. ['NY', 'MA', 'CT'])
   * countryRestrict - string abbreviations using ISO 2-letter codes (ex. 'us') (defaults to 'us' if nothing is defined)
   * templateUrl : 
-    * "ionic/autocomplete.html"
-    * "yeoman/autocomplete.html"
+    * "hybrid/autocomplete.html"
+    * "web/autocomplete.html"
+
+* **numpad**
+currently available in hybrid templates - allows for quick rapid input
+
+* **time** 
+  `options`
+  
+  * templateUrl: 
+      * "hyrbrid/time.html"
+  * format (defaults to 24): 12 || 24 
+  * increments (defaults to 15) [increase/decrease minutes in set increments] : 1 || 15
+  * required 
+  * initial (string needs to be consistent with format chosen)- 
+    * 12 hour format  `"12:45 PM"` (ensure spacing is correct)
+    * 24 hour format `"23:15"`
+
+* **map-multi-select** - map questionType
+ `options`
+ * required
+ * tileSources (is an array of several tiles)
+``` json
+[
+{
+    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",
+    "attrib": "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri'",
+    "name": "ESRI",
+    "storeName": "esri",
+    "maxZoom": 14,
+    "subdomain": ""
+},
+ {
+    "name": "Bing",
+    "bingType": "AerialWithLabels"
+}
+]
+  ```
+  * initial 
+    * center point of map - array (ex. `[-7.5, 116.5]`)
+    * zoom - starting zoom level - (ex. `6`)
+ * type - `list` || `featureCollection` 
+   * (how features are saved as)
+   * list saves an array of `id` 
+   * featureCollection saves all geosjon info
+ * geojsonChoices  - styling and path info for geojson 
+   * clickStyle - used if clickEvent color styling is a completely different than initial geojson styling
+ ``` json
+{
+    "path": "mock/mfish_grid.geojson",
+    "style": {
+        "color": "#000099",
+        "opacity": 0.6,
+        "fillOpacity": 0.0,
+        "weight": 1,
+        "clickable": true
+    },
+    "clickStyle": {
+        "fillColor": "#A28E2C",
+        "fillOpacity": 0.8
+    }
+}
+  ```
 
 
-### Available in version v0.8
+
+### Available in later stages
 * **email**
   PASSING TESTS - 
   `options`
 
-  * required
-  * default
-
-
-* **time** 
- 
-  `options`
-  
-  * templateUrl: 
-      * "ionic/time.html"
-      * "ionic/popup.html"
-      * "yeoman/time.html"
-      * "yeoman/popup.html"
-  * initial
-  * min 
-  * max
-  * datejs_format: [String] e.g. 'HH:mm:ss'
   * required
   * default
 

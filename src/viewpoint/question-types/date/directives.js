@@ -14,8 +14,20 @@ angular.module('p97.questionTypes')
         link: function(scope, element, attrs) {
 
             if (!scope.question) return;
-            var options = scope.question.options;
-            
+            var options = angular.copy(scope.question.options);
+
+            /*
+              see possible language translations options in URL below
+              https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations
+              use those to help fill out datePickerOptions
+            */
+            scope.datePickerOptions = options.settings;
+
+            if (options.initial && options.format !== 'yyyy') {
+                scope.selectedDate = new Date(options.initial[0], options.initial[1] - 1, options.initial[2]);
+            }
+                 
+
             //validates years between 1900-2100
             //we can expanded if needed
             var regYear = /^(19|20)\d{2}$/;
