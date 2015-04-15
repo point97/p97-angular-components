@@ -249,7 +249,7 @@ IN PROGRESS but otherwise PASSING TESTS
        * if `"yyyy"` is selected as a format - validates any year between 1900 and 2099
        * if `!=='yyyy'` `options.setting` can be added
       * settings - is an object (primarily for translations of languages) - see [https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations](https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations)
-  ``` json
+ ``` json
   {
       monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
       monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
