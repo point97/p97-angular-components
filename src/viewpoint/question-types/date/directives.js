@@ -16,6 +16,7 @@ angular.module('p97.questionTypes')
             if (!scope.question) return;
             var options = angular.copy(scope.question.options);
 
+
             /*
               see possible language translations options in URL below
               https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations
