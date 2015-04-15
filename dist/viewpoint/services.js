@@ -1,4 +1,4 @@
-// build timestamp: Tue Apr 14 2015 16:43:46 GMT-0700 (PDT)
+// build timestamp: Tue Apr 14 2015 17:02:59 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1570,10 +1570,8 @@ angular.module('vpApi.services', [])
                     console.log('Got app ', data)
                     formstacks = data["formstacks"];
                     //Clear data
-                    oldStacks = $vpApi.db.getCollection('formstack').find();
-                    _.each(oldStacks, function(old){
-                        $vpApi.db.getCollection('formstack').remove(old);
-                    });
+                    $vpApi.db.getCollection('formstack').clear();
+                    
                     // Insert Most recent Fromstack data
                     _.each(formstacks, function(formstack){
                         formstack.appId = data.id;

@@ -270,10 +270,8 @@ angular.module('vpApi.services', [])
                     console.log('Got app ', data)
                     formstacks = data["formstacks"];
                     //Clear data
-                    oldStacks = $vpApi.db.getCollection('formstack').find();
-                    _.each(oldStacks, function(old){
-                        $vpApi.db.getCollection('formstack').remove(old);
-                    });
+                    $vpApi.db.getCollection('formstack').clear();
+                    
                     // Insert Most recent Fromstack data
                     _.each(formstacks, function(formstack){
                         formstack.appId = data.id;
