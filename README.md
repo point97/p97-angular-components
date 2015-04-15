@@ -338,7 +338,7 @@ currently available in hybrid templates - allows for quick rapid input
  `options`
  * required
  * tileSources (is an array of several tiles)
-``` json
+ ``` json
 [
 {
     "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",

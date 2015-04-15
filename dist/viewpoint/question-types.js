@@ -1,4 +1,4 @@
-// build timestamp: Wed Apr 15 2015 14:18:56 GMT-0700 (PDT)
+// build timestamp: Wed Apr 15 2015 14:30:44 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -1846,6 +1846,12 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 
             scope.$watch('compute()', function(keystroke){
                 scope.value = keystroke;
+            });
+
+            scope.$on("reset-numpad", function(arg){
+                while(scope.display.length >0 && scope.display[0] != '0'){
+                    scope.remove();
+                }
             });
         }
     }

@@ -231,7 +231,46 @@ angular.module('starter')
                 'increments': 15,
                 'initial': "12:14 PM"
             }
-        },]
+        },{
+              "body": "Please Map",
+              "type": "map-multi-select",
+              "slug": "map-fished-areas",
+              "options": {
+                "tileSources": [
+                  {
+                    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",
+                    "attrib": "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri",
+                    "name": "ESRI",
+                    "storeName": "esri",
+                    "maxZoom": 14,
+                    "subdomain": ""
+                  }
+                ],
+                "initial": {
+                  "center": [
+                    -7.5,
+                    116.5
+                  ],
+                  "zoom": 6
+                },
+                "type": "list",
+                "geojsonChoices": {
+                  "path": "mock/mfish_grid.geojson",
+                  "style": {
+                    "color": "#000099",
+                    "opacity": 0.6,
+                    "fillOpacity": 0.0,
+                    "weight": 1,
+                    "clickable": true
+                  },
+                  "clickStyle": {
+                    "fillColor": "#A28E2C",
+                    "fillOpacity": 0.8
+                  }
+                }
+              }
+            }
+        ]
     };
 
     //Create empty answers array (one for each question)
