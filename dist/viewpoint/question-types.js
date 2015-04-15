@@ -1,4 +1,4 @@
-// build timestamp: Mon Apr 13 2015 13:46:38 GMT-0700 (PDT)
+// build timestamp: Wed Apr 15 2015 14:18:56 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -975,14 +975,16 @@ angular.module('p97.questionTypes')
         link: function(scope, element, attrs) {
 
             if (!scope.question) return;
-            var options = scope.question.options;
+            var options = angular.copy(scope.question.options);
+
 
             /*
               see possible language translations options in URL below
               https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations
               use those to help fill out datePickerOptions
             */
-            var datePickerOptions = options.settings;
+
+            scope.datePickerOptions = options.settings;
 
             if (options.initial && options.format !== 'yyyy') {
                 scope.selectedDate = new Date(options.initial[0], options.initial[1] - 1, options.initial[2]);

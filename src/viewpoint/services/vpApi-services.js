@@ -1,3 +1,4 @@
+'user strict';
 
 angular.module('vpApi.services', [])
 
@@ -20,6 +21,7 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
+
         obj.db = window.data.db;
         // if (platform === 'web'){
         //     obj.db.save = function(){
@@ -155,7 +157,7 @@ angular.module('vpApi.services', [])
                 obj.user = user;
                 obj.db.save();
                 localStorage.setItem('user', JSON.stringify(obj.user));
-                $rootScope.$broadcast('authenticated', {onSuccess: success_callback});
+                $rootScope.$broadcast('authenticated', {onSuccess: success_callback, onError: error_callback});
             })
             .error(function(data, status){
                 error_callback(data, status)
@@ -206,24 +208,66 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service('$user', ['$rootScope', '$vpApi', '$app', '$formstack', '$profile', function($rootScope, $vpApi, $app, $formstack, $profile){
+.service('$user', ['$rootScope', 
+                   '$vpApi',
+                   '$app',
+                   '$formstack',
+                   '$profile',
+                   'config',
+          function($rootScope, 
+                   $vpApi, 
+                   $app, 
+                   $formstack, 
+                   $profile, 
+                   config
+                   ){
     var obj = this;
 
     this.authenticatedCallback = function(event, args){
+        /*
+            This will call the args.onSuccessCallback (because the user did authenticate by this pont)
+            with data = {} and 
+            status = 1 if there were allowedApps and was able to fetch them.
+            status = 2 if there we no allowed apps for the user or the acceptedApp 
+                       was not in the allowedApps.
+            status = 3 if there were alledApps but fetching failed            
+            
+        */
+
         $profile.fetch(function(){
+            console.log("Got profile")
             $vpApi.db.save(); // This is to save the profile to indexedDB.
 
-            allowedApps = $vpApi.user.profile.allowed_apps;
+            var allowedApps = $vpApi.user.profile.allowed_apps;
+            var appSlug;
+
             if (allowedApps.length > 0) {
-                appSlug = allowedApps[0];
+                
+                if (config.accectedApp) {
+                    // Look for accepted app in allowed apps.
+                    var res = _.indexOf(allowedApps, config.accectedApp);
+                    if (res > 0){
+                        appSlug = config.acceptedApp;
+                    } else {
+                        args.onSuccess({}, 2)
+                        return;
+                    }
+                } else {
+                    // This is left in for past apps, just use first app. 
+                    appSlug = allowedApps[0];
+                }
+            
             } else {
-                console.error("There are no allowed Apps for this user.");
+                console.warn("There are no allowed Apps for this user.");
                 // TODO Handle the no formstack case.
+                args.onSuccess({}, 2);
+                return;
             }
 
             // Now use the allowed_apps to get first app.
             $app.fetchBySlug(appSlug,
                 function(data, status){
+                    console.log('Got app ', data)
                     formstacks = data["formstacks"];
                     //Clear data
                     oldStacks = $vpApi.db.getCollection('formstack').find();
@@ -250,11 +294,12 @@ angular.module('vpApi.services', [])
                     // Save the changes
                     $vpApi.db.save();
                     $rootScope.$broadcast('apploaded');
-                    args.onSuccess();
+                    args.onSuccess({}, 1);
                 },
                 function(data, status){
                     console.log('[$user] failed to fetch formstack');
                     console.log(data);
+                    args.onSuccess({}, 3);
                 }
             );
         },

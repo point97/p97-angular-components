@@ -1,13 +1,13 @@
 {
   "name": "p97-components",
-  "version": "1.1.7",
+  "version": "1.2.11",
   "homepage": "https://github.com/point97/p97-angular-components",
   "authors": [
     "Wil Black <wil@pointnineseven.com>",
     "Drew Seminara <drew@pointnineseven.com>"
   ],
   "description": "A collection of Javascript (mostly angular) components to be used with the Viewpoint 2 API",
-  "main": "dist/",
+  "main": ["./dist/viewpoint/services.min.js", "./dist/viewpoint/question-types.min.js"],
   "keywords": [
     "angular",
     "p97",
