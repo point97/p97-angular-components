@@ -1,4 +1,4 @@
-// build timestamp: Thu Apr 16 2015 10:29:07 GMT-0700 (PDT)
+// build timestamp: Thu Apr 16 2015 16:25:14 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -402,16 +402,26 @@ angular.module('p97.questionTypes')
 
 
             scope.setBlock = function(){
-                scope.errors = [];
+                                scope.errors = [];
                 //if filter option exist, only show choices in group_value
                 if (options.filter) {
                     if ($formUtils && $vpApi.db && scope.current) {
-                        var answer = $formUtils.getAnswer(null, options.filter, scope.current.fsResp.id);
-                        if (answer !== null) {
-                            scope.localChoices = _.filter(scope.question.choices, function(item) {
-                                return item.group_value === answer.value
-                            });
-                        };
+                        if(scope.current.form.forEachItem && scope.current.form.forEachItem.value != ""){
+                            var answer = $formUtils.getAnswer(null, options.filter, scope.current.fsResp.id);
+                            if (answer !== null) {
+                                scope.localChoices = _.filter(scope.question.choices, function(item) {
+                                    return item.group_value === scope.current.form.forEachItem.value
+                                });
+                            }
+                        }else{
+                            var answer = $formUtils.getAnswer(null, options.filter, scope.current.fsResp.id);
+                            if (answer !== null) {
+                                scope.localChoices = _.filter(scope.question.choices, function(item) {
+                                    return item.group_value === answer.value
+                                });
+                            }
+                        }
+
                     };
                 }else{
                     scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
