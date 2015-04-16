@@ -346,6 +346,7 @@ angular.module('survey.services', [])
         Inputs:
         action: [String] 'forward', 'back'
         */
+
         var newState = 'app.';
         var newStateParams;
         var nextBlock, nextForm;

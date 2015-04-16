@@ -1,4 +1,4 @@
-// build timestamp: Tue Apr 14 2015 17:07:56 GMT-0700 (PDT)
+// build timestamp: Thu Apr 16 2015 09:55:52 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -716,6 +716,7 @@ angular.module('survey.services', [])
         Inputs:
         action: [String] 'forward', 'back'
         */
+
         var newState = 'app.';
         var newStateParams;
         var nextBlock, nextForm;
@@ -2067,7 +2068,6 @@ angular.module('vpApi.services', [])
                 "timestamp": lastUrl.timestamp
             }
         }
-
         fsResp = angular.copy(item);
         fsResp.meta = undefined;
         fsResp.fsSlug = undefined;
@@ -2392,7 +2392,8 @@ angular.module('vpApi.services')
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
 
             // Update record's status to synced to lock it if it was submitted.
-            fsResp.status = (data.status === 'submitted')? 'synced': data.status;
+
+            fsResp.status = data.status;
             fsResp.syncedAt = $vpApi.getTimestamp();
 
             $vpApi.db.save();
