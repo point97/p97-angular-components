@@ -249,18 +249,18 @@ IN PROGRESS but otherwise PASSING TESTS
        * if `"yyyy"` is selected as a format - validates any year between 1900 and 2099
        * if `!=='yyyy'` `options.setting` can be added
       * settings - is an object (primarily for translations of languages) - see [https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations](https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations)
-  ``` json
-  {
-      monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
-      monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
-      weekdaysFull: [ 'Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu' ],
-        weekdaysShort: [ 'Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab' ],
-        today: 'hari ini',
-      clear: 'menghapus',
-      firstDay: 1,
-      format: 'yyyy/mm/dd',
-      formatSubmit: 'yyyy/mm/dd'
-  }
+ ``` json
+ {
+   "monthsFull": [ "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember" ],
+   "monthsShort": [ "Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des" ],
+   "weekdaysFull": [ "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" ],
+   "weekdaysShort": [ "Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab" ],
+   "today": "hari ini",
+   "clear": "menghapus",
+   "firstDay": 1,
+   "format": "yyyy/mm/dd",
+   "formatSubmit": "yyyy/mm/dd"
+ }
   ```
    
 
@@ -338,7 +338,7 @@ currently available in hybrid templates - allows for quick rapid input
  `options`
  * required
  * tileSources (is an array of several tiles)
-``` json
+ ``` json
 [
 {
     "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",

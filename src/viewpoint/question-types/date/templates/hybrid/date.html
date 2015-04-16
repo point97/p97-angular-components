@@ -8,8 +8,8 @@
                    ng-if="question.options.format !== 'yyyy'" 
                    pick-a-date="selectedDate"
                    pick-a-date-options="datePickerOptions"
-
                    /> 
+                   
             <input type="tel"
                    ng-if="question.options.format === 'yyyy'"
                    ng-model="$parent.value"

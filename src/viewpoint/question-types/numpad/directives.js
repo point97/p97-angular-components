@@ -77,6 +77,12 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             scope.$watch('compute()', function(keystroke){
                 scope.value = keystroke;
             });
+
+            scope.$on("reset-numpad", function(arg){
+                while(scope.display.length >0 && scope.display[0] != '0'){
+                    scope.remove();
+                }
+            });
         }
     }
 }]);

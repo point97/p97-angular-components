@@ -22,6 +22,7 @@ angular.module('p97.questionTypes')
               https://github.com/amsul/pickadate.js/tree/3.5.5/lib/translations
               use those to help fill out datePickerOptions
             */
+
             scope.datePickerOptions = options.settings;
 
             if (options.initial && options.format !== 'yyyy') {
