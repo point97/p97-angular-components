@@ -1,4 +1,4 @@
-// build timestamp: Thu Apr 16 2015 10:01:18 GMT-0700 (PDT)
+// build timestamp: Thu Apr 16 2015 10:29:07 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2062,6 +2062,7 @@ angular.module('vpApi.services', [])
         // Get fs Info
         var item = $vpApi.db.getCollection('fsResp').find({id:fsRespId})[0];
         var lastUrl = $vpApi.db.getCollection("lastSavedUrl").data[0];
+        var lastSavedUrl = {};
         if (lastUrl){
             lastSavedUrl = {
                 "path": lastUrl.path,

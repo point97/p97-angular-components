@@ -761,6 +761,7 @@ angular.module('vpApi.services', [])
         // Get fs Info
         var item = $vpApi.db.getCollection('fsResp').find({id:fsRespId})[0];
         var lastUrl = $vpApi.db.getCollection("lastSavedUrl").data[0];
+        var lastSavedUrl = {};
         if (lastUrl){
             lastSavedUrl = {
                 "path": lastUrl.path,
