@@ -1,0 +1,23 @@
+<div class="p97-integer">
+  <div ng-bind-html="renderHtml(question.body)"></div>
+    <div class="list">
+        <div class="item item-input-inset" ng-hide="(question.options.hideInput === true)">
+          <label class="item-input-wrapper">
+            <input 
+                   type="tel" 
+                   ng-model="dummyValue" 
+                   placeholder="{{question.label}}"
+
+            />
+            <input
+                  type="hidden"
+                  ng-model="value"
+                  ng-required='question.options.required'
+            />
+          </label>
+        </div>
+        <div class="item item-divider" ng-show="errors.length>0"> 
+          <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+        </div>
+    </div>
+</div>

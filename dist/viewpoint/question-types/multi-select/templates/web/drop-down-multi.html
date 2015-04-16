@@ -1,0 +1,21 @@
+<div class="p97-multi-select">
+    <div ng-bind-html="renderHtml(question.body)"></div>
+        <div class="item item-input" ng-hide="(question.options.hideInput === true)">
+             <select 
+                class="multiselect" 
+                ng-model="value"
+                ng-required='question.option.required'
+                ng-class="{'error':errors.length>0}" 
+                ng-options="choice.value as choice.verbose for choice in question.choices"
+                multiple="multiple" 
+                multiselect-dropdown > 
+            </select>
+            <div ng-show="showOtherInput">
+                <input type="text"
+                    ng-blur="otherValueBlur()"
+                    ng-model="otherValue"
+                    placeholder="'Other' Choice">
+            </div>
+            <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+        </div>
+</div>

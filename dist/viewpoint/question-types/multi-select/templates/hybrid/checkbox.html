@@ -1,0 +1,25 @@
+<div class="p97-multi-select">
+    <div ng-bind-html="renderHtml(question.body)"></div>
+      <ion-checkbox ng-repeat="choice in localChoices"
+                    ng-hide="(question.options.hideInput === true)"
+                    ng-click="addChoicesToArray(choice.value)"
+                    ng-value="choice.value"
+                    ng-model="choice.checked"
+                    ng-required="question.option.required">
+
+          <div class="item item-thumbnail-left" ng-if="choice.img">
+            <img ng-src="{{choice.img}}"/>
+            <span class="verbose-image">{{choice.verbose}}</span>
+          </div>
+          <div ng-hide="choice.img"> 
+            {{choice.verbose}}
+          </div>
+
+      </ion-checkbox>
+
+      <div class="item item-divider warning" ng-show="errors.length>0"> 
+          <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
+      </div>
+</div>
+
+

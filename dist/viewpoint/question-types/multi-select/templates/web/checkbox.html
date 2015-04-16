@@ -1,0 +1,33 @@
+<div class="question_bg form">
+    <div class="p97-multi-select">
+        <label ng-bind-html="renderHtml(question.body)"></label>
+            <div class="select-wrapper">
+
+                <label class="button-select btn-lg" 
+                       ng-repeat="choice in localChoices" 
+                       ng-hide="(question.options.hideInput === true)"
+                       ng-class="{'selected': choice.checked}">
+
+                    <input  type="checkbox"
+                            ng-click="addChoicesToArray(choice.value)"
+                            ng-value="choice.value"
+                            ng-model="choice.checked"
+                            ng-required='question.options.required'
+                            ng-class="{'error':errors.length>0}">
+
+                    <span class="glyphicon glyphicon-ok-sign" 
+                          aria-hidden="true" 
+                          ng-if="choice.checked">
+                    </span>&nbsp;{{choice.verbose}}
+
+                </label> 
+                <div ng-show="showOtherInput">
+                    <input type="text"
+                        ng-model="otherValue"
+                        ng-blur="otherValueBlur()"
+                        placeholder="'Other' Choice">
+                </div>
+                <div ng-repeat="error in errors" class="error" ng-show="errors.length>0">{{error}}</div>
+            </div>
+    </div>
+</div>
