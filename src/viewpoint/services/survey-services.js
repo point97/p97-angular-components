@@ -26,6 +26,7 @@ angular.module('survey.services', [])
             hash: null
 
         };
+        scope.current.formRepeatItem;
         var fsSlug = null;
         if(stateParams && stateParams.fsSlug){
             fsSlug = stateParams.fsSlug;
@@ -101,9 +102,8 @@ angular.module('survey.services', [])
             stateParams.qIndex = stateParams.qIndex || 'intro';
 
             // Set the repeatItem if appropriate.
-            scope.current.formRepeatItem;
-            if (scope.current.formResp && scope.current.formResp.formRepeatItem) {
-                scope.current.formRepeatItem =  scope.current.formResp.formRepeatItem;
+            if (scope.current.formResp && scope.current.formResp.formForEachItem) {
+                scope.current.formRepeatItem =  scope.current.formResp.formForEachItem;
             }
             scope.current.formIndex = _.indexOf(scope.formstack.forms, scope.current.form);
             scope.current.blockIndex = _.indexOf(scope.current.form.blocks, scope.current.block);
@@ -140,7 +140,7 @@ angular.module('survey.services', [])
                         'fsRespId': scope.current.fsResp.id,
                         'formId': scope.current.form.id,
                         'formIndex': scope.current.formIndex,
-                        'formRepeatItem':null,
+                        'formForEachItem':null,
                         'client_created': $vpApi.getTimestamp(),
                         'client_updated': $vpApi.getTimestamp()
                     });
@@ -168,7 +168,7 @@ angular.module('survey.services', [])
                         'fsRespId': scope.current.fsResp.id,
                         'formId': scope.current.form.id,
                         'formIndex': scope.current.formIndex,
-                        'formRepeatItem':null,
+                        'formForEachItem':null,
                         'client_updated': $vpApi.getTimestamp()
                     });
                     $vpApi.db.save()
@@ -207,7 +207,6 @@ angular.module('survey.services', [])
             scope.current.formIndex = _.indexOf(scope.formstack.forms, scope.current.form);
             scope.current.page = stateParams.page;
             scope.current.form.forEach = null;
-            scope.current.form.repeatItem = null;
 
         } else {
             /*
@@ -224,7 +223,7 @@ angular.module('survey.services', [])
 
             Also sets
 
-            scope.current.form.forEachItem
+            scope.current.form.formForEachItem
 
             */
 
@@ -285,10 +284,10 @@ angular.module('survey.services', [])
         /*
         Set form forEach variables:
         scope.current.form.forEach
-        scope.current.form.forEachItem
+        scope.current.form.formForEachItem
 
         scope.current.block.forEach
-        scope.current.block.forEachItem
+        scope.current.block.formForEachItem
 
         */
 
@@ -306,7 +305,7 @@ angular.module('survey.services', [])
             });
         }
         if (scope.current.form.forEach){
-            // This will populate the forEachItems with formResp and blockResp.
+            // This will populate the formForEachItems with formResp and blockResp.
             // It also keeps the formResp in sync with the answers selected
             loadFormForEachItems(scope);
         }
@@ -329,9 +328,9 @@ angular.module('survey.services', [])
         }
 
         // Set the forEachItem
-        if (scope.current.formResp && typeof(scope.current.formResp.formForEachItem) !== 'undefined'){
+        if (scope.current.formResp && scope.current.formResp.formForEachItem !== null && scope.current.formResp.formForEachItem.length > 0){
             choice = $formstack.getChoice(scope.current.formResp.formForEachQuestionSlug, scope.current.formResp.formForEachItem);
-            scope.current.form.forEachItem = choice;
+            scope.current.form.formForEachItem = choice;
         }
 
         
@@ -346,7 +345,6 @@ angular.module('survey.services', [])
         Inputs:
         action: [String] 'forward', 'back'
         */
-
         var newState = 'app.';
         var newStateParams;
         var nextBlock, nextForm;
@@ -430,7 +428,7 @@ angular.module('survey.services', [])
                     } else {
                         // TODO Add non map for repeat action
                         debugger
-                        $scope.current.formRepeatItem = null;
+                        // $scope.current.formRepeatItem = null;
                         formRespId = 'new-' + $scope.current.form.id;
                         blockRespId = 'new-' + nextBlock.id;
                     }
@@ -641,7 +639,7 @@ angular.module('survey.services', [])
         $state.go(newState, newStateParams);
     }; // End changeState();
 
-    _getAnswer = function(scope, qSlug, fsRespId){
+    _getAnswer = function(scope, qSlug, fsRespId, blockRespId){
         /*
         A shortcut function to make survey authoring a little easier. You can
         can this from options.skipWhen or options.repeat_count, etc...
@@ -651,10 +649,13 @@ angular.module('survey.services', [])
         fsRespId = fsRespId || scope.current.fsResp.id;
 
         answers = $vpApi.db.getCollection('answer');
-        var ans = $vpApi.db.getCollection('answer').chain()
+        var qs = $vpApi.db.getCollection('answer').chain()
             .find({'questionSlug':qSlug})
-            .find({'fsRespId': fsRespId})
-            .data();
+            .find({'fsRespId': fsRespId});
+        if (blockRespId) {
+            qs = qs.find({'blockRespId': blockRespId})
+        }
+        var ans = qs.data();
 
         if (ans.length > 1){
             if (VERBOSE) console.log("found more than one answer, returns the first one.");
@@ -727,7 +728,7 @@ angular.module('survey.services', [])
             item.formResp = scope.formResps.chain()
                 .find({'fsRespId': scope.current.fsResp.id}) // There should only be one form response for a given item.
                 .find({'formId': scope.current.form.id})
-                .find({'formRepeatItem': item.value})
+                .find({'formForEachItem': item.value})
                 .data();
 
             // A get or create on formResp and set item.formResp
@@ -738,7 +739,6 @@ angular.module('survey.services', [])
                     'fsRespId': scope.current.fsResp.id,
                     'formId': scope.current.form.id,
                     'formIndex': scope.current.formIndex,
-                    'formRepeatItem':item.value,
                     'formForEachItem':item.value,
                     'formForEachQuestionSlug': scope.current.form.options.forEachAnswer,
                     'client_created': $vpApi.getTimestamp(),
