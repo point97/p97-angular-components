@@ -38,6 +38,12 @@ angular.module('p97.questionTypes')
                     
                     if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
 
+                    if (options.required && options.required === true) {
+                        if (scope.value === '' || scope.char_count === 0) {
+                            scope.errors.push('This field is required.')
+                        }
+                    }
+
                     if (options.min_word && typeof(options.min_word === 'number')) {                 
                         if (scope.word_count < options.min_word){
                             scope.errors.push('You must have at least '+options.min_word+' words. You have ' + scope.word_count);

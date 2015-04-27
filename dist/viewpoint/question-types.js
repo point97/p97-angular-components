@@ -1,5 +1,4 @@
-// build timestamp: Mon Apr 27 2015 12:32:43 GMT-0700 (PDT)
-
+// build timestamp: Mon Apr 27 2015 15:45:33 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -256,6 +255,12 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 scope.errors = [];
                 
                 if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
+
+                if (options.required && options.required === true) {
+                    if (scope.value === '' || scope.char_count === 0) {
+                        scope.errors.push('This field is required.')
+                    }
+                }
 
                 if (options.min_word && typeof(options.min_word === 'number')) {                 
                     if (scope.word_count < options.min_word){
@@ -726,6 +731,12 @@ angular.module('p97.questionTypes')
                     scope.errors = [];
                     
                     if (scope.value === null) scope.value = ''; //Convert to empty string to make processing easier.
+
+                    if (options.required && options.required === true) {
+                        if (scope.value === '' || scope.char_count === 0) {
+                            scope.errors.push('This field is required.')
+                        }
+                    }
 
                     if (options.min_word && typeof(options.min_word === 'number')) {                 
                         if (scope.word_count < options.min_word){
