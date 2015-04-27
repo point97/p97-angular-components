@@ -35,6 +35,10 @@ var QUESTION_TYPES = [
                       'map-multi-select'
                      ]
 
+gulp.copy=function(src,dest){
+    return gulp.src(src, {base:"."})
+        .pipe(gulp.dest(dest));
+};
 
 gulp.task('question-types', function() {
     
@@ -73,6 +77,17 @@ gulp.task('question-types', function() {
 
 });
 
+gulp.task('clean-vendor', function () {
+  return gulp.src('dist/vendor', {read: false})
+    .pipe(clean());
+});
+
+
+gulp.task('vendor', ['clean-vendor'], function() {
+    // gulp.src('dist/vendor/', {read: false}).pipe(clean())
+    gulp.copy(['vendor/**/*'], 'dist/')
+});
+
 gulp.task('viewpoint', function() {
     gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean())
     return gulp.src(['src/viewpoint/services/*.js'])
@@ -90,6 +105,7 @@ gulp.task('viewpoint', function() {
 });
 
 
-gulp.task('default', ['question-types', 'viewpoint'], function() {
+
+gulp.task('default', ['question-types', 'viewpoint', 'vendor'], function() {
     
 });
