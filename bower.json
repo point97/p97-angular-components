@@ -16,7 +16,7 @@
   "license": "MIT",
   "ignore": [
     "src",
-    "vendor",
+    "./vendor",
     "**/.*",
     "node_modules",
     "bower_components",
