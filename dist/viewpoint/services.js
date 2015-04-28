@@ -1,4 +1,4 @@
-// build timestamp: Mon Apr 27 2015 12:32:43 GMT-0700 (PDT)
+// build timestamp: Tue Apr 28 2015 16:46:39 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2383,7 +2383,8 @@ angular.module('vpApi.services')
         var failCount = 0;
         var resource;
         var statusTable = $vpApi.db.getCollection('statusTable');
-
+        var item;
+        
         submitSuccess = function(data, status){
 
             // Update statusTable
