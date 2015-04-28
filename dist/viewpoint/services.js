@@ -1,4 +1,4 @@
-// build timestamp: Mon Apr 27 2015 12:32:43 GMT-0700 (PDT)
+// build timestamp: Tue Apr 28 2015 08:42:01 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -368,6 +368,9 @@ angular.module('mock-ionic.services', [])
     console.log("mock $ionicScrollDelegate");
 }]);
 
+angular.module('ionic-timepicker', [], function(){
+    // I'm just here for looks.
+})
 
 angular.module('survey.services', [])
 
@@ -699,7 +702,14 @@ angular.module('survey.services', [])
         }
 
         // Set the forEachItem
-        if (scope.current.formResp && typeof(scope.current.formResp.formForEachItem) !== 'undefined'){
+        var formForEachItem = null;
+        if (scope.current.formResp && scope.current.formResp.formForEachItem !== undefined){
+            var formForEachItem = scope.current.formResp.formForEachItem;
+            if (formForEachItem === null || formForEachItem === '') {
+                formForEachItem = null;
+            }
+        }
+        if (formForEachItem !== null){
             choice = $formstack.getChoice(scope.current.formResp.formForEachQuestionSlug, scope.current.formResp.formForEachItem);
             scope.current.form.forEachItem = choice;
         }
@@ -2430,7 +2440,7 @@ angular.module('vpApi.services')
             
             // Update status table
             var statusTable = $vpApi.db.getCollection('statusTable');
-            item = statusTable.find({'resourceId':resp.id});
+            var item = statusTable.find({'resourceId':resp.id});
 
             if (item.length === 0) {
                 // This must be a new attempt
