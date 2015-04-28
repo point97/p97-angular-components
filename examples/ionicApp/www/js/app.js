@@ -11,7 +11,12 @@ var platform = 'hybrid';
 var API_SERVER = "http://localhost:8000";
 var API_BASE_URI = API_SERVER + '/api/v2/';
 
-angular.module('starter', ['ionic', 'starter.controllers', 'p97.questionTypes', 'survey.services', 'vpApi.services', 'cache.services'])
+angular.module('starter', ['ionic', 
+                           'starter.controllers', 
+                           'p97.questionTypes', 
+                           'survey.services', 
+                           'vpApi.services', 
+                           'cache.services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

@@ -48,3 +48,7 @@ angular.module('mock-ionic.services', [])
 .service( '$ionicScrollDelegate', [function() {
     console.log("mock $ionicScrollDelegate");
 }]);
+
+angular.module('ionic-timepicker', [], function(){
+    // I'm just here for looks.
+})
