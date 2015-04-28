@@ -163,7 +163,8 @@ angular.module('vpApi.services')
         var failCount = 0;
         var resource;
         var statusTable = $vpApi.db.getCollection('statusTable');
-
+        var item;
+        
         submitSuccess = function(data, status){
 
             // Update statusTable
