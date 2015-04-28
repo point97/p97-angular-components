@@ -210,7 +210,7 @@ angular.module('vpApi.services')
             
             // Update status table
             var statusTable = $vpApi.db.getCollection('statusTable');
-            item = statusTable.find({'resourceId':resp.id});
+            var item = statusTable.find({'resourceId':resp.id});
 
             if (item.length === 0) {
                 // This must be a new attempt

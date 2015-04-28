@@ -328,7 +328,14 @@ angular.module('survey.services', [])
         }
 
         // Set the forEachItem
-        if (scope.current.formResp && scope.current.formResp.formForEachItem !== null && scope.current.formResp.formForEachItem.length > 0){
+        var formForEachItem = null;
+        if (scope.current.formResp && scope.current.formResp.formForEachItem !== undefined){
+            var formForEachItem = scope.current.formResp.formForEachItem;
+            if (formForEachItem === null || formForEachItem === '') {
+                formForEachItem = null;
+            }
+        }
+        if (formForEachItem !== null){
             choice = $formstack.getChoice(scope.current.formResp.formForEachQuestionSlug, scope.current.formResp.formForEachItem);
             scope.current.form.formForEachItem = choice;
         }
