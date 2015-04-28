@@ -26,7 +26,7 @@ angular.module('p97.questionTypes')
 
 
             scope.setBlock = function(){
-                                scope.errors = [];
+                scope.errors = [];
                 //if filter option exist, only show choices in group_value
                 if (options.filter) {
                     if ($formUtils && $vpApi.db && scope.current) {
@@ -86,6 +86,7 @@ angular.module('p97.questionTypes')
                         }
                     }
                 });
+                scope.value = scope.inputValue;
             };
 
 
