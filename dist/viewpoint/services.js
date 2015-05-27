@@ -1,4 +1,4 @@
-// build timestamp: Tue May 26 2015 17:02:07 GMT-0700 (PDT)
+// build timestamp: Wed May 27 2015 12:47:12 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1493,6 +1493,19 @@ angular.module('vpApi.services', [])
         });
     }
 
+    this.ping = function() {
+        var url = apiBase;
+        var qs = {};
+        var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        $http.get(url, config).success(function(data, status){
+          console.log("ping success");
+          $rootScope.$broadcast('sync-network', {msg:'Connected to ' + config.apiBaseUri});
+        })
+        .error(function(data, status){
+          console.log("ping fail");
+          $rootScope.$broadcast('sync-no-network', {msg:'Cannot connected to ' + config.apiBaseUri});
+        });
+    } 
     this.post = function(resource, data, success, fail){
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
@@ -1861,13 +1874,13 @@ angular.module('vpApi.services', [])
         );
     };
 
-    this.getQuestionBySlug = function(slug) {
-        var fs = $vpApi.db.getCollection('formstack').data[0];
+    this.getQuestionBySlug = function(fsSlug, qSlug) {
+        var fs = $vpApi.db.getCollection('formstack').find({'slug': fsSlug})[0];
         var out;
         _.find(fs.forms, function(form){
             blockRes = _.find(form.blocks, function(block){
                 qRes = _.find(block.questions, function(q){
-                    if (q.slug === slug){
+                    if (q.slug === qSlug){
                         out = q;
                         return true;
                     }
@@ -1879,6 +1892,19 @@ angular.module('vpApi.services', [])
         return out;
     };
 
+    this.getChoice = function(fsSlug, qSlug, value){
+        /*
+            Get's a questions choice by question slug and value.
+            Handles the 'other' answer case
+        */
+        var choice;
+        var question = obj.getQuestionBySlug(fsSlug, qSlug);
+        choice = _.find(question.choices, function(item){return(item.value === value);});
+        if (!choice) {
+            choice = {'verbose': 'User Enter: ' + value, 'value': value };
+        }
+        return choice;
+    };
     this.getChoice = function(qSlug, value){
         /*
             Get's a questions choice by question slug and value.
@@ -2257,7 +2283,8 @@ angular.module('vpApi.services')
     - sync-fail - Also sends errors lists. Fires if one or more formstack resps fails.
     - sync-success - Also sends success list. Fires only if all formstack resps were successful
     - sync-complete - Fires when sycing is done, regardless of status. 
-    - sync-no-network
+    - sync-network - Fired by checkConnection if connection to vp2 is made.
+    - sync-no-network - Fired y checkConnection if connection fails.
 
 
     */
@@ -2284,6 +2311,7 @@ angular.module('vpApi.services')
 
         */
 
+        obj.checkConnection();
         $timeout(function(){
             $rootScope.$broadcast('sync-start');
             var fsResps; // Responses to submit
@@ -2329,35 +2357,51 @@ angular.module('vpApi.services')
             }, 1000);
     };
 
+    this.checkConnection = function(){
+        $vpApi.ping();
+    }
+
     this.getFsResps = function(){
-        // Get formstack responses and then submit them
+        
+        /*
+        
+        Returns a list of formstacks to sync. The formstack are based on what has changed and
+        what is in status of pending. 
+        */ 
+
         var changes = $vpApi.db.generateChangesNotification(['fsResp']);
         var fsResps = [];
         
         if (VERBOSE === true) console.log("[sync.run()] Changes: " + _.map(changes, function(item){if (VERBOSE === true) console.log(item);}) );
-        
+
+        // Get formstacks that have changed since the last sync. 
         if (changes.length > 0){
             fsResps = _.map(changes, function(change){
                 if (VERBOSE === true) console.log("change.obj.id: ")
                 if (VERBOSE === true) console.log(change.obj.id)
                 if (!change.obj.id) return null;  // Insert operations have no ID. That is done after the insert.
-                var fsRespObj = $vpApi.db.getCollection('fsResp').find({'id':change.obj.id});
-                
+                var fsRespObj = $vpApi.db.getCollection('fsResp').chain()
+                    .find({'id':change.obj.id})
+                    .find({'status':{'$ne':'rejected'}})
+                    .data();
                 if (VERBOSE === true) console.log(fsRespObj);
                 if (fsRespObj.length > 0){
                     return angular.copy(fsRespObj[0]);
                 }
             });
-        }
+        };
 
+        fsResps = _.compact(fsResps);
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });
 
+
         fsResps = _.compact(unique);
+        console.log("First query resps", fsResps)
         if (VERBOSE === true) console.log("[sync.run()] found "+fsResps.length+" fsResps that changed");
         
-        // Get unsynced responses
+        // Get unsynced responses, these are ones that failed to sync because offline.
         var resps = $vpApi.db.getCollection('statusTable').chain()
                         .find({"collection": "fsResp"})
                         .find({"status": "pending"})
@@ -2366,7 +2410,9 @@ angular.module('vpApi.services')
         var staleResps = [];
         if (resps.length > 0) {
             staleResps = _.map(resps, function(resp){
-                var item = $vpApi.db.getCollection('fsResp').find({'id':resp.resourceId});
+                var item = $vpApi.db.getCollection('fsResp').chain()
+                    .find({'id':resp.resourceId})
+                    .find({'status': {'$ne':'rejected'}});
                 if (item.length > 1){
                     console.warn("[sync.getFsResps] Found more than one fsResp")
                 }
@@ -2376,6 +2422,7 @@ angular.module('vpApi.services')
 
         if (VERBOSE === true) console.log("[sync.run()] found "+staleResps.length+" 'pending' fsResps");
         
+        console.log("Stale resps", staleResps)
         fsResps = fsResps.concat(angular.copy(staleResps));
 
         return fsResps;
@@ -2398,10 +2445,11 @@ angular.module('vpApi.services')
         var results = {success:[], fail:[]};
         var resource;
         var statusTable = $vpApi.db.getCollection('statusTable');
+        var fsResps = $vpApi.db.getCollection('fsResp');
         var item;
         
         submitSuccess = function(data, status){
-
+            debugger;
             // Update statusTable
             item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';
@@ -2425,17 +2473,44 @@ angular.module('vpApi.services')
         }
 
         submitFail = function(data, status){
+            /*
+            Date containd keywords:
+            - errors
+            - id
+            - status
+            - operations
+
+            */
+            var item;
             if (VERBOSE === true) console.log('I failed ' + status);
             $rootScope.$broadcast('sync-failed', {data:data, status:status});
             // Update statusTable
             
-            item = statusTable.find({'resourceId':data.id});
-            item.status = 'fail';
+            if (data.status === 'rejected'){
+                // This means the server-side post processing was rejected, but the response still saved.
+                item = fsResps.find({'id':data.id})[0];
+                item.status = 'rejected';
+                item.errors = data.errors;
+                fsResps.update(item);
+
+                item = statusTable.find({'resourceId':data.id})[0];
+                item.status = 'success';
+                statusTable.update(item);
+            } else {
+                // This is the original case.
+                item = statusTable.find({'resourceId':data.id})[0];
+                item.status = 'fail';
+                statusTable.update(item);
+            }
             $vpApi.db.save();
 
 
             var msg = data.id + " - "+data.fsSlug+ " Formstack response successully synced.";
-            results.fail.push(data.errors);
+            var errorObj = {
+                fsRespId:data.id,
+                errors: data.errors
+            }
+            results.fail.push(errorObj);
             count++;
             failCount++;
             if (count === resps.length) {

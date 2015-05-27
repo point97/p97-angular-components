@@ -28,7 +28,8 @@ angular.module('vpApi.services')
     - sync-fail - Also sends errors lists. Fires if one or more formstack resps fails.
     - sync-success - Also sends success list. Fires only if all formstack resps were successful
     - sync-complete - Fires when sycing is done, regardless of status. 
-    - sync-no-network
+    - sync-network - Fired by checkConnection if connection to vp2 is made.
+    - sync-no-network - Fired y checkConnection if connection fails.
 
 
     */
@@ -55,6 +56,7 @@ angular.module('vpApi.services')
 
         */
 
+        obj.checkConnection();
         $timeout(function(){
             $rootScope.$broadcast('sync-start');
             var fsResps; // Responses to submit
@@ -100,35 +102,51 @@ angular.module('vpApi.services')
             }, 1000);
     };
 
+    this.checkConnection = function(){
+        $vpApi.ping();
+    }
+
     this.getFsResps = function(){
-        // Get formstack responses and then submit them
+        
+        /*
+        
+        Returns a list of formstacks to sync. The formstack are based on what has changed and
+        what is in status of pending. 
+        */ 
+
         var changes = $vpApi.db.generateChangesNotification(['fsResp']);
         var fsResps = [];
         
         if (VERBOSE === true) console.log("[sync.run()] Changes: " + _.map(changes, function(item){if (VERBOSE === true) console.log(item);}) );
-        
+
+        // Get formstacks that have changed since the last sync. 
         if (changes.length > 0){
             fsResps = _.map(changes, function(change){
                 if (VERBOSE === true) console.log("change.obj.id: ")
                 if (VERBOSE === true) console.log(change.obj.id)
                 if (!change.obj.id) return null;  // Insert operations have no ID. That is done after the insert.
-                var fsRespObj = $vpApi.db.getCollection('fsResp').find({'id':change.obj.id});
-                
+                var fsRespObj = $vpApi.db.getCollection('fsResp').chain()
+                    .find({'id':change.obj.id})
+                    .find({'status':{'$ne':'rejected'}})
+                    .data();
                 if (VERBOSE === true) console.log(fsRespObj);
                 if (fsRespObj.length > 0){
                     return angular.copy(fsRespObj[0]);
                 }
             });
-        }
+        };
 
+        fsResps = _.compact(fsResps);
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });
 
+
         fsResps = _.compact(unique);
+        console.log("First query resps", fsResps)
         if (VERBOSE === true) console.log("[sync.run()] found "+fsResps.length+" fsResps that changed");
         
-        // Get unsynced responses
+        // Get unsynced responses, these are ones that failed to sync because offline.
         var resps = $vpApi.db.getCollection('statusTable').chain()
                         .find({"collection": "fsResp"})
                         .find({"status": "pending"})
@@ -137,7 +155,9 @@ angular.module('vpApi.services')
         var staleResps = [];
         if (resps.length > 0) {
             staleResps = _.map(resps, function(resp){
-                var item = $vpApi.db.getCollection('fsResp').find({'id':resp.resourceId});
+                var item = $vpApi.db.getCollection('fsResp').chain()
+                    .find({'id':resp.resourceId})
+                    .find({'status': {'$ne':'rejected'}});
                 if (item.length > 1){
                     console.warn("[sync.getFsResps] Found more than one fsResp")
                 }
@@ -147,6 +167,7 @@ angular.module('vpApi.services')
 
         if (VERBOSE === true) console.log("[sync.run()] found "+staleResps.length+" 'pending' fsResps");
         
+        console.log("Stale resps", staleResps)
         fsResps = fsResps.concat(angular.copy(staleResps));
 
         return fsResps;
@@ -169,10 +190,11 @@ angular.module('vpApi.services')
         var results = {success:[], fail:[]};
         var resource;
         var statusTable = $vpApi.db.getCollection('statusTable');
+        var fsResps = $vpApi.db.getCollection('fsResp');
         var item;
         
         submitSuccess = function(data, status){
-
+            debugger;
             // Update statusTable
             item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';
@@ -196,17 +218,44 @@ angular.module('vpApi.services')
         }
 
         submitFail = function(data, status){
+            /*
+            Date containd keywords:
+            - errors
+            - id
+            - status
+            - operations
+
+            */
+            var item;
             if (VERBOSE === true) console.log('I failed ' + status);
             $rootScope.$broadcast('sync-failed', {data:data, status:status});
             // Update statusTable
             
-            item = statusTable.find({'resourceId':data.id});
-            item.status = 'fail';
+            if (data.status === 'rejected'){
+                // This means the server-side post processing was rejected, but the response still saved.
+                item = fsResps.find({'id':data.id})[0];
+                item.status = 'rejected';
+                item.errors = data.errors;
+                fsResps.update(item);
+
+                item = statusTable.find({'resourceId':data.id})[0];
+                item.status = 'success';
+                statusTable.update(item);
+            } else {
+                // This is the original case.
+                item = statusTable.find({'resourceId':data.id})[0];
+                item.status = 'fail';
+                statusTable.update(item);
+            }
             $vpApi.db.save();
 
 
             var msg = data.id + " - "+data.fsSlug+ " Formstack response successully synced.";
-            results.fail.push(data.errors);
+            var errorObj = {
+                fsRespId:data.id,
+                errors: data.errors
+            }
+            results.fail.push(errorObj);
             count++;
             failCount++;
             if (count === resps.length) {

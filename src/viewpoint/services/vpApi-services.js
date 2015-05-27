@@ -182,6 +182,19 @@ angular.module('vpApi.services', [])
         });
     }
 
+    this.ping = function() {
+        var url = apiBase;
+        var qs = {};
+        var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        $http.get(url, config).success(function(data, status){
+          console.log("ping success");
+          $rootScope.$broadcast('sync-network', {msg:'Connected to ' + config.apiBaseUri});
+        })
+        .error(function(data, status){
+          console.log("ping fail");
+          $rootScope.$broadcast('sync-no-network', {msg:'Cannot connected to ' + config.apiBaseUri});
+        });
+    } 
     this.post = function(resource, data, success, fail){
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
@@ -550,13 +563,13 @@ angular.module('vpApi.services', [])
         );
     };
 
-    this.getQuestionBySlug = function(slug) {
-        var fs = $vpApi.db.getCollection('formstack').data[0];
+    this.getQuestionBySlug = function(fsSlug, qSlug) {
+        var fs = $vpApi.db.getCollection('formstack').find({'slug': fsSlug})[0];
         var out;
         _.find(fs.forms, function(form){
             blockRes = _.find(form.blocks, function(block){
                 qRes = _.find(block.questions, function(q){
-                    if (q.slug === slug){
+                    if (q.slug === qSlug){
                         out = q;
                         return true;
                     }
@@ -568,6 +581,19 @@ angular.module('vpApi.services', [])
         return out;
     };
 
+    this.getChoice = function(fsSlug, qSlug, value){
+        /*
+            Get's a questions choice by question slug and value.
+            Handles the 'other' answer case
+        */
+        var choice;
+        var question = obj.getQuestionBySlug(fsSlug, qSlug);
+        choice = _.find(question.choices, function(item){return(item.value === value);});
+        if (!choice) {
+            choice = {'verbose': 'User Enter: ' + value, 'value': value };
+        }
+        return choice;
+    };
     this.getChoice = function(qSlug, value){
         /*
             Get's a questions choice by question slug and value.

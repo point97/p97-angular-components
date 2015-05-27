@@ -5,7 +5,7 @@
         <input type="date"
                ng-if="question.options.format !== 'yyyy'" 
                placeholder="{{ question.label }}" 
-               ng-model="$parent.value"
+               ng-model="value"
                min="{{question.options.min}}"
                max="{{question.options.max}}"
                ng-required='question.options.required'
@@ -25,5 +25,3 @@
         </div>
   </div>
 </div>
-
-
