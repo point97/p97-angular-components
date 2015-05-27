@@ -1,4 +1,4 @@
-// build timestamp: Thu May 21 2015 13:40:51 GMT-0700 (PDT)
+// build timestamp: Tue May 26 2015 17:02:07 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2227,10 +2227,6 @@ angular.module('vpApi.services', [])
 
 }])
 
-/*
-    build timestamp: Sun Feb 01 2015 11:09:50 GMT-0800 (PST)
-    build source: vp-survey
-*/
 angular.module('vpApi.services')
 
 .service( '$sync', ['$rootScope', 
@@ -2256,12 +2252,16 @@ angular.module('vpApi.services')
 
     Also listens for 'db.save' event and will just run pushFsResps() to save to server. 
     
-    Broasdcasts
-    - sync-failed
-    - sync-complete
+    Broasdcasts - 
+    - sync-start
+    - sync-fail - Also sends errors lists. Fires if one or more formstack resps fails.
+    - sync-success - Also sends success list. Fires only if all formstack resps were successful
+    - sync-complete - Fires when sycing is done, regardless of status. 
+    - sync-no-network
+
 
     */
-    var VERBOSE = false;  // Set to true to turn on console.logs.
+    var VERBOSE = true;  // Set to true to turn on console.logs.
     var obj = this;
     this.toasDuration = 3000;
     this.intervalHandle = null; // A handle for the setInterval that runs the sync.
@@ -2280,34 +2280,40 @@ angular.module('vpApi.services')
         
         There is a slight added before running. This is to deal with the case
         where the function is called directly after saving a block to account
-        for the delayed generation of the changes object and the UUID's.   
+        for the delayed generation of the changes object and the UUID's.
+
         */
 
         $timeout(function(){
-
+            $rootScope.$broadcast('sync-start');
             var fsResps; // Responses to submit
             if (window.HAS_CONNECTION !== true) {
                 console.warn("[sync.run()] No network found, sync cancelled.");
+                $rootScope.$broadcast('sync-no-network');
                 return;
             }
 
             if (!$vpApi.user) {
                 console.warn("[sync.run()] No user found, sync cancelled.");
+                $rootScope.$broadcast('sync-fail', {"errors":["No user found, sync cancelled."]});
                 return;
             }
 
             onSucess = function(data, status) {
-                $rootScope.$broadcast('sync-complete', data);
+                $rootScope.$broadcast('sync-success', data);
                 callback(data, status);
                 $vpApi.db.clearChanges();
-                
+                $rootScope.$broadcast('sync-complete');
             };
 
             onError = function(data, status) {
-                if (VERBOSE === true) console.log('[$sync.run.OnError]');
-                //$ionicLoading.show({ template: 'There was a problem syncing some responses.', noBackdrop: true, duration: obj.toastDuration });
+                if (VERBOSE === true) console.log('[$sync.run.OnError] ', data.fail);
+                $rootScope.$broadcast('sync-fail', data.fail);
+                $rootScope.$broadcast('sync-complete');
             };
 
+            // Get the list of fsResps that need to be synced, and push them to
+            // the server.
             fsResps = obj.getFsResps();
             if (fsResps.length > 0) {
                 obj.pushFsResps(fsResps, onSucess, onError);
@@ -2318,7 +2324,6 @@ angular.module('vpApi.services')
 
             // Update readonly resources
             obj.updateReadOnly();
-            $rootScope.$broadcast('sync-complete');
 
 
             }, 1000);
@@ -2390,6 +2395,7 @@ angular.module('vpApi.services')
         var count = 0;
         var successCount = 0;
         var failCount = 0;
+        var results = {success:[], fail:[]};
         var resource;
         var statusTable = $vpApi.db.getCollection('statusTable');
         var item;
@@ -2403,17 +2409,18 @@ angular.module('vpApi.services')
             fsResp = $vpApi.db.getCollection('fsResp').find({"id":data.id})[0];
 
             // Update record's status to synced to lock it if it was submitted.
-
             fsResp.status = data.status;
             fsResp.syncedAt = $vpApi.getTimestamp();
-
             $vpApi.db.save();
+
+            var msg = data.id + " - "+data.fsSlug+ " Formstack response successully synced.";
+            results.success.push(msg);
             count++;
             successCount++;
             if (count === resps.length) {
                 // This is the last response.
                 if (VERBOSE === true) console.log("[sync.pushFsResps()] " + successCount +" successully sumbitted, "+ failCount + " failed.");
-                onSucess([1,2], 'Finished submitting formstacks.');
+                finishedSubmitting();
             }
         }
 
@@ -2426,12 +2433,26 @@ angular.module('vpApi.services')
             item.status = 'fail';
             $vpApi.db.save();
 
+
+            var msg = data.id + " - "+data.fsSlug+ " Formstack response successully synced.";
+            results.fail.push(data.errors);
             count++;
             failCount++;
             if (count === resps.length) {
                 // This is the last response.
-                onSucess({}, 'Finished submitting formstacks.');
+                finishedSubmitting();
             }
+        }
+
+
+        finishedSubmitting = function(){
+            
+            if (results.fail.length === 0){
+                onSucess(results, 'Finished submitting formstacks.');
+            } else {
+                onError(results, 'Finished submitting formstacks with errors.');
+            }
+            
         }
 
         _.each(resps, function( resp ){

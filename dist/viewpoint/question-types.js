@@ -1,4 +1,4 @@
-// build timestamp: Thu May 21 2015 13:40:51 GMT-0700 (PDT)
+// build timestamp: Tue May 26 2015 17:02:07 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -983,7 +983,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
 }]);
 
 angular.module('p97.questionTypes')
-  .directive('date', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
+ .directive('date', ['$http', '$templateCache', '$compile', '$sce', function($http, $templateCache, $compile, $sce){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -1012,7 +1012,15 @@ angular.module('p97.questionTypes')
             if (options.initial && options.format !== 'yyyy') {
                 scope.selectedDate = new Date(options.initial[0], options.initial[1] - 1, options.initial[2]);
             }
-                 
+
+            // Default to today if no default is provided. 
+            
+            if (platform === 'web' && (!options.default || options.default === 'today')) {
+                var now = new Date();
+                scope.value = now;
+            }
+            
+
 
             //validates years between 1900-2100
             //we can expanded if needed
@@ -1025,7 +1033,7 @@ angular.module('p97.questionTypes')
                     return BASE_TEMPLATE_URL+'date/templates/'+scope.question.options.widget+'.html';
                 else
                     return BASE_TEMPLATE_URL+'date/templates/'+platform+'/date.html';
-            }    
+            }
 
             scope.renderHtml = function(htmlCode) {
                 return $sce.trustAsHtml(htmlCode);
