@@ -136,7 +136,7 @@ angular.module('vpApi.services')
             });
         };
 
-        fsResps = _.compact(fsResps);
+
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });
@@ -166,12 +166,14 @@ angular.module('vpApi.services')
         }
 
         if (VERBOSE === true) console.log("[sync.run()] found "+staleResps.length+" 'pending' fsResps");
-        
+        staleResps = _.compact(staleResps);
         console.log("Stale resps", staleResps)
+
         fsResps = fsResps.concat(angular.copy(staleResps));
 
         return fsResps;
     };
+
 
     this.pushFsResps = function(resps, onSucess, onError) {
         /*

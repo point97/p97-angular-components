@@ -1,4 +1,4 @@
-// build timestamp: Wed May 27 2015 12:47:12 GMT-0700 (PDT)
+// build timestamp: Mon Jun 01 2015 11:54:20 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2020,6 +2020,26 @@ angular.module('vpApi.services', [])
         return defer.promise;
     }
 
+    this.fetchByRespId = function(fsRespId){
+        /*
+        Returns a promise.
+        */ 
+
+        var defer = $q.defer();
+
+        $vpApi.fetch("pforms/formstack-response/"+fsRespId+"/", {}, function(data, status){
+            // Success, add the formstack responses
+            if (data.results.length > 0){
+                obj.loadResponses([data.results]);
+            };
+            defer.resolve(data.results, status);
+        }, function(data, status){
+            // Fail
+            defer.reject(data.results, status)
+        });
+        return defer.promise;
+    }
+
     this.loadResponses = function(fsRespNested) {
         /*
         This function is used to load the fsResp nested json object returned
@@ -2193,7 +2213,7 @@ angular.module('vpApi.services', [])
     }
 }])
 
-.service('$blockResp', ['$vpApi', function($vpApi){
+.service('$blockResp', ['$vpApi', '$sync', '$rootScope', function($vpApi, $sync, $rootScope){
     /*
         A block response is of the form
         {
@@ -2226,6 +2246,249 @@ angular.module('vpApi.services', [])
         $vpApi.db.save();
     }
 
+
+    /********************** ADDED FROM MARKET-DASHBOARD *******************/
+
+    obj.reset = function(questions) {
+        _.each(questions, function(q){
+            q.value = "";
+            if (q.form === undefined){
+                q.form = {};
+            }
+            q.form.show = true;
+
+            if (q.options && q.options.widget && platform === 'web') {
+                q.options.widget = q.options.widget.replace("hybrid/", "web/");
+            }
+        });
+    };
+
+    obj.load = function(fsRespId, formRespId, blockRespId, questions){
+        /*
+        data - An object whose key words are question slugs.
+
+
+        Get the previous answers to questions and assigns them to q.value for each quesiton
+        in the block. If there are no previous answers the question.value is assign to question.options.default
+        or a blank string if no default is present.
+
+        */
+
+        var isNew = false;
+        var previousAnswers;
+        var answers = $vpApi.db.getCollection("answer");
+
+        formRespId = formRespId + "";
+        blockRespId = blockRespId + "";
+
+        if (fsRespId === 'new'
+            || formRespId.split('-')[0] === 'new'
+            || blockRespId.split('-')[0] === 'new') isNew = true;
+
+        if (isNew){
+            previousAnswers = [];
+        } else {
+            previousAnswers = answers.chain()
+               .find({'fsRespId': fsRespId})
+               .find({'formRespId': formRespId})
+               .find({'blockRespId': blockRespId})
+               .data();
+        };
+
+        console.table(previousAnswers);
+
+        // Loop over answers and set defaults
+        _.each(questions, function(q){
+            // Get the answer for the question
+            var ans = _.find(previousAnswers, function(pans){
+                return (pans.questionId === q.id);
+            });
+
+
+            if (ans) {
+                q.value = ans.value;
+                q.previousValue = ans.value;
+                q.answerId = ans.id;
+            } else if ( typeof(q.options['default']) !==  'undefined'){
+                q.value = q.options['default'];
+                q.previousValue = q.options['default'];
+                q.answerId = null;
+            } else {
+                q.value = '';
+                q.previousValue = '';
+                q.answerId = null;
+            }
+        });
+
+        return questions;
+    };
+
+
+    obj.save = function(fsRespId, formRespId, blockRespId, questions, formForEachItem){
+        if (!obj.isValid(questions)){
+            return;
+        }
+
+        var fsResps = $vpApi.db.getCollection('fsResp');
+        var formResps = $vpApi.db.getCollection('formResp');
+        var blockResps = $vpApi.db.getCollection('blockResp');
+        var answers = $vpApi.db.getCollection('answer');
+
+        var fs;
+        var fsResp = formResp = blockResp = formId = formIndex = blockId = blockIndex = null;
+        
+
+        if (fsRespId.split("new-").length === 2) {
+            fsId = parseInt(fsRespId.split("new-")[1],10);
+            fsRespId = 'new';
+            fs = $vpApi.db.getCollection('formstack').find({'id':fsId})[0];
+        } else {
+            fsResp = fsResps.find({'id':fsRespId})[0];
+            fs = $vpApi.db.getCollection('formstack').find({'id':fsResp.fsId})[0];
+        }
+
+        if (formRespId.split("new-").length === 2){
+            formId = parseInt(formRespId.split("new-")[1], 10);
+            formRespId = 'new';
+            formIndex = _.findIndex(fs.forms, function(form){
+                return form.id === formId;
+            });
+        } else {
+            formResp = formResps.find({'id':formRespId})[0];
+        }
+        if (blockRespId.split("new-").length === 2){
+            blockId = parseInt(blockRespId.split("new-")[1],10);
+            blockRespId = 'new';
+            blockIndex = _.findIndex(fs.forms[formIndex].blocks, function(block){
+                return block.id === blockId;
+            });
+        } else {
+            blockResp = blockResps.find({'id':blockRespId})[0];
+        }
+
+        var isValid = true;
+        if (isValid){
+            // I need to save the answers here.
+            
+            // Create a new blockResponse and formResponse if this is a new-form and new-block
+            if (fsRespId === 'new') {
+                fsResp = fsResps.insert({
+                    'id': $vpApi.generateUUID(),
+                    'fsId': fs.id,
+                    'fsSlug':fs.slug,
+                    'client_updated': $vpApi.getTimestamp(),
+                    'client_created': $vpApi.getTimestamp(),
+                    'status': 'submitted'
+                });
+            } else {
+                // The fsResp already exists, so just need to update cupdate. 
+                fsResp.client_updated = $vpApi.getTimestamp();
+                fsResps.update(fsResp);
+            }
+
+            if (formRespId == 'new') {
+                formResp = formResps.insert({
+                    'id': $vpApi.generateUUID(),
+                    'fsSlug':fs.slug,
+                    'fsRespId': fsResp.id,
+                    'formId': formId,
+                    'formIndex': formIndex,
+                    'formForEachItem': formForEachItem || null,
+                    'client_updated': $vpApi.getTimestamp(),
+                    'client_created': $vpApi.getTimestamp()
+                });
+
+            } else {
+                // formResp already exists, just update the timestamp.
+                formResp.client_updated = $vpApi.getTimestamp();
+                formResps.update(formResp);
+            }
+
+            if (blockRespId === 'new') {
+                blockResp = blockResps.insert({
+                    'id': $vpApi.generateUUID(),
+                    'fsSlug':fs.slug,
+                    'fsRespId': fsResp.id,
+                    'formId': formId,
+                    'formIndex': formIndex,
+                    'formRespId': formResp.id,
+                    'formForEachItem':formForEachItem || null, // This is used by form-foreach
+                    'blockId': blockId,
+                    'blockIndex': blockIndex,
+                    'client_updated': $vpApi.getTimestamp(),
+                    'client_created': $vpApi.getTimestamp()
+                });
+            } else {
+                blockResp.client_updated = $vpApi.getTimestamp();
+                blockResps.update(blockResp);
+            }
+
+            // Need to actaully save the answers here.
+            _.each(questions, function(q){
+                if (!q.answerId) {
+                    
+                    answers.insert({
+                        'id': $vpApi.generateUUID(),
+                        'value': q.value,
+                        'questionId': q.id,
+                        'questionSlug': q.slug,
+                        'blockRespId': blockResp.id,
+                        'blockId': blockId,
+                        'formRespId': formResp.id,
+                        'formId': formId,
+                        'formForEachItem':formForEachItem || null,
+                        'fsRespId': fsResp.id,
+                        'fsSlug': fs.slug,
+                        'client_updated': $vpApi.getTimestamp(),
+                        'client_created': $vpApi.getTimestamp(),
+                    });
+                } else {
+                    var answer = answers.find({id:q.answerId})[0];
+                    answer.value = q.value
+                    answer.client_updated = $vpApi.getTimestamp()
+                    answers.update(answer);
+                }
+                
+            });
+            
+            // Clear any previous answers
+            // _.each(questions, function(q){
+            //     q.value = "";
+            // });
+            
+            $vpApi.db.save();
+            if (platform === 'web') {
+                $sync.run(function(){});
+            };
+
+            console.log("******* Block successfully save *********");
+            $rootScope.$broadcast('block-saved', blockResp);
+            return fsResp;
+        } // End if is_valid()
+    }; // End save()
+
+
+
+    obj.isValid = function(questions) {
+        /* 
+        Loop over each question in the block and run the clean and validate functions.
+        
+        Returns boolean;
+        */
+
+        var out = true;
+        _.each(questions, function(q){
+            
+            console.log("question", q)
+            q.form.clean_answer();
+            var isValid = q.form.validate_answer();
+            if (!isValid){
+                out = false;
+            } 
+        });
+        return out;
+    };
+    /********************** END FROM MARKET-DASHBOARD STUFF *******************/
 
 }])
 
@@ -2391,7 +2654,7 @@ angular.module('vpApi.services')
             });
         };
 
-        fsResps = _.compact(fsResps);
+
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });
@@ -2421,12 +2684,14 @@ angular.module('vpApi.services')
         }
 
         if (VERBOSE === true) console.log("[sync.run()] found "+staleResps.length+" 'pending' fsResps");
-        
+        staleResps = _.compact(staleResps);
         console.log("Stale resps", staleResps)
+
         fsResps = fsResps.concat(angular.copy(staleResps));
 
         return fsResps;
     };
+
 
     this.pushFsResps = function(resps, onSucess, onError) {
         /*
