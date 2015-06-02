@@ -1,16 +1,13 @@
 <div class="question_bg form">
   <div class="p97-date">
-    <label ng-bind-html="renderHtml(question.body)"></label>
+    
       <div ng-hide="(question.options.hideInput === true)">
-        <input type="date"
-               ng-if="question.options.format !== 'yyyy'" 
-               placeholder="{{ question.label }}" 
-               ng-model="value"
-               min="{{question.options.min}}"
-               max="{{question.options.max}}"
-               ng-required='question.options.required'
-               class="form-control"
-               />
+
+        <label ng-bind-html="renderHtml(question.body)"></label>
+        <input type="text" 
+               data-autoclose="1"
+               ng-model="value" 
+               bs-datepicker>
 
         <input type="tel"
                ng-if="question.options.format === 'yyyy'"
