@@ -1,4 +1,4 @@
-// build timestamp: Mon Jun 01 2015 12:07:42 GMT-0700 (PDT)
+// build timestamp: Tue Jun 02 2015 11:33:57 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1905,19 +1905,7 @@ angular.module('vpApi.services', [])
         }
         return choice;
     };
-    this.getChoice = function(qSlug, value){
-        /*
-            Get's a questions choice by question slug and value.
-            Handles the 'other' answer case
-        */
-        var choice;
-        var question = obj.getQuestionBySlug(qSlug);
-        choice = _.find(question.choices, function(item){return(item.value === value);});
-        if (!choice) {
-            choice = {'verbose': 'User Enter: ' + value, 'value': value };
-        }
-        return choice;
-    };
+
 
 
     this.getSlugs = function(){

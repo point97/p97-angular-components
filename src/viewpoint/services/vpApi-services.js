@@ -594,19 +594,7 @@ angular.module('vpApi.services', [])
         }
         return choice;
     };
-    this.getChoice = function(qSlug, value){
-        /*
-            Get's a questions choice by question slug and value.
-            Handles the 'other' answer case
-        */
-        var choice;
-        var question = obj.getQuestionBySlug(qSlug);
-        choice = _.find(question.choices, function(item){return(item.value === value);});
-        if (!choice) {
-            choice = {'verbose': 'User Enter: ' + value, 'value': value };
-        }
-        return choice;
-    };
+
 
 
     this.getSlugs = function(){
