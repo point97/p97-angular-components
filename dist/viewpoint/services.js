@@ -1,4 +1,4 @@
-// build timestamp: Tue Jun 02 2015 12:26:28 GMT-0700 (PDT)
+// build timestamp: Wed Jun 03 2015 10:20:51 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2312,10 +2312,11 @@ angular.module('vpApi.services', [])
     };
 
 
-    obj.save = function(fsRespId, formRespId, blockRespId, questions, formForEachItem){
+    obj.save = function(fsRespId, formRespId, blockRespId, questions, status, formForEachItem){
         if (!obj.isValid(questions)){
             return;
         }
+        status = status || 'submitted';
 
         var fsResps = $vpApi.db.getCollection('fsResp');
         var formResps = $vpApi.db.getCollection('formResp');
@@ -2366,7 +2367,7 @@ angular.module('vpApi.services', [])
                     'fsSlug':fs.slug,
                     'client_updated': $vpApi.getTimestamp(),
                     'client_created': $vpApi.getTimestamp(),
-                    'status': 'submitted'
+                    'status': status
                 });
             } else {
                 // The fsResp already exists, so just need to update cupdate. 
@@ -2702,7 +2703,6 @@ angular.module('vpApi.services')
         var item;
         
         submitSuccess = function(data, status){
-            debugger;
             // Update statusTable
             item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';

@@ -196,7 +196,6 @@ angular.module('vpApi.services')
         var item;
         
         submitSuccess = function(data, status){
-            debugger;
             // Update statusTable
             item = statusTable.find({'resourceId':data.id})[0];
             item.status = 'success';

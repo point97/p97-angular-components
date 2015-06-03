@@ -1001,10 +1001,11 @@ angular.module('vpApi.services', [])
     };
 
 
-    obj.save = function(fsRespId, formRespId, blockRespId, questions, formForEachItem){
+    obj.save = function(fsRespId, formRespId, blockRespId, questions, status, formForEachItem){
         if (!obj.isValid(questions)){
             return;
         }
+        status = status || 'submitted';
 
         var fsResps = $vpApi.db.getCollection('fsResp');
         var formResps = $vpApi.db.getCollection('formResp');
@@ -1055,7 +1056,7 @@ angular.module('vpApi.services', [])
                     'fsSlug':fs.slug,
                     'client_updated': $vpApi.getTimestamp(),
                     'client_created': $vpApi.getTimestamp(),
-                    'status': 'submitted'
+                    'status': status
                 });
             } else {
                 // The fsResp already exists, so just need to update cupdate. 
