@@ -642,7 +642,7 @@ angular.module('vpApi.services', [])
         $vpApi.db.save();
     };
 
-    this.delete = function(fsRespId){
+    this.delete = function(fsRespId, callback){
         /*
 
         A cascading delete for fsResps, this will delete the children of the fsResp.

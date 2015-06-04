@@ -1,4 +1,4 @@
-// build timestamp: Thu Jun 04 2015 16:18:03 GMT-0700 (PDT)
+// build timestamp: Thu Jun 04 2015 16:40:58 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1953,7 +1953,7 @@ angular.module('vpApi.services', [])
         $vpApi.db.save();
     };
 
-    this.delete = function(fsRespId){
+    this.delete = function(fsRespId, callback){
         /*
 
         A cascading delete for fsResps, this will delete the children of the fsResp.
