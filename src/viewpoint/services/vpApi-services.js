@@ -644,35 +644,21 @@ angular.module('vpApi.services', [])
 
     this.delete = function(fsRespId){
         /*
-        DEPRACTED 3/3/2015 by WB, use delete2() instead. 
 
-
-        A cascading delete for formResps, this will delete the children of the fsResp.
+        A cascading delete for fsResps, this will delete the children of the fsResp.
         
         */
 
-        obj.objects = $vpApi.db.getCollection('fsResp');
-        var fsResp = obj.objects.get(fsRespId);
-        obj.objects.remove(fsResp);
+        $vpApi.db.getCollection('fsResp').removeWhere({'id': fsRespId});
+        $vpApi.db.getCollection('formResp').removeWhere({'fsRespId': fsRespId});
+        $vpApi.db.getCollection('blockResp').removeWhere({'fsRespId': fsRespId});
+        $vpApi.db.getCollection('answer').removeWhere({'fsRespId': fsRespId});
 
-
-        var formResps = $vpApi.db.getCollection('formResp').find({'fsRespId': fsRespId});
-        var blockResps = $vpApi.db.getCollection('blockResp').find({'fsRespId': fsRespId});
-        var answers = $vpApi.db.getCollection('answer').find({'fsRespId': fsRespId});
-
-
-        _.each(formResps, function(resp){
-            $vpApi.db.getCollection('formResp').remove(resp);
-        });
-        _.each(blockResps, function(resp){
-            $vpApi.db.getCollection('blockResp').remove(resp);
+        $vpApi.db.save(function(){
+            if(typeof(callback) == "function")
+                callback();
         });
 
-        _.each(answers, function(resp){
-            $vpApi.db.getCollection('answer').remove(resp);
-        });
-
-        $vpApi.db.save();
         console.log("[$fsResp.delete()] Deleted all responses. About to broadcast fsResp-deleted for " + fsRespId);
         $rootScope.$broadcast('fsResp-deleted', {fsRespId: fsRespId});
     }
@@ -862,31 +848,20 @@ angular.module('vpApi.services', [])
 
     //this.objects = $vpApi.db.getCollection('formResp');
 
-    this.delete = function(formRespId){
+    this.delete = function(formRespId, callback){
         /*
         A cascading delete for formResps, this will delete the children of the formResp.
 
         */
 
-        var formResp = $vpApi.db.getCollection('formResp').get(formRespId);
-        if (formResp) {
-            var blockResps = $vpApi.db.getCollection('blockResp').find({'formRespId': formRespId});
-            var answers = $vpApi.db.getCollection('answer').find({'formRespId': formRespId});
-        } else {
-            console.warn("Form Response does not exist: " + formRespId);
-            return;
-        }
+        $vpApi.db.getCollection('formResp').removeWhere({'id': formRespId});
+        $vpApi.db.getCollection('blockResp').removeWhere({'formRespId': formRespId});
+        $vpApi.db.getCollection('answer').removeWhere({'formRespId': formRespId})
 
-        // Remove the responses
-        $vpApi.db.getCollection('formResp').remove(formResp);
-        _.each(blockResps, function(resp){
-            $vpApi.db.getCollection('blockResp').remove(resp);
+        $vpApi.db.save(function(){
+            if(typeof(callback) == "function")
+                callback();
         });
-
-        _.each(answers, function(resp){
-            $vpApi.db.getCollection('answer').remove(resp);
-        });
-        $vpApi.db.save();
     }
 }])
 
@@ -904,23 +879,18 @@ angular.module('vpApi.services', [])
     var obj = this;
     this.resource_name = 'pforms/block-response'; //This is currently client side only
 
-    this.delete = function(blockRespId){
+    this.delete = function(blockRespId, callback){
         /*
         Deleting entire block responses
 
         */
-        var blockResp = $vpApi.db.getCollection('blockResp').find({'id': blockRespId});
-        // Remove the responses in block
-        $vpApi.db.getCollection('blockResp').remove(blockResp);
+        $vpApi.db.getCollection('blockResp').removeWhere({'id': blockRespId});
+        $vpApi.db.getCollection('answer').removeWhere({'blockRespId': blockRespId})
 
-        var answers = $vpApi.db.getCollection('answer').find({'blockRespId': blockRespId})
-
-
-        _.each(answers, function(ans){
-            $vpApi.db.getCollection('answer').remove(ans);
+        $vpApi.db.save(function(){
+            if(typeof(callback) == "function")
+                callback();
         });
-
-        $vpApi.db.save();
     }
 
 
@@ -1189,7 +1159,21 @@ angular.module('vpApi.services', [])
 
   */
 
+
   var obj = this;
   this.resource_name = "pforms/answer";
+
+    this.delete = function(answerId, callback){
+        /*
+        Deleting entire block responses
+
+        */
+        $vpApi.db.getCollection('answer').removeWhere({'id': answerId});
+        $vpApi.db.save(function(){
+            if(typeof(callback) == "function")
+                callback();
+        });
+
+    }  
 
 }])
