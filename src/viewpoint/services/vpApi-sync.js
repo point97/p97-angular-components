@@ -136,7 +136,7 @@ angular.module('vpApi.services')
             });
         };
 
-
+        fsResps = _.compact(fsResps);
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });

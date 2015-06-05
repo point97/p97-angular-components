@@ -1,4 +1,4 @@
-// build timestamp: Thu Jun 04 2015 16:40:58 GMT-0700 (PDT)
+// build timestamp: Fri Jun 05 2015 11:03:39 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2627,7 +2627,7 @@ angular.module('vpApi.services')
             });
         };
 
-
+        fsResps = _.compact(fsResps);
         var unique = _.uniq(fsResps, function(item) { 
             return item.id;
         });
