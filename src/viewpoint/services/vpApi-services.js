@@ -690,15 +690,13 @@ angular.module('vpApi.services', [])
 
         var defer = $q.defer();
 
-        $vpApi.fetch("pforms/formstack-response/"+fsRespId+"/", {}, function(data, status){
+        $vpApi.fetch("pforms/formstack-response/"+fsRespId, {}, function(data, status){
             // Success, add the formstack responses
-            if (data.results.length > 0){
-                obj.loadResponses([data.results]);
-            };
-            defer.resolve(data.results, status);
+            obj.loadResponses([data]);
+            defer.resolve(data, status);
         }, function(data, status){
             // Fail
-            defer.reject(data.results, status)
+            defer.reject(data, status)
         });
         return defer.promise;
     }

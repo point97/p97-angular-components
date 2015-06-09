@@ -107,7 +107,6 @@ angular.module('vpApi.services')
     }
 
     this.getFsResps = function(){
-        
         /*
         
         Returns a list of formstacks to sync. The formstack are based on what has changed and

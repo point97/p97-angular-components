@@ -1,4 +1,4 @@
-// build timestamp: Fri Jun 05 2015 11:03:39 GMT-0700 (PDT)
+// build timestamp: Tue Jun 09 2015 11:43:02 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2001,15 +2001,13 @@ angular.module('vpApi.services', [])
 
         var defer = $q.defer();
 
-        $vpApi.fetch("pforms/formstack-response/"+fsRespId+"/", {}, function(data, status){
+        $vpApi.fetch("pforms/formstack-response/"+fsRespId, {}, function(data, status){
             // Success, add the formstack responses
-            if (data.results.length > 0){
-                obj.loadResponses([data.results]);
-            };
-            defer.resolve(data.results, status);
+            obj.loadResponses([data]);
+            defer.resolve(data, status);
         }, function(data, status){
             // Fail
-            defer.reject(data.results, status)
+            defer.reject(data, status)
         });
         return defer.promise;
     }
@@ -2598,7 +2596,6 @@ angular.module('vpApi.services')
     }
 
     this.getFsResps = function(){
-        
         /*
         
         Returns a list of formstacks to sync. The formstack are based on what has changed and
