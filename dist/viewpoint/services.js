@@ -1,4 +1,4 @@
-// build timestamp: Tue Jun 09 2015 11:43:02 GMT-0700 (PDT)
+// build timestamp: Wed Jun 10 2015 15:29:18 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2212,7 +2212,7 @@ angular.module('vpApi.services', [])
                 q.form = {};
             }
             q.form.show = true;
-
+            q.answerId = null;
             if (q.options && q.options.widget && platform === 'web') {
                 q.options.widget = q.options.widget.replace("hybrid/", "web/");
             }
@@ -2522,7 +2522,7 @@ angular.module('vpApi.services')
 
 
     */
-    var VERBOSE = true;  // Set to true to turn on console.logs.
+    var VERBOSE = window.VERBOSE || false;  // Set to true to turn on console.logs.
     var obj = this;
     this.toasDuration = 3000;
     this.intervalHandle = null; // A handle for the setInterval that runs the sync.

@@ -901,7 +901,7 @@ angular.module('vpApi.services', [])
                 q.form = {};
             }
             q.form.show = true;
-
+            q.answerId = null;
             if (q.options && q.options.widget && platform === 'web') {
                 q.options.widget = q.options.widget.replace("hybrid/", "web/");
             }

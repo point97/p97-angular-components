@@ -32,8 +32,10 @@ angular.module('p97.questionTypes')
             // Default to today if no default is provided. 
             
             if (platform === 'web' && (!options.default || options.default === 'today')) {
-                var now = new Date();
-                scope.value = now;
+                if (scope.value === "") {
+                    var now = new Date();
+                    scope.value = now;
+                }
             }
             
 

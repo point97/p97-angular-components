@@ -33,7 +33,7 @@ angular.module('vpApi.services')
 
 
     */
-    var VERBOSE = true;  // Set to true to turn on console.logs.
+    var VERBOSE = window.VERBOSE || false;  // Set to true to turn on console.logs.
     var obj = this;
     this.toasDuration = 3000;
     this.intervalHandle = null; // A handle for the setInterval that runs the sync.

@@ -1,4 +1,4 @@
-// build timestamp: Tue Jun 09 2015 11:43:02 GMT-0700 (PDT)
+// build timestamp: Wed Jun 10 2015 15:29:18 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -1016,8 +1016,10 @@ angular.module('p97.questionTypes')
             // Default to today if no default is provided. 
             
             if (platform === 'web' && (!options.default || options.default === 'today')) {
-                var now = new Date();
-                scope.value = now;
+                if (scope.value === "") {
+                    var now = new Date();
+                    scope.value = now;
+                }
             }
             
 
