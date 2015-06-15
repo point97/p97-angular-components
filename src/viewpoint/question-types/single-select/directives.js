@@ -46,7 +46,9 @@ angular.module('p97.questionTypes')
                             }
                         }
 
-                    };
+                    }else{
+                        scope.localChoices = []
+                    }
                 }else{
                     scope.localChoices = angular.copy(scope.question.choices); // This creates a deep copy
                 }
