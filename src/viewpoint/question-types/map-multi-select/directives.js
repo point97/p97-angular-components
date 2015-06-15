@@ -184,18 +184,31 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     };
                 });
 
+                L.TopoJSON = L.GeoJSON.extend({
+                  addData: function(jsonData) {    
+                    if (jsonData.type === "Topology") {
+                      for (key in jsonData.objects) {
+                        geojson = topojson.feature(jsonData, jsonData.objects[key]);
+                        L.GeoJSON.prototype.addData.call(this, geojson);
+                      }
+                    }    
+                    else {
+                      L.GeoJSON.prototype.addData.call(this, jsonData);
+                    }
+                  }  
+                });
+
                 if (options.hasOwnProperty('geojsonChoices')) {
                     $http.get(options.geojsonChoices.path).success(function(data, status) {
-                        var geojsonLayer = new L.geoJson(data,
-                        {
-                            style: options.geojsonChoices.style,
-                            onEachFeature: onEachFeature
-                        });
-                    geojsonLayer.addTo(scope.map).bringToFront();
+                        var jsonLayer = new L.TopoJSON(data, 
+                            {
+                                style: options.geojsonChoices.style,
+                                onEachFeature: onEachFeature
+                            });
+                        jsonLayer.addTo(scope.map).bringToFront();
                     });
                 };
             });
-
         }
     }
 }]);

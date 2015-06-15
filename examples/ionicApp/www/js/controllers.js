@@ -255,7 +255,7 @@ angular.module('starter')
               },
               "type": "list",
               "geojsonChoices": {
-                "path": "mock/cal_blocks_geo.json",
+                "path": "mock/cal_blocks_topo.json",
                 "style": {
                   "color": "#000099",
                   "opacity": 0.6,
