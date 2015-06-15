@@ -90,11 +90,11 @@ angular.module('cache.services', [])
                 _.each(fs.forms, function(form){
                     _.each(form.blocks, function(block){
                         _.each(block.questions, function(q){
-                            if (q.options.geojsonChoices && q.options.geojsonChoices.url){
-                                fnames.push(q.options.geojsonChoices.url);
+                            if (q.options.geojsonChoices && q.options.geojsonChoices.path){
+                                fnames.push(q.options.geojsonChoices.path);
                             }
-                            if (q.options.geoFence && q.options.geoFence.url){
-                                fnames.push(q.options.geoFence.url);
+                            if (q.options.geoFence && q.options.geoFence.path){
+                                fnames.push(q.options.geoFence.path);
                             }
                         }); // End questions loop
                     }); // End block loop
