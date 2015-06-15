@@ -232,44 +232,44 @@ angular.module('starter')
                 'initial': "12:14 PM"
             }
         },{
-              "body": "Please Map",
-              "type": "map-multi-select",
-              "slug": "map-fished-areas",
-              "options": {
-                "tileSources": [
-                  {
-                    "url": "http://server.arcgisonline.com/ArcGIS/rest/services/Ocean_Basemap/MapServer/tile/{z}/{y}/{x}",
-                    "attrib": "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri",
-                    "name": "ESRI",
-                    "storeName": "esri",
-                    "maxZoom": 14,
-                    "subdomain": ""
-                  }
+            "body": "Please Map",
+            "type": "map-multi-select",
+            "slug": "map-fished-areas",
+            "options": {
+              "tileSources": [
+                {
+                  "url": "https://otile{s}-s.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpeg",
+                  "attrib": "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+                  "name": "MapQuest Open",
+                  "storeName": "mapquest",
+                  "maxZoom": 14,
+                  "subdomain": "1234"
+                }
+              ],
+              "initial": {
+                "center": [
+                  37.06,
+                  -123.14
                 ],
-                "initial": {
-                  "center": [
-                    -7.5,
-                    116.5
-                  ],
-                  "zoom": 6
+                "zoom": 6
+              },
+              "type": "list",
+              "geojsonChoices": {
+                "path": "mock/cal_blocks_geo.json",
+                "style": {
+                  "color": "#000099",
+                  "opacity": 0.6,
+                  "fillOpacity": 0.0,
+                  "weight": 1,
+                  "clickable": true
                 },
-                "type": "list",
-                "geojsonChoices": {
-                  "path": "mock/mfish_grid.geojson",
-                  "style": {
-                    "color": "#000099",
-                    "opacity": 0.6,
-                    "fillOpacity": 0.0,
-                    "weight": 1,
-                    "clickable": true
-                  },
-                  "clickStyle": {
-                    "fillColor": "#A28E2C",
-                    "fillOpacity": 0.8
-                  }
+                "clickStyle": {
+                  "fillColor": "#dbcb7c",
+                  "fillOpacity": 0.8
                 }
               }
             }
+          }
         ]
     };
 

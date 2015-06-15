@@ -174,12 +174,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 });
 
                 if (options.hasOwnProperty('geojsonChoices')) {
-                    var geojsonLayer = new L.GeoJSON.AJAX(options.geojsonChoices.path,
+                    $http.get(options.geojsonChoices.path).success(function(data, status) {
+                        var geojsonLayer = new L.geoJson(data,
                         {
                             style: options.geojsonChoices.style,
                             onEachFeature: onEachFeature
                         });
                     geojsonLayer.addTo(scope.map).bringToFront();
+                    });
                 };
             });
 
