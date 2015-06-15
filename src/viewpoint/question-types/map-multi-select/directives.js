@@ -1,6 +1,5 @@
 angular.module('p97.questionTypes')  // All p97 components should be under p97.
-  .directive('mapMultiSelect', ['$http', '$templateCache', '$compile', '$sce', '$timeout', function($http, $templateCache, $compile, $sce, $timeout){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
-
+  .directive('mapMultiSelect', ['$http', '$templateCache', '$compile', '$sce', '$timeout', '$vpApi', function($http, $templateCache, $compile, $sce, $timeout, $vpApi){  // question-type directives should be the nameof the question type as defined in the Viewpoint API.
 
     return {
         template: '',
@@ -46,7 +45,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 if (x === "") {
                     return false;
                 };
-                
+
                 y = parseInt(x, 10);
                 return (typeof y === 'number') && (x % 1 === 0);
             }
@@ -185,28 +184,42 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 });
 
                 L.TopoJSON = L.GeoJSON.extend({
-                  addData: function(jsonData) {    
+                  addData: function(jsonData) {
                     if (jsonData.type === "Topology") {
                       for (key in jsonData.objects) {
                         geojson = topojson.feature(jsonData, jsonData.objects[key]);
                         L.GeoJSON.prototype.addData.call(this, geojson);
                       }
-                    }    
+                    }
                     else {
                       L.GeoJSON.prototype.addData.call(this, jsonData);
                     }
-                  }  
+                  }
                 });
 
                 if (options.hasOwnProperty('geojsonChoices')) {
-                    $http.get(options.geojsonChoices.path).success(function(data, status) {
-                        var jsonLayer = new L.TopoJSON(data, 
+                    try{
+                       var files = $vpApi.db.getCollection("media").find({"fname": options.geojsonChoices.path})
+                    }catch(e){
+                        files = [];
+                    }
+                    if(files.length >0){
+                        var jsonLayer = new L.TopoJSON(files[0].data,
                             {
                                 style: options.geojsonChoices.style,
                                 onEachFeature: onEachFeature
                             });
                         jsonLayer.addTo(scope.map).bringToFront();
-                    });
+                    }else{
+                        $http.get(options.geojsonChoices.path).success(function(data, status) {
+                            var jsonLayer = new L.TopoJSON(data,
+                                {
+                                    style: options.geojsonChoices.style,
+                                    onEachFeature: onEachFeature
+                                });
+                            jsonLayer.addTo(scope.map).bringToFront();
+                        });
+                    }
                 };
             });
         }
