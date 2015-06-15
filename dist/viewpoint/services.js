@@ -1,4 +1,4 @@
-// build timestamp: Mon Jun 15 2015 14:54:43 GMT-0700 (PDT)
+// build timestamp: Mon Jun 15 2015 15:11:02 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -91,11 +91,11 @@ angular.module('cache.services', [])
                 _.each(fs.forms, function(form){
                     _.each(form.blocks, function(block){
                         _.each(block.questions, function(q){
-                            if (q.options.geojsonChoices && q.options.geojsonChoices.url){
-                                fnames.push(q.options.geojsonChoices.url);
+                            if (q.options.geojsonChoices && q.options.geojsonChoices.path){
+                                fnames.push(q.options.geojsonChoices.path);
                             }
-                            if (q.options.geoFence && q.options.geoFence.url){
-                                fnames.push(q.options.geoFence.url);
+                            if (q.options.geoFence && q.options.geoFence.path){
+                                fnames.push(q.options.geoFence.path);
                             }
                         }); // End questions loop
                     }); // End block loop
