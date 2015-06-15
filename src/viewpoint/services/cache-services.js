@@ -80,25 +80,30 @@ angular.module('cache.services', [])
     };
 
     this.getFilenames = function(){
-        
-        // Get loop over formstack and get a list of files names to cache
-        var fs = $vpApi.getFormstack();
+
+        // Get loop over formstacks and get a list of files names to cache
+        var app = $vpApi.getApp();
         var fnames = [];
-        _.each(fs.forms, function(form){
-            _.each(form.blocks, function(block){
-                _.each(block.questions, function(q){
-                    if (q.options.geojsonChoices && q.options.geojsonChoices.url){
-                        fnames.push(q.options.geojsonChoices.url);
-                    }
-                    if (q.options.geoFence && q.options.geoFence.url){
-                        fnames.push(q.options.geoFence.url);
-                    }
-                }); // End questions loop
-            }); // End block loop
-        }); // End forms loop
-        fnames = _.uniq(fnames);
+        if(app && app.formstacks){
+            _.each(app.formstacks, function(fs){
+                //var fs = $vpApi.getFormstack();
+                _.each(fs.forms, function(form){
+                    _.each(form.blocks, function(block){
+                        _.each(block.questions, function(q){
+                            if (q.options.geojsonChoices && q.options.geojsonChoices.url){
+                                fnames.push(q.options.geojsonChoices.url);
+                            }
+                            if (q.options.geoFence && q.options.geoFence.url){
+                                fnames.push(q.options.geoFence.url);
+                            }
+                        }); // End questions loop
+                    }); // End block loop
+                }); // End forms loop
+            })
+        }
         console.log("[getFilenames] Files to cache: ");
         console.log(fnames);
+        fnames = _.uniq(fnames);
         return fnames;
     }
 
