@@ -42,6 +42,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return $sce.trustAsHtml(htmlCode);
             };
 
+            isInteger = function (x) {
+                if (x === "") {
+                    return false;
+                };
+                
+                y = parseInt(x, 10);
+                return (typeof y === 'number') && (x % 1 === 0);
+            }
 
             function onEachFeature(feature, layer) {
                var geojsonOptions = options.geojsonChoices;
@@ -70,6 +78,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                             fillOpacity: geojsonOptions.clickStyle.fillOpacity
                         });
                         scope.selectedFeatures.push(grid);
+                        if (isInteger(grid)) {
+                            scope.selectedFeatures.sort(function(a, b){return a-b});
+                        };
                     }
                     scope.$apply(function () {
                         if (options.type === 'featureCollection' && scope.selectedFeatures.length > 0) {
@@ -173,16 +184,31 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     };
                 });
 
+                L.TopoJSON = L.GeoJSON.extend({
+                  addData: function(jsonData) {    
+                    if (jsonData.type === "Topology") {
+                      for (key in jsonData.objects) {
+                        geojson = topojson.feature(jsonData, jsonData.objects[key]);
+                        L.GeoJSON.prototype.addData.call(this, geojson);
+                      }
+                    }    
+                    else {
+                      L.GeoJSON.prototype.addData.call(this, jsonData);
+                    }
+                  }  
+                });
+
                 if (options.hasOwnProperty('geojsonChoices')) {
-                    var geojsonLayer = new L.GeoJSON.AJAX(options.geojsonChoices.path,
-                        {
-                            style: options.geojsonChoices.style,
-                            onEachFeature: onEachFeature
-                        });
-                    geojsonLayer.addTo(scope.map).bringToFront();
+                    $http.get(options.geojsonChoices.path).success(function(data, status) {
+                        var jsonLayer = new L.TopoJSON(data, 
+                            {
+                                style: options.geojsonChoices.style,
+                                onEachFeature: onEachFeature
+                            });
+                        jsonLayer.addTo(scope.map).bringToFront();
+                    });
                 };
             });
-
         }
     }
 }]);

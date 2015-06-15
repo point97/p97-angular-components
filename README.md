@@ -334,7 +334,7 @@ currently available in hybrid templates - allows for quick rapid input
     * 12 hour format  `"12:45 PM"` (ensure spacing is correct)
     * 24 hour format `"23:15"`
 
-* **map-multi-select** - map questionType
+* **map-multi-select** - map questionType (works with either topojson or geojson)
  `options`
  * required
  * tileSources (is an array of several tiles)
