@@ -194,7 +194,8 @@ angular.module('vpApi.services', [])
           console.log("ping fail");
           $rootScope.$broadcast('sync-no-network', {msg:'Cannot connected to ' + config.apiBaseUri});
         });
-    } 
+    };
+
     this.post = function(resource, data, success, fail){
         var url = apiBase + resource + '/';
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
@@ -210,7 +211,37 @@ angular.module('vpApi.services', [])
         .error(function(data, status){
           fail(data, status);
         });
-    }
+    };
+
+    this.put = function(resource, data, success, fail){
+        var url = apiBase + resource + '/';
+        var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        $http({
+              url:url,
+              method:'PUT',
+              data: data,
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
+        }).success(function(data, status){
+          success(data, status);
+        })
+        .error(function(data, status){
+          fail(data, status);
+        });
+    };
+
+    this.delete = function(resource, success, fail){
+        var url = apiBase + resource + "/";
+        $http({
+              url:url,
+              method:'DELETE',
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
+        }).success(function(data, status){
+          success(data, status);
+        })
+        .error(function(data, status){
+          fail(data, status);
+        });
+    };
 
     this.showCollection = function(collectionName){
         console.log("SHOW TABLE: " + collectionName);
