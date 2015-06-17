@@ -1002,6 +1002,7 @@ angular.module('vpApi.services', [])
 
     obj.save = function(fsRespId, formRespId, blockRespId, questions, status, formForEachItem){
         if (!obj.isValid(questions)){
+            $rootScope.$broadcast('block-invalid');
             return;
         }
         status = status || 'submitted';

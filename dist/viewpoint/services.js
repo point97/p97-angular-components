@@ -1,4 +1,4 @@
-// build timestamp: Tue Jun 16 2015 12:15:36 GMT-0700 (PDT)
+// build timestamp: Tue Jun 16 2015 22:38:31 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -2318,6 +2318,7 @@ angular.module('vpApi.services', [])
 
     obj.save = function(fsRespId, formRespId, blockRespId, questions, status, formForEachItem){
         if (!obj.isValid(questions)){
+            $rootScope.$broadcast('block-invalid');
             return;
         }
         status = status || 'submitted';
