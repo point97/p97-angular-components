@@ -1,4 +1,4 @@
-// build timestamp: Tue Jun 16 2015 22:38:31 GMT-0700 (PDT)
+// build timestamp: Wed Jun 17 2015 14:05:46 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -22,7 +22,7 @@ angular.module('cache.services', [])
         _.each(fnames, function(fname){
             $http({
                 method: 'GET',
-                withCredentials: true,
+                // withCredentials: true,
                 url: fname
             }).success(function(data) {
                 // Save this to persistent storage

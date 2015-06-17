@@ -21,7 +21,7 @@ angular.module('cache.services', [])
         _.each(fnames, function(fname){
             $http({
                 method: 'GET',
-                withCredentials: true,
+                // withCredentials: true,
                 url: fname
             }).success(function(data) {
                 // Save this to persistent storage
