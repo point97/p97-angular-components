@@ -1,4 +1,4 @@
-// build timestamp: Wed Jun 17 2015 14:05:46 GMT-0700 (PDT)
+// build timestamp: Wed Jun 17 2015 21:15:42 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -676,6 +676,20 @@ angular.module('p97.questionTypes')
             };
 
             scope.checkPreviousAnswer();
+
+            scope.$on('filter-choices', function(event, args){
+                /*
+                Listens for the filter-choices event, which should be called from a
+                controller listening for the value-changed event.
+                This will dynamically filter other lists, based on a chosen option
+                */
+                if(scope.question.options && scope.question.options.filter && scope.question.options.filter == args.slug){
+                    var choices = _.filter(scope.question.choices, function(c){
+                        return c.group_value === (""+args.changedVal)
+                    })
+                    scope.localChoices = choices
+                }
+            });
 
             scope.$on('reset-block', function(event){
                 /*

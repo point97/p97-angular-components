@@ -295,6 +295,20 @@ angular.module('p97.questionTypes')
 
             scope.checkPreviousAnswer();
 
+            scope.$on('filter-choices', function(event, args){
+                /*
+                Listens for the filter-choices event, which should be called from a
+                controller listening for the value-changed event.
+                This will dynamically filter other lists, based on a chosen option
+                */
+                if(scope.question.options && scope.question.options.filter && scope.question.options.filter == args.slug){
+                    var choices = _.filter(scope.question.choices, function(c){
+                        return c.group_value === (""+args.changedVal)
+                    })
+                    scope.localChoices = choices
+                }
+            });
+
             scope.$on('reset-block', function(event){
                 /*
                 Listens for the reset-block event fired by the map-form whenever the user
