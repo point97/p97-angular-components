@@ -38,6 +38,19 @@ angular.module('p97.questionTypes')
                 }
             }
             
+            scope.toggleDatepicker = function() {
+                /*
+                This is used on the web platform but should probably be available for mobile as well.
+                */
+                var input = element.find('input')[0];
+
+                var dp = element.find(".dropdown-menu")
+                if ( dp.length > 0 ){
+                    input.blur();
+                } else {
+                    input.focus();
+                }
+            };
 
 
             //validates years between 1900-2100

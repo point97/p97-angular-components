@@ -1,4 +1,4 @@
-// build timestamp: Wed Jun 17 2015 21:15:42 GMT-0700 (PDT)
+// build timestamp: Wed Jun 24 2015 12:24:14 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -1038,6 +1038,19 @@ angular.module('p97.questionTypes')
                 }
             }
             
+            scope.toggleDatepicker = function() {
+                /*
+                This is used on the web platform but should probably be available for mobile as well.
+                */
+                var input = element.find('input')[0];
+
+                var dp = element.find(".dropdown-menu")
+                if ( dp.length > 0 ){
+                    input.blur();
+                } else {
+                    input.focus();
+                }
+            };
 
 
             //validates years between 1900-2100

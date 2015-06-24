@@ -1,24 +1,26 @@
-<div class="question_bg form">
-  <div class="p97-date">
-    
-      <div ng-hide="(question.options.hideInput === true)">
+<div class="p97-date">
+    <div class="">
+        <div ng-hide="(question.options.hideInput === true)">
 
-        <label ng-bind-html="renderHtml(question.body)"></label>
-        <input type="text" 
-               data-autoclose="1"
-               ng-model="value" 
-               bs-datepicker>
-
-        <input type="tel"
-               ng-if="question.options.format === 'yyyy'"
-               placeholder="{{ question.label }}"
-               ng-model="$parent.value"
-               ng-required='question.options.required'
-               class="form-control"
-               />
-      </div>
+            <label ng-bind-html="renderHtml(question.body)"></label>
+            <div class="input-group">
+              <div ng-click="toggleDatepicker()" class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></div>
+              <input type="text" 
+                     data-autoclose="1"
+                     ng-model="value" 
+                     placement='bottom-right'
+                     bs-datepicker>
+            </div>
+            <input type="tel"
+                   ng-if="question.options.format === 'yyyy'"
+                   placeholder="{{ question.label }}"
+                   ng-model="$parent.value"
+                   ng-required='question.options.required'
+                   class="form-control"
+                   />
+        </div>
         <div class="item item-divider" ng-show="errors.length>0">
           <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
         </div>
-  </div>
+    </div>
 </div>
