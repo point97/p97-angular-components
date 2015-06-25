@@ -1,4 +1,4 @@
-// build timestamp: Wed Jun 24 2015 12:24:14 GMT-0700 (PDT)
+// build timestamp: Thu Jun 25 2015 16:10:28 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1898,9 +1898,9 @@ angular.module('vpApi.services', [])
                 var fs = null;
                 if (data.length > 0) {
                     obj._fetchSuccess(data, status, slug);
-                    fs = data[0]
+                    fs = data[0];
+                    $rootScope.$broadcast('formstack-updated', slug);
                 }
-                $rootScope.$broadcast('formstack-updated', slug);                 
                 success(fs,status, slug);
             },
             function(data, status){

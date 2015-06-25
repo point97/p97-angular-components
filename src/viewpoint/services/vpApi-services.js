@@ -582,9 +582,9 @@ angular.module('vpApi.services', [])
                 var fs = null;
                 if (data.length > 0) {
                     obj._fetchSuccess(data, status, slug);
-                    fs = data[0]
+                    fs = data[0];
+                    $rootScope.$broadcast('formstack-updated', slug);
                 }
-                $rootScope.$broadcast('formstack-updated', slug);                 
                 success(fs,status, slug);
             },
             function(data, status){
