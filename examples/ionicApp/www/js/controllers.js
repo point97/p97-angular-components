@@ -11,7 +11,7 @@ angular.module('starter.controllers', [])
  */
 angular.module('starter')
   .controller('HomeCtrl', function ($scope) {
-    
+
 
     $scope.numberControl = {};
 
@@ -142,10 +142,10 @@ angular.module('starter')
             "body": "What is your phone number?",
             "label": "+1 (888) 123-4567",
             "type": "phonenumber",
-            "options": { 
+            "options": {
                 "required": true,
                 "format": 'North America',
-                "country": '1' 
+                "country": '1'
             }
         },{
             "body": "Please select a choice from the following",
@@ -206,7 +206,7 @@ angular.module('starter')
             'body': 'Select a date:',
             'type': 'date',
             'options': {
-                'settings': 
+                'settings':
                 {
                   monthsFull: [ 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember' ],
                   monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des' ],
@@ -242,16 +242,17 @@ angular.module('starter')
                   "attrib": "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'> &mdash; Map data &copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
                   "name": "MapQuest Open",
                   "storeName": "mapquest",
-                  "maxZoom": 14,
+                  "maxZoom": 12,
                   "subdomain": "1234"
-                }
+                },
               ],
+              "labelLayer": 'http://localhost:8000/tiles/cal_blocks1/{z}/{x}/{y}.png',
               "initial": {
                 "center": [
                   37.06,
                   -123.14
                 ],
-                "zoom": 6
+                "zoom": 7
               },
               "type": "list",
               "geojsonChoices": {
@@ -285,7 +286,7 @@ angular.module('starter')
 
     // Save button callback
     $scope.saveBlockCallback = function(){
-        
+
         // clean_data
         var isBlockValid = true;
         _.each($scope.current.block.answers, function(answer){
@@ -296,13 +297,13 @@ angular.module('starter')
                     isBlockValid = false;
                 }
                 else {
-                    answer.value = cleaned_value; 
+                    answer.value = cleaned_value;
                 }
             } catch(err) {
                 console.log(err)
                 console.log(answer)
             }
-            
+
         });
 
         if (isBlockValid){
@@ -312,7 +313,6 @@ angular.module('starter')
         }
     };
 
-    
+
 
   });
-
