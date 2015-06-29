@@ -1,4 +1,4 @@
-// build timestamp: Thu Jun 25 2015 16:10:28 GMT-0700 (PDT)
+// build timestamp: Mon Jun 29 2015 09:25:09 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1602,19 +1602,20 @@ angular.module('vpApi.services', [])
             var appSlug;
 
             if (allowedApps.length > 0) {
-                
-                if (config.accectedApp) {
+                 if (config.acceptedAppType) {
                     // Look for accepted app in allowed apps.
-                    var res = _.indexOf(allowedApps, config.accectedApp);
-                    if (res > 0){
-                        appSlug = config.acceptedApp;
+                    var res = _.find(allowedApps, function(item){
+                        return (item.appType === config.acceptedAppType);
+                    });
+                    if (res){
+                        appSlug = res.appSlug;
                     } else {
                         args.onSuccess({}, 2)
                         return;
                     }
                 } else {
                     // This is left in for past apps, just use first app. 
-                    appSlug = allowedApps[0];
+                    appSlug = allowedApps[0].appSlug;
                 }
             
             } else {
