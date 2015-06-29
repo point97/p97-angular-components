@@ -1,4 +1,4 @@
-// build timestamp: Mon Jun 29 2015 09:25:09 GMT-0700 (PDT)
+// build timestamp: Mon Jun 29 2015 09:26:45 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -2184,6 +2184,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 var layer = {};
                 var layersArray = [];
                 var tileSources = options.tileSources;
+                if (options.labelLayer) {
+                  var labelLayer = L.tileLayer(options.labelLayer);
+                }
 
                 _.each(tileSources, function(tileSource) {
 
@@ -2238,6 +2241,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 $timeout(function(){
                     //grabs the first object in the array
                     layersArray[0].addTo(scope.map);
+                    if (options.labelLayer) {
+                      labelLayer.addTo(scope.map);
+                    }; 
                     if (baseLayers.length > 1) {
                         L.control.layers(baseLayers).addTo(scope.map)
                     };

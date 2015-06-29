@@ -124,6 +124,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 var layer = {};
                 var layersArray = [];
                 var tileSources = options.tileSources;
+                if (options.labelLayer) {
+                  var labelLayer = L.tileLayer(options.labelLayer);
+                }
 
                 _.each(tileSources, function(tileSource) {
 
@@ -178,6 +181,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 $timeout(function(){
                     //grabs the first object in the array
                     layersArray[0].addTo(scope.map);
+                    if (options.labelLayer) {
+                      labelLayer.addTo(scope.map);
+                    }; 
                     if (baseLayers.length > 1) {
                         L.control.layers(baseLayers).addTo(scope.map)
                     };
