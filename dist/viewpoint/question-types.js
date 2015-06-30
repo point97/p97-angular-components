@@ -1,4 +1,4 @@
-// build timestamp: Mon Jun 29 2015 09:26:45 GMT-0700 (PDT)
+// build timestamp: Tue Jun 30 2015 15:58:03 GMT-0700 (PDT)
 // p97.question-types module definition. This must be called first in the gulpfile
 angular.module('p97.questionTypes', ['monospaced.elastic', 'google.places', 'angular-datepicker', 'ionic-timepicker']);
 
@@ -2088,7 +2088,14 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 scope.selectedFeatures = scope.geoCollection.features;
             } else {
                 scope.selectedFeatures = [];
-            }
+            };
+
+            //find previous answers
+            if (scope.value && scope.value !== "" && scope.value.length > 0) {
+              if (options.type !== 'featureCollection') {
+                scope.previousGridAnswers = scope.value;
+              }
+            };
 
             scope.getContentUrl = function() {
                 if(scope.question.options.widget)
@@ -2110,10 +2117,25 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                 return (typeof y === 'number') && (x % 1 === 0);
             }
 
+
             function onEachFeature(feature, layer) {
                var geojsonOptions = options.geojsonChoices;
-               layer.on('click', function (e) {
 
+               //select/'re-check' previous grids
+               if (scope.previousGridAnswers) {
+                 //leaflet click event is binded to scope.selectedFeatures
+                 scope.selectedFeatures = scope.previousGridAnswers;
+                 _.each(scope.selectedFeatures, function(id){
+                   if (feature.properties.id == id) {
+                     layer.setStyle({
+                       fillColor: geojsonOptions.clickStyle.fillColor,
+                       fillOpacity: geojsonOptions.clickStyle.fillOpacity
+                     });
+                   }
+                 })
+               };
+
+               layer.on('click', function (e) {
                     if (options.type === 'featureCollection') {
                         var grid = e.target.feature;
                     } else {
@@ -2243,7 +2265,7 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
                     layersArray[0].addTo(scope.map);
                     if (options.labelLayer) {
                       labelLayer.addTo(scope.map);
-                    }; 
+                    };
                     if (baseLayers.length > 1) {
                         L.control.layers(baseLayers).addTo(scope.map)
                     };

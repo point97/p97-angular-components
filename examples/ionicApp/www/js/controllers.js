@@ -246,7 +246,7 @@ angular.module('starter')
                   "subdomain": "1234"
                 },
               ],
-              "labelLayer": 'http://localhost:8000/tiles/cal_blocks1/{z}/{x}/{y}.png',
+              "labelLayer": 'http://tiles.point97.io/tiles/cal_fish_blocks/{z}/{x}/{y}.png',
               "initial": {
                 "center": [
                   37.06,
