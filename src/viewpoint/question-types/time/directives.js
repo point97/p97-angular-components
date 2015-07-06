@@ -32,22 +32,42 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
               claims its EpochTime - but maybe slightly different
             */
             scope.getPickersUnits = function(initial) {
+                if(scope.value != ""){
+                    var timeStr = scope.value.replace(/\D/g,'');
+                    var hourStr = scope.value.substring(0,2);
+                    var minutesStr = scope.value.substring(3,5);
+                    var secondString = 00
+                    if(scope.value.length === 8){ // HH:MM:SS
+                        secondString = scope.value.substring(6,8);
+                    } // Otherwise assume it was just HH:MM and leave the SS to 00
 
-                if (options.initial !== undefined) {
-                    var timeStr = initial.replace(/\D/g,'');
-                    var hourStr = initial.substring(0,2);
-                    var minutesStr = initial.substring(3,5);
-
-                    if ((options.format === 12 && hourStr !== '12' && initial.slice(-2) === "AM")  
-                        || (options.format === 12 && hourStr === '12' && initial.slice(-2) === 'PM')
+                    if ((options.format === 12 && hourStr !== '12' && scope.value.slice(-2) === "AM")  
+                        || (options.format === 12 && hourStr === '12' && scope.value.slice(-2) === 'PM')
                         || (options.format === 24)) {
                         return parseInt(hourStr) * 3600 + parseInt(minutesStr) * 60;
-                    } else if (hourStr !== '12' && initial.slice(-2) === "PM") {
+                    } else if (hourStr !== '12' && scope.value.slice(-2) === "PM") {
                         return (parseInt(hourStr) + 12) * 3600 + parseInt(minutesStr) * 60;
-                    } else if (hourStr === '12' && initial.slice(-2) === 'AM') {
+                    } else if (hourStr === '12' && scope.value.slice(-2) === 'AM') {
                         return parseInt(minutesStr) * 60;
+                    }else{
+                        return parseInt(hourStr) * 3600 + parseInt(minutesStr) * 60 + parseInt(secondString)
                     }
-                };
+                }else{
+                    if (options.initial !== undefined) {
+                        var timeStr = initial.replace(/\D/g,'');
+                        var hourStr = initial.substring(0,2);
+                        var minutesStr = initial.substring(3,5);
+                        if ((options.format === 12 && hourStr !== '12' && initial.slice(-2) === "AM")  
+                            || (options.format === 12 && hourStr === '12' && initial.slice(-2) === 'PM')
+                            || (options.format === 24)) {
+                            return parseInt(hourStr) * 3600 + parseInt(minutesStr) * 60;
+                        } else if (hourStr !== '12' && initial.slice(-2) === "PM") {
+                            return (parseInt(hourStr) + 12) * 3600 + parseInt(minutesStr) * 60;
+                        } else if (hourStr === '12' && initial.slice(-2) === 'AM') {
+                            return parseInt(minutesStr) * 60;
+                        }
+                    };
+                }
             };
 
 
