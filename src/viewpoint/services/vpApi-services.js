@@ -182,7 +182,7 @@ angular.module('vpApi.services', [])
     }
 
     this.ping = function() {
-        var url = apiBase;
+        var url = apiBase+"pforms/ping/";
         var qs = {};
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
         $http.get(url, config).success(function(data, status){
