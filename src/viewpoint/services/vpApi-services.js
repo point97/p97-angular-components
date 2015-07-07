@@ -243,6 +243,22 @@ angular.module('vpApi.services', [])
         });
     };
 
+    this.passwordChange = function(data) {
+        /*
+        Data should contain keywords: old_password, new_password1, new_password2
+
+        Returns a promise. If it fails the promise will return an 'errors' array.
+        */
+        var defer = $q.defer();
+        var resource = "account/password/change";
+        obj.post(resource, data, function(data, res){
+            defer.resolve(data[0], status);
+        }, function(data, res){
+            defer.reject(data, status);
+        });
+        return defer.promise;
+    };
+
     this.showCollection = function(collectionName){
         console.log("SHOW TABLE: " + collectionName);
         console.table(data.db.getCollection(collectionName).data);

@@ -1,4 +1,4 @@
-// build timestamp: Mon Jul 06 2015 16:15:35 GMT-0700 (PDT)
+// build timestamp: Tue Jul 07 2015 10:39:33 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1557,6 +1557,22 @@ angular.module('vpApi.services', [])
         .error(function(data, status){
           fail(data, status);
         });
+    };
+
+    this.passwordChange = function(data) {
+        /*
+        Data should contain keywords: old_password, new_password1, new_password2
+
+        Returns a promise. If it fails the promise will return an 'errors' array.
+        */
+        var defer = $q.defer();
+        var resource = "account/password/change";
+        obj.post(resource, data, function(data, res){
+            defer.resolve(data[0], status);
+        }, function(data, res){
+            defer.reject(data, status);
+        });
+        return defer.promise;
     };
 
     this.showCollection = function(collectionName){
