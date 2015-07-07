@@ -1,4 +1,4 @@
-// build timestamp: Tue Jul 07 2015 11:29:38 GMT-0700 (PDT)
+// build timestamp: Tue Jul 07 2015 15:08:37 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1499,7 +1499,7 @@ angular.module('vpApi.services', [])
     }
 
     this.ping = function() {
-        var url = apiBase;
+        var url = apiBase+"pforms/ping/";
         var qs = {};
         var config = {headers: {'Authorization':'Token ' + this.user.token}};
         $http.get(url, config).success(function(data, status){
