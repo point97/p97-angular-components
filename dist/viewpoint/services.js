@@ -1,4 +1,4 @@
-// build timestamp: Tue Jul 07 2015 10:39:33 GMT-0700 (PDT)
+// build timestamp: Tue Jul 07 2015 11:29:38 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -1318,7 +1318,7 @@ angular.module('survey.services', [])
 
 angular.module('vpApi.services', [])
 
-.service( '$vpApi', ['$rootScope', '$http', 'config', function($rootScope, $http, config) {
+.service( '$vpApi', ['$rootScope', '$http', '$q', 'config', function($rootScope, $http, $q, config) {
     var obj = this;
     var apiBase = config.apiBaseUri;
     this.username = '';

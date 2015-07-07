@@ -2,7 +2,7 @@
 
 angular.module('vpApi.services', [])
 
-.service( '$vpApi', ['$rootScope', '$http', 'config', function($rootScope, $http, config) {
+.service( '$vpApi', ['$rootScope', '$http', '$q', 'config', function($rootScope, $http, $q, config) {
     var obj = this;
     var apiBase = config.apiBaseUri;
     this.username = '';
