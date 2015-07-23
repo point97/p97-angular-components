@@ -9,22 +9,20 @@
                     ng-required='question.options.required'/>
 
 
-                <div class="item item-thumbnail-left" ng-if="choice.img">
+                <div class="item-thumbnail-left" ng-if="choice.img">
                     <img ng-src="{{choice.img}}"/>
-                    <span class="verbose-image">{{choice.verbose}}</span>
+                    <span class="item verbose-image">{{choice.verbose}}</span>
                 </div>
                 <div ng-hide="choice.img" class="item-content">
                     {{choice.verbose}}
                 </div>
 
                 <i class="radio-icon ion-checkmark"></i>
-
             </label>
-        </div> 
+        </div>
 
-        <div class="item item-divider" ng-show="errors.length>0"> 
+        <div class="item item-divider" ng-show="errors.length>0">
             <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
         </div>
     </div>
 </div>
-

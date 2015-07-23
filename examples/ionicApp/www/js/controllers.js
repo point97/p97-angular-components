@@ -69,9 +69,20 @@ angular.module('starter')
             "slug": "gear-type-1",
             'type': 'single-select',
             'choices': [
-                    {'verbose': 'Hook & Line', 'value': '5'},
-                    {'verbose': 'Trawl Net', 'value': '6'},
-                    {'verbose': 'Trap', 'value': '7'},
+                    {
+                      'verbose': 'Hook & Line',
+                      'value': '5', 'img':'http://www.juggernart.com/games/free-online-fishing/img/screens/hook-line-sinker.jpg'
+                    },
+                    {
+                      'verbose': 'Trawl Net',
+                      'value': '6',
+                      'img': 'http://nw08.american.edu/~vconn/seafood/images/Chalutage%20en%20boeuf.jpeg'
+                    },
+                    {
+                      'verbose': 'Trap',
+                      'value': '7',
+                      'img': 'http://seafoodexport.com/nsite/images/stories/Misc/fishing_methods/fish_trap.jpg'
+                    },
                 ],
             'options': {
                 'required': false,
@@ -93,7 +104,6 @@ angular.module('starter')
             'options': {
                 'required': true,
                 'widget': 'hybrid/radio',
-                "filter": "gear-type-2",
                 'allow_other': 1,
                 "other_max_length": 10
             }
