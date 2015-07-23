@@ -1,18 +1,41 @@
-/* 
-Styles for Ionic Question Types 
+/*
+Styles for Ionic Question Types
 ===============================
 */
 
 
 /* UX Controls */
 
-.checkbox input:before, 
+.checkbox input:before,
 .checkbox .checkbox-icon:before {
 	border-color: #16A085;
 }
-.checkbox input:checked:before, 
+.checkbox input:checked:before,
 .checkbox input:checked + .checkbox-icon:before {
 	background: #1abc9c;
+}
+
+.item-checkbox {
+	padding-left: 10px;
+}
+
+.item-checkbox .checkbox {
+	left: auto;
+}
+
+.item.item-thumbnail-left.image-display {
+	/*margin-right: 15px;*/
+	border-width: 0px;
+}
+
+.item.verbose-image {
+	border: 0px;
+	padding-right: 35px;
+	margin-left: -20px;
+}
+
+img.icon-image {
+	z-index: 99999;
 }
 
 .ion-checkmark {
