@@ -1,30 +1,43 @@
 <div class="p97-single-select">
     <div ng-bind-html="renderHtml(question.body)"></div>
     <div class="list">
-        <div ng-repeat="choice in localChoices" ng-hide="(question.options.hideInput === true)">
+        <!-- <div ng-repeat="choice in localChoices" ng-hide="(question.options.hideInput === true)">
             <label class="item item-radio">
                 <input type="radio"
                     ng-model="$parent.inputValue"
                     ng-value="choice.value"
                     ng-required='question.options.required'/>
 
-
                 <div class="item item-thumbnail-left" ng-if="choice.img">
-                    <img ng-src="{{choice.img}}"/>
-                    <span class="verbose-image">{{choice.verbose}}</span>
+                    <img class="icon-image" ng-src="{{choice.img}}"/>
+                    <span class="item no-border">{{choice.verbose}}</span>
                 </div>
                 <div ng-hide="choice.img" class="item-content">
                     {{choice.verbose}}
                 </div>
 
                 <i class="radio-icon ion-checkmark"></i>
-
             </label>
-        </div> 
+        </div> -->
+        <ion-radio ng-repeat="choice in localChoices"
+                      ng-hide="(question.options.hideInput === true)"
+                      ng-value="choice.value"
+                      ng-model="$parent.inputValue"
+                      ng-required="question.option.required"
+                      ng-class="{ 'no-padding': choice.img}">
 
-        <div class="item item-divider" ng-show="errors.length>0"> 
+            <div class="item item-thumbnail-left no-border transparent" ng-if="choice.img">
+              <img class="icon-image" ng-src="{{choice.img}}"/>
+              <span class="no-border">{{choice.verbose}}</span>
+            </div>
+            <div ng-hide="choice.img">
+              {{choice.verbose}}
+            </div>
+
+        </ion-radio>
+
+        <div class="item item-divider" ng-show="errors.length>0">
             <div class="error" ng-repeat="error in errors" class="error" >{{error}}</div>
         </div>
     </div>
 </div>
-
