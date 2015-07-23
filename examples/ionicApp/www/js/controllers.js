@@ -71,7 +71,8 @@ angular.module('starter')
             'choices': [
                     {
                       'verbose': 'Hook & Line',
-                      'value': '5', 'img':'http://www.juggernart.com/games/free-online-fishing/img/screens/hook-line-sinker.jpg'
+                      'value': '5',
+                      'img':'http://www.juggernart.com/games/free-online-fishing/img/screens/hook-line-sinker.jpg'
                     },
                     {
                       'verbose': 'Trawl Net',
@@ -95,7 +96,12 @@ angular.module('starter')
             "slug": "gear-type-2",
             'type': 'single-select',
             'choices': [
-                    {'verbose': 'Hook & Line', 'value': '5', 'group_value': '5'},
+                    {
+                      'verbose': 'Hook & Line',
+                      'value': '5',
+                      'group_value': '5',
+                      'img':'http://www.juggernart.com/games/free-online-fishing/img/screens/hook-line-sinker.jpg'
+                    },
                     {'verbose': 'Rod n Reel', 'value': 8, 'group_value': '5'},
                     {'verbose': 'Shore Fishin', 'value': 9, 'group_value': '6'},
                     {'verbose': 'Trawl Net', 'value': '6', 'group_value': '6'},
@@ -162,7 +168,7 @@ angular.module('starter')
             "label": "Which one do you like?",
             "slug": "which-do-you-like-1",
             "choices": [
-                {'verbose': 'Hook & Line', 'value': '5'},
+                {'verbose': 'Hook & Line', 'value': '5', 'img': 'http://seafoodexport.com/nsite/images/stories/Misc/fishing_methods/fish_trap.jpg'},
                 {'verbose': 'Trawl Net', 'value': '6'},
                 {'verbose': 'Trap', 'value': '7'},
                 {'verbose': 'Siene Net', 'value': '8'},
@@ -192,7 +198,7 @@ angular.module('starter')
                 "max_choice": 4,
                 'allow_other': 2,
                 "other_max_length": 25,
-                'templateUrl': 'ionic/checkbox'
+                'templateUrl': 'hybrid/checkbox'
             }
         },{
             'body': 'Search',
