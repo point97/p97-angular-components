@@ -21,20 +21,19 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
-
+        console.log("$vpApi.dbinit]")
         obj.db = window.data.db;
-        // if (platform === 'web'){
-        //     obj.db.save = function(){
-        //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
-        //         $rootScope.$broadcast("db.save");
-        //     }
-        // };
-
+        
+        if (obj.db.collections.length === 0){
+            console.error("[$vpApi.dbinit()] There are no collection in the database. Try removing ng-app from you index.html.")
+        };
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
         // Add listeners to generate uuid's 
         var col = obj.db.getCollection('fsResp');
+
+        
         col.setChangesApi(true);
         col.on('insert', function(item){
             if (!item.id){
@@ -264,7 +263,11 @@ angular.module('vpApi.services', [])
         console.table(data.db.getCollection(collectionName).data);
     }
 
-    if (window.data) this.dbinit();
+    if (window.data) {
+        console.log("[$vpApi] About to call dbinit()");
+        this.dbinit();
+
+    }
 
 }])
 
