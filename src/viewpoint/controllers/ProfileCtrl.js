@@ -36,6 +36,7 @@ angular.module('p97.controllers')
 
     $scope.loadOrg = function(){
         $scope.master.org.name = $scope.user.profile.orgs[0].name;
+        $scope.master.org.options = $scope.user.profile.orgs[0].options;
 
         $scope.current.org = angular.copy($scope.master.org);
     };
@@ -63,17 +64,12 @@ angular.module('p97.controllers')
         service.update(data)
             .then(function(data, status){
                 if (form.$name === 'profileForm'){
-                    $scope.$vpApi.user.profile = data;
-                    $scope.$vpApi.db.save();
                     $scope.loadProfile();
                     $scope.showProfileForm = false;
                 } else if(form.$name === 'orgForm') {
-                    $scope.$vpApi.user.profile.orgs[0] = data;
-                    $scope.$vpApi.db.save();
                     $scope.loadOrg();
                     $scope.showOrgForm = false;
                 }
-
                 $loadingModal.hide();
 
             }, function(data, status){

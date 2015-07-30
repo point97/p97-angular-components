@@ -408,6 +408,8 @@ angular.module('vpApi.services', [])
         var defer = $q.defer();
         var resource = 'account/org/'+$vpApi.user.profile.orgs[0].id;
         $vpApi.patch(resource, data, function(data, status){
+            $vpApi.user.profile.orgs[0] = data;
+            $vpApi.db.save();
             defer.resolve(data, status);
         }, function(data, status){
             defer.reject(data, status)
@@ -448,6 +450,8 @@ angular.module('vpApi.services', [])
         var defer = $q.defer();
         var resource = 'account/profile/'+$vpApi.user.profile.id;
         $vpApi.patch(resource, data, function(data, status){
+            $vpApi.user.profile = data;
+            $vpApi.db.save();
             defer.resolve(data, status);
         }, function(data, status){
             defer.reject(data, status)
