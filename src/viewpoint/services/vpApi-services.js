@@ -228,6 +228,28 @@ angular.module('vpApi.services', [])
         });
     };
 
+
+    this.patch = function(resource, data, success, fail){
+        /*
+            Use this for partial updates to an endpoint.
+
+        */
+        var url = apiBase + resource + '/';
+        var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        $http({
+              url:url,
+              method:'PATCH',
+              data: data,
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
+        }).success(function(data, status){
+          success(data, status);
+        })
+        .error(function(data, status){
+          fail(data, status);
+        });
+    };
+
+
     this.delete = function(resource, success, fail){
         var url = apiBase + resource + "/";
         $http({
@@ -376,7 +398,27 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service( '$profile', ['$http', '$vpApi', 'config', function($http, $vpApi, config){
+.service( '$org', ['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+
+    this.update = function(data){
+        /*
+        Updates a user's profile. 
+        */
+        var defer = $q.defer();
+        var resource = 'account/org/'+$vpApi.user.profile.orgs[0].id;
+        $vpApi.patch(resource, data, function(data, status){
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
+}])
+
+
+.service( '$profile', ['$http', '$vpApi', '$q', 'config', function($http, $vpApi, $q, config){
     var obj = this;
     var apiBase = config.apiBaseUri;
 
@@ -398,6 +440,21 @@ angular.module('vpApi.services', [])
                 errorCallback()
             });
     };
+
+    this.update = function(data){
+        /*
+        Updates a user's profile. 
+        */
+        var defer = $q.defer();
+        var resource = 'account/profile/'+$vpApi.user.profile.id;
+        $vpApi.patch(resource, data, function(data, status){
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
 
 }])
 

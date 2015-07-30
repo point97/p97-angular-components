@@ -1,12 +1,13 @@
 angular.module('p97.controllers')
 //angular.module('dockDashboardApp')
 
-.controller('ProfileCtrl', function($scope, $state, $vpApi, $user, config, $http) {
+.controller('ProfileCtrl', function($scope, $state, $vpApi, $user, $profile, $org, $loadingModal, config, $http) {
 
     console.log("[ProfileCtrl]")
     $scope.user = $vpApi.user;
     $scope.config = config;
 
+    $scope.$vpApi = $vpApi;
     $scope.showProfileForm = false;
     $scope.showOrgForm = false;
 
@@ -43,14 +44,43 @@ angular.module('p97.controllers')
 
     $scope.submit = function(form){
         // Trigger validation flag.
+        $loadingModal.show()
         $scope.submitted = true;
 
         // If form is invalid, return and let AngularJS show validation errors.
-        if (form.$invalid) {
-            return;
-        }
+        if (form.$invalid) return;
 
-        debugger
+        var service, data;
+        if (form.$name === 'profileForm'){
+            service = $profile;
+            data = $scope.current.profile;
+        } else if(form.$name === 'orgForm') {
+            service = $org;
+            data = $scope.current.org;
+        }
+       
+        
+        service.update(data)
+            .then(function(data, status){
+                if (form.$name === 'profileForm'){
+                    $scope.$vpApi.user.profile = data;
+                    $scope.$vpApi.db.save();
+                    $scope.loadProfile();
+                    $scope.showProfileForm = false;
+                } else if(form.$name === 'orgForm') {
+                    $scope.$vpApi.user.profile.orgs[0] = data;
+                    $scope.$vpApi.db.save();
+                    $scope.loadOrg();
+                    $scope.showOrgForm = false;
+                }
+
+                $loadingModal.hide();
+
+            }, function(data, status){
+                console.log("There were errors.")
+                $loadingModal.hide();
+            });
+
     }
 
     $scope.wtf = {};

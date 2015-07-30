@@ -24,6 +24,34 @@ angular.module('mock-ionic.services', [])
     }
 }])
 
+
+
+
+.service('$loadingModal', [ '$modal', function($modal){
+    /*
+        This is the angular strap loading modal.
+    */
+    var obj = this;
+
+    obj.$modal = $modal({
+        template: 'views/partials/loading-modal.html',
+        container: "body",
+        backdrop: "static",
+        placement: 'center',
+        keyboard: false,
+        show: false
+    });
+
+    obj.show = function(){
+        obj.$modal.show();
+    }
+
+    obj.hide = function(){
+        obj.$modal.hide();
+    }
+}])
+
+
 .service( '$ionicModal', ["$q", function($q) {
     console.log("mock $ionicModal");
 
