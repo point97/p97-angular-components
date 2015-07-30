@@ -1,4 +1,4 @@
-// build timestamp: Tue Jul 07 2015 11:29:38 GMT-0700 (PDT)
+// build timestamp: Thu Jul 30 2015 16:11:13 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -322,6 +322,30 @@ angular.module('cache.services', [])
         callback(event);
     };
 }])
+angular.module('dock.services', [])
+.service('$choiceList', ['$vpApi', '$formstack', '$http', '$q', function($vpApi, $formstack, $http, $q){
+  var obj = this;
+  obj.species = [];
+  obj.sites = [];
+
+  obj.fetch = function(tableName){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+          orgSlug: orgSlug,
+      };
+      $vpApi.fetch('dock/' + tableName, params, function(data, status){
+          obj[tableName] = data;
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[choiceList.fetch] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+  }
+}])
+
 angular.module('mock-ionic.services', [])
 
 .service( '$ionicLoading', [ "blockUI", "$timeout", function(blockUI, $timeout) {
@@ -347,6 +371,34 @@ angular.module('mock-ionic.services', [])
         
     }
 }])
+
+
+
+
+.service('$loadingModal', [ '$modal', function($modal){
+    /*
+        This is the angular strap loading modal.
+    */
+    var obj = this;
+
+    obj.$modal = $modal({
+        template: 'views/partials/loading-modal.html',
+        container: "body",
+        backdrop: "static",
+        placement: 'center',
+        keyboard: false,
+        show: false
+    });
+
+    obj.show = function(){
+        obj.$modal.show();
+    }
+
+    obj.hide = function(){
+        obj.$modal.hide();
+    }
+}])
+
 
 .service( '$ionicModal', ["$q", function($q) {
     console.log("mock $ionicModal");
@@ -1337,20 +1389,19 @@ angular.module('vpApi.services', [])
         */
 
         // Makes the loki database available at $vpApi.db.
-
+        console.log("$vpApi.dbinit]")
         obj.db = window.data.db;
-        // if (platform === 'web'){
-        //     obj.db.save = function(){
-        //         console.warn('[db.save()] indexedDB disabled. Broadcasting event: db.save')
-        //         $rootScope.$broadcast("db.save");
-        //     }
-        // };
-
+        
+        if (obj.db.collections.length === 0){
+            console.error("[$vpApi.dbinit()] There are no collection in the database. Try removing ng-app from you index.html.")
+        };
         obj.user = data.user;
         obj.users = data.db.getCollection('user');
         obj.dbLoaded = true;
         // Add listeners to generate uuid's 
         var col = obj.db.getCollection('fsResp');
+
+        
         col.setChangesApi(true);
         col.on('insert', function(item){
             if (!item.id){
@@ -1545,6 +1596,28 @@ angular.module('vpApi.services', [])
         });
     };
 
+
+    this.patch = function(resource, data, success, fail){
+        /*
+            Use this for partial updates to an endpoint.
+
+        */
+        var url = apiBase + resource + '/';
+        var config = {headers: {'Authorization':'Token ' + this.user.token}};
+        $http({
+              url:url,
+              method:'PATCH',
+              data: data,
+              headers: {'Authorization':'Token ' + this.user.token, 'Content-Type': 'application/json; charset=utf-8'}
+        }).success(function(data, status){
+          success(data, status);
+        })
+        .error(function(data, status){
+          fail(data, status);
+        });
+    };
+
+
     this.delete = function(resource, success, fail){
         var url = apiBase + resource + "/";
         $http({
@@ -1580,7 +1653,11 @@ angular.module('vpApi.services', [])
         console.table(data.db.getCollection(collectionName).data);
     }
 
-    if (window.data) this.dbinit();
+    if (window.data) {
+        console.log("[$vpApi] About to call dbinit()");
+        this.dbinit();
+
+    }
 
 }])
 
@@ -1689,7 +1766,29 @@ angular.module('vpApi.services', [])
 
 }])
 
-.service( '$profile', ['$http', '$vpApi', 'config', function($http, $vpApi, config){
+.service( '$org', ['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+
+    this.update = function(data){
+        /*
+        Updates a user's profile. 
+        */
+        var defer = $q.defer();
+        var resource = 'account/org/'+$vpApi.user.profile.orgs[0].id;
+        $vpApi.patch(resource, data, function(data, status){
+            $vpApi.user.profile.orgs[0] = data;
+            $vpApi.db.save();
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
+}])
+
+
+.service( '$profile', ['$http', '$vpApi', '$q', 'config', function($http, $vpApi, $q, config){
     var obj = this;
     var apiBase = config.apiBaseUri;
 
@@ -1711,6 +1810,23 @@ angular.module('vpApi.services', [])
                 errorCallback()
             });
     };
+
+    this.update = function(data){
+        /*
+        Updates a user's profile. 
+        */
+        var defer = $q.defer();
+        var resource = 'account/profile/'+$vpApi.user.profile.id;
+        $vpApi.patch(resource, data, function(data, status){
+            $vpApi.user.profile = data;
+            $vpApi.db.save();
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
 
 }])
 
