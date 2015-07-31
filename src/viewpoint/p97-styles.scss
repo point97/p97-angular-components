@@ -505,6 +505,8 @@ Smart Tables Styles
     align-items: stretch;
     max-height: 400px; /* this can vary */
 
+    
+
     thead {
         display: flex;
         flex-direction: column;
@@ -514,6 +516,8 @@ Smart Tables Styles
     tbody {
         overflow-y: scroll;
         display: inline-block;
+
+
     }
 
     thead > tr, tbody > tr, tfoot > tr {
@@ -559,6 +563,9 @@ Smart Tables Styles
     -moz-box-sizing: inherit;
 }
 
+.surveyors-table tbody tr:hover {
+    background-color: darken(#f5f5f5, 10);
+}
 
 /**********************************
 Header
