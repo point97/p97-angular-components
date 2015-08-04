@@ -1,4 +1,4 @@
-// build timestamp: Thu Jul 30 2015 16:11:13 GMT-0700 (PDT)
+// build timestamp: Tue Aug 04 2015 16:48:30 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -345,6 +345,34 @@ angular.module('dock.services', [])
       return deferred.promise;
   }
 }])
+
+.service('$surveyor',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+
+    this.save = function(data){
+        /*
+        Updates a user's profile. 
+        */
+
+        var defer = $q.defer();
+        var method;
+        var resource = 'dock/surveyor';
+        if (data.id === undefined) {
+            method = 'post';
+        } else {
+            method = 'patch';
+            resource = resource +'/'+ data.id;
+        }
+        $vpApi[method](resource, data, function(data, status){
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
+}])
+
 
 angular.module('mock-ionic.services', [])
 
