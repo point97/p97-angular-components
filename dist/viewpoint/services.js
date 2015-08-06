@@ -1,4 +1,4 @@
-// build timestamp: Thu Jul 30 2015 16:11:13 GMT-0700 (PDT)
+// build timestamp: Thu Aug 06 2015 14:47:26 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -343,8 +343,59 @@ angular.module('dock.services', [])
           deferred.reject(data, status);
       });
       return deferred.promise;
-  }
+  };
+
+  obj.save = function(tableName, data){
+      var deferred = $q.defer();
+      var org = $vpApi.user.profile.orgs[0].id;
+      data[org] = org;
+
+      // Set method and resource depding on if it's new or not.
+      var method = 'post';
+      var resource = "dock/"+tableName;
+      if (data.id !== undefined){
+        method = 'patch';
+        resource += "/"+ data.id;
+      }
+
+      $vpApi[method](resource, data, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[choiceList.save] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+  };
+
 }])
+
+.service('$surveyor',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+
+    this.save = function(data){
+        /*
+        Updates a user's profile. 
+        */
+
+        var defer = $q.defer();
+        var method;
+        var resource = 'dock/surveyor';
+        if (data.id === undefined) {
+            method = 'post';
+        } else {
+            method = 'patch';
+            resource = resource +'/'+ data.id;
+        }
+        $vpApi[method](resource, data, function(data, status){
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
+}])
+
 
 angular.module('mock-ionic.services', [])
 
@@ -2482,6 +2533,9 @@ angular.module('vpApi.services', [])
             });
         } else {
             formResp = formResps.find({'id':formRespId})[0];
+            formIndex = _.findIndex(fs.forms, function(form){
+                return form.id === formResp.formId;
+            });
         }
         if (blockRespId.split("new-").length === 2){
             blockId = parseInt(blockRespId.split("new-")[1],10);
@@ -2656,6 +2710,47 @@ angular.module('vpApi.services', [])
     }  
 
 }])
+
+.service('$masterList', [ '$rootScope', '$vpApi', '$q', function($rootScope, $vpApi, $q){
+    var obj = this;
+    obj.current = {
+        resourceName: '',
+        table: [],
+        item: {}
+    }
+    obj.new = {};
+
+    obj.fetchTable = function(resourceName){
+        /*
+            resourceName is the name of the API endpoint.
+        */
+        var defer = $q.defer();
+        obj[resourceName] = [];
+        var params = {};
+        
+        $vpApi.fetch('lookup/'+resourceName, params, function(data, status){
+            obj[resourceName] = data;
+            $rootScope.$broadcast('lookup-table-loaded', resourceName);
+            defer.resolve(data, status);
+        }, function(data, status){
+            console.log("[fetchTable] failed", data);
+            defer.reject(data, status);
+        });
+
+        return defer.promise;
+    }
+
+
+
+    // obj.fetchTable('Species');
+    // obj.fetchTable('Port');
+    // obj.fetchTable('GearType');
+    // //obj.fetchTable('Unit');
+    // obj.fetchTable('StartForm');
+    // obj.fetchTable('TargetForm');
+
+}])
+
 
 angular.module('vpApi.services')
 

@@ -556,6 +556,13 @@ Smart Tables Styles
         background-color: $market-landed-color;
     }
 
+    tr.item-inactive {
+        background-color: #CCC !important;
+    }
+    tr.item-new {
+        background-color: #DFD !important;
+    }
+
 }
 
 .table * {
@@ -563,8 +570,11 @@ Smart Tables Styles
     -moz-box-sizing: inherit;
 }
 
-.surveyors-table tbody tr:hover {
-    background-color: darken(#f5f5f5, 10);
+.surveyors-table, .list-item-table {
+
+    tbody tr:hover {
+        background-color: darken(#f5f5f5, 10);
+    }
 }
 
 /**********************************

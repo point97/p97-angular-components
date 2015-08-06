@@ -19,7 +19,30 @@ angular.module('dock.services', [])
           deferred.reject(data, status);
       });
       return deferred.promise;
-  }
+  };
+
+  obj.save = function(tableName, data){
+      var deferred = $q.defer();
+      var org = $vpApi.user.profile.orgs[0].id;
+      data[org] = org;
+
+      // Set method and resource depding on if it's new or not.
+      var method = 'post';
+      var resource = "dock/"+tableName;
+      if (data.id !== undefined){
+        method = 'patch';
+        resource += "/"+ data.id;
+      }
+
+      $vpApi[method](resource, data, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[choiceList.save] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+  };
+
 }])
 
 .service('$surveyor',['$vpApi', '$q', function($vpApi, $q){

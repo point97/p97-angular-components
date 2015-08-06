@@ -1114,6 +1114,9 @@ angular.module('vpApi.services', [])
             });
         } else {
             formResp = formResps.find({'id':formRespId})[0];
+            formIndex = _.findIndex(fs.forms, function(form){
+                return form.id === formResp.formId;
+            });
         }
         if (blockRespId.split("new-").length === 2){
             blockId = parseInt(blockRespId.split("new-")[1],10);
@@ -1288,3 +1291,44 @@ angular.module('vpApi.services', [])
     }  
 
 }])
+
+.service('$masterList', [ '$rootScope', '$vpApi', '$q', function($rootScope, $vpApi, $q){
+    var obj = this;
+    obj.current = {
+        resourceName: '',
+        table: [],
+        item: {}
+    }
+    obj.new = {};
+
+    obj.fetchTable = function(resourceName){
+        /*
+            resourceName is the name of the API endpoint.
+        */
+        var defer = $q.defer();
+        obj[resourceName] = [];
+        var params = {};
+        
+        $vpApi.fetch('lookup/'+resourceName, params, function(data, status){
+            obj[resourceName] = data;
+            $rootScope.$broadcast('lookup-table-loaded', resourceName);
+            defer.resolve(data, status);
+        }, function(data, status){
+            console.log("[fetchTable] failed", data);
+            defer.reject(data, status);
+        });
+
+        return defer.promise;
+    }
+
+
+
+    // obj.fetchTable('Species');
+    // obj.fetchTable('Port');
+    // obj.fetchTable('GearType');
+    // //obj.fetchTable('Unit');
+    // obj.fetchTable('StartForm');
+    // obj.fetchTable('TargetForm');
+
+}])
+
