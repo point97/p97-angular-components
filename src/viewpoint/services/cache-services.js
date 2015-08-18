@@ -16,6 +16,9 @@ angular.module('cache.services', [])
         */
         
         if (!USE_INDEXED_DB) return;
+        
+        // This  is the old way of get files.        
+        var medias = $vpApi.db.getCollection('media');
         var fnames = obj.getFilenames();
         // Cache all geojsonChoices
         _.each(fnames, function(fname){
@@ -26,7 +29,7 @@ angular.module('cache.services', [])
             }).success(function(data) {
                 // Save this to persistent storage
 
-                var medias = $vpApi.db.getCollection('media');
+                
                 var entry = medias.find({'fname':fname});
                 if (entry.length > 0){
                     entry.cupdate = $vpApi.getTimestamp();
@@ -45,6 +48,35 @@ angular.module('cache.services', [])
                 console.log("Could not load media file ")
             });
         });
+
+
+        // This is caches directly from the app media endpoint.
+        org_id = $vpApi.user.profile.orgs[0].id;
+        $vpApi.fetch("pforms/org-media", {org:org_id}, function(data, res){
+            
+            _.each(data, function(cache){
+                if (cache.imageName) {
+                    var entry = medias.find({'fname':cache.imageName});
+                    
+                    if (entry.length > 0){
+                        entry.cupdate = $vpApi.getTimestamp();
+                        entry.data = "data:image/jpeg;base64," + cache.image64;
+                        medias.update(entry);
+                    } else {
+                        entry = {
+                            'fname':cache.imageName,
+                            'data': "data:image/jpeg;base64," + cache.image64,
+                            'cupdate': $vpApi.getTimestamp()
+                        }
+                        medias.insert(entry);
+                    }
+                    $vpApi.db.save();
+                }
+            })
+        }, function(data, res){
+            console.log("Failed to fetch org-media")
+        })
+
     };
 
     this.get = function(fname, appSlug){
@@ -101,6 +133,7 @@ angular.module('cache.services', [])
                 }); // End forms loop
             })
         }
+
         console.log("[getFilenames] Files to cache: ");
         console.log(fnames);
         fnames = _.uniq(fnames);
