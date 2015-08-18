@@ -1,4 +1,4 @@
-// build timestamp: Tue Aug 18 2015 09:36:21 GMT-0700 (PDT)
+// build timestamp: Tue Aug 18 2015 11:03:16 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -16,8 +16,9 @@ angular.module('cache.services', [])
 
         */
         
-        if (!USE_INDEXED_DB) return;
-        
+        if (!USE_INDEXED_DB || $vpApi.user === undefined) {
+            return;
+        };
         // This  is the old way of get files.        
         var medias = $vpApi.db.getCollection('media');
         var fnames = obj.getFilenames();
@@ -52,6 +53,7 @@ angular.module('cache.services', [])
 
 
         // This is caches directly from the app media endpoint.
+        
         org_id = $vpApi.user.profile.orgs[0].id;
         $vpApi.fetch("pforms/org-media", {org:org_id}, function(data, res){
             
