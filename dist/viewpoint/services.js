@@ -1,4 +1,4 @@
-// build timestamp: Thu Aug 20 2015 11:48:33 GMT-0700 (PDT)
+// build timestamp: Fri Aug 21 2015 11:45:12 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -404,6 +404,36 @@ angular.module('dock.services', [])
 
 }])
 
+
+.service('$dockUser',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+
+    this.save = function(data){
+        /*
+        Updates a user's profile. 
+        */
+
+        var defer = $q.defer();
+        var method;
+        var resource = 'dock/user';
+        if (data.id === undefined) {
+            method = 'post';
+        } else {
+            method = 'patch';
+            resource = resource +'/'+ data.id;
+        }
+        $vpApi[method](resource, data, function(data, status){
+            defer.resolve(data, status);
+        }, function(data, status){
+            defer.reject(data, status)
+        })
+
+        return defer.promise;
+    }
+}])
+
+
+
 .service('$surveyor',['$vpApi', '$q', function($vpApi, $q){
     var obj = this;
 
@@ -477,7 +507,9 @@ angular.module('mock-ionic.services', [])
     });
 
     obj.show = function(){
-        obj.$modal.show();
+        obj.$modal.$promise.then(function() {
+            obj.$modal.show();
+        });
     }
 
     obj.hide = function(){
