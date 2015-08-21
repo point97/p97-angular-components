@@ -43,7 +43,9 @@ angular.module('mock-ionic.services', [])
     });
 
     obj.show = function(){
-        obj.$modal.show();
+        obj.$modal.$promise.then(function() {
+            obj.$modal.show();
+        });
     }
 
     obj.hide = function(){
