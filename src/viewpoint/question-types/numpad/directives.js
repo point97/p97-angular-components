@@ -28,7 +28,9 @@ angular.module('p97.questionTypes')  // All p97 components should be under p97.
             };
 
             scope.keypad = [['1', '2', '3'],['4', '5', '6'],['7', '8', '9'],['0', '.', 'DEL']];
-            scope.display = ['0'];
+            
+            //check for previous value and display
+            (scope.question.value !== "") ? scope.display = [scope.question.value] : scope.display = ['0'];
 
             //fires on keypress
             scope.input = function(item) {
