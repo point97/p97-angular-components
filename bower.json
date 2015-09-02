@@ -9,7 +9,7 @@
   "description": "A collection of Javascript (mostly angular) components to be used with the Viewpoint 2 API",
   "main": ["./dist/viewpoint/services.min.js",
            "./dist/viewpoint/question-types.min.js",
-           "./dist/viewpoint/until.min.js"],
+           "./dist/viewpoint/utils.min.js"],
   "keywords": [
     "angular",
     "p97",
