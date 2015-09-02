@@ -89,8 +89,9 @@ gulp.task('vendor', ['clean-vendor'], function() {
 });
 
 gulp.task('viewpoint', function() {
-    gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean())
-    return gulp.src(['src/viewpoint/services/*.js'])
+    gulp.src(DEST+'viewpoint/*.js', {read: false}).pipe(clean());
+    // Process service files.
+    gulp.src(['src/viewpoint/services/*.js'])
    
       // This will output the non-minified version
       .pipe(concat('services.js'))
@@ -102,6 +103,17 @@ gulp.task('viewpoint', function() {
       .pipe(rename({ extname: '.min.js' }))
       .pipe(gulp.dest(DEST + 'viewpoint'));
 
+
+    // Process utils
+    return gulp.src(['src/viewpoint/utils.js'])
+      // This will output the non-minified version
+      .pipe(concatUtil.header('// build timestamp: '+now+'\n'))
+      .pipe(gulp.dest(DEST + 'viewpoint'))
+      
+      // This will minify and rename to foo.min.js
+      .pipe(uglify())
+      .pipe(rename({ extname: '.min.js' }))
+      .pipe(gulp.dest(DEST + 'viewpoint'));
 });
 
 
