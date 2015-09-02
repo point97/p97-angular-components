@@ -1,4 +1,4 @@
-// build timestamp: Fri Aug 21 2015 11:45:12 GMT-0700 (PDT)
+// build timestamp: Wed Sep 02 2015 10:39:34 GMT-0700 (PDT)
 
 angular.module('cache.services', [])
 
@@ -404,6 +404,109 @@ angular.module('dock.services', [])
 
 }])
 
+.service('$qaRecord',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+    var resource = 'dock/qa-record'
+    obj.fetch = function(){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+          orgSlug: orgSlug,
+      };
+      $vpApi.fetch(resource, params, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[choiceList.fetch] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+    };
+
+    obj.fetchById = function(qaId){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+          orgSlug: orgSlug,
+          full:true
+      };
+      $vpApi.fetch(resource+"/"+qaId, params, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[$qaRecord.fetchById] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+    };
+}])
+
+
+
+.service('$combinedSample',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+    var resource = 'dock/combined-sample';
+
+    obj.fetchByQaRecordId = function(qaId){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+        'qarecordId': qaId
+      }
+      $vpApi.fetch(resource, params, function(data, status){
+          if (data.length > 0) {
+            data = data[0];
+          } else {
+            data = null;
+          }
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[$combinedSample.fetchById] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+    };
+}])
+
+
+
+.service('$sample',['$vpApi', '$q', function($vpApi, $q){
+    var obj = this;
+    var resource = 'dock/qa-record'
+    obj.fetch = function(){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+          orgSlug: orgSlug,
+      };
+      $vpApi.fetch(resource, params, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[choiceList.fetch] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+    };
+
+    obj.fetchById = function(qaId){
+      var deferred = $q.defer();
+      var orgSlug = $vpApi.user.profile.orgs[0].slug;
+
+      var params = {
+          orgSlug: orgSlug,
+          full:true
+      };
+      $vpApi.fetch(resource+"/"+qaId, params, function(data, status){
+          deferred.resolve(data, status);
+      }, function(data, status){
+          console.log("[$qaRecord.fetchById] failed", data);
+          deferred.reject(data, status);
+      });
+      return deferred.promise;
+    };
+}])
 
 .service('$dockUser',['$vpApi', '$q', function($vpApi, $q){
     var obj = this;
@@ -460,6 +563,8 @@ angular.module('dock.services', [])
         return defer.promise;
     }
 }])
+
+
 
 
 angular.module('mock-ionic.services', [])
