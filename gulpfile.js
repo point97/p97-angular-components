@@ -103,6 +103,17 @@ gulp.task('viewpoint', function() {
       .pipe(rename({ extname: '.min.js' }))
       .pipe(gulp.dest(DEST + 'viewpoint'));
 
+    // Process Controllers
+    gulp.src(['src/viewpoint/controllers/*.js'])
+      // This will output the non-minified version
+      .pipe(concat('controllers.js'))
+      .pipe(concatUtil.header('// build timestamp: '+now+'\n'))
+      .pipe(gulp.dest(DEST + 'viewpoint'))
+      
+      // This will minify and rename to foo.min.js
+      .pipe(uglify())
+      .pipe(rename({ extname: '.min.js' }))
+      .pipe(gulp.dest(DEST + 'viewpoint'));
 
     // Process utils
     return gulp.src(['src/viewpoint/utils.js'])
