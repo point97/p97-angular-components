@@ -1,3 +1,5 @@
+DEPRACTED NOV 5, 2015
+CONTINUED DEVELOPMENT BY P97 WILL BE BE DONE ON THIS REPO https://bitbucket.org/point97/p97-angular-components
 
 # p97-components
 
